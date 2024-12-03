@@ -1,0 +1,473 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		64EBAF832CFECECE000429A4 /* Atomics in Frameworks */ = {isa = PBXBuildFile; productRef = 64EBAF822CFECECE000429A4 /* Atomics */; };
+		64EBAF862CFECEE4000429A4 /* ColorfulX in Frameworks */ = {isa = PBXBuildFile; productRef = 64EBAF852CFECEE4000429A4 /* ColorfulX */; };
+		64EBAF892CFECEF0000429A4 /* KeyboardShortcuts in Frameworks */ = {isa = PBXBuildFile; productRef = 64EBAF882CFECEF0000429A4 /* KeyboardShortcuts */; };
+		64EBAF8C2CFECEFE000429A4 /* LaunchAtLogin in Frameworks */ = {isa = PBXBuildFile; productRef = 64EBAF8B2CFECEFE000429A4 /* LaunchAtLogin */; };
+		64EBAF8F2CFECF09000429A4 /* Pow in Frameworks */ = {isa = PBXBuildFile; productRef = 64EBAF8E2CFECF09000429A4 /* Pow */; };
+		64EBAF932CFECF26000429A4 /* OrderedCollections in Frameworks */ = {isa = PBXBuildFile; productRef = 64EBAF922CFECF26000429A4 /* OrderedCollections */; };
+		64EBAF952CFECF7E000429A4 /* SkyLight.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 64EBAF942CFECF7E000429A4 /* SkyLight.framework */; };
+		64EBAF962CFECF7E000429A4 /* SkyLight.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 64EBAF942CFECF7E000429A4 /* SkyLight.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+/* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		64EBAF972CFECF7E000429A4 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				64EBAF962CFECF7E000429A4 /* SkyLight.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		64EBAE7F2CFECD56000429A4 /* Peninsula.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Peninsula.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		64EBAF942CFECF7E000429A4 /* SkyLight.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SkyLight.framework; path = ../../../../../System/Library/PrivateFrameworks/SkyLight.framework; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		64EBAE812CFECD56000429A4 /* Peninsula */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = Peninsula;
+			sourceTree = "<group>";
+		};
+/* End PBXFileSystemSynchronizedRootGroup section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		64EBAE7C2CFECD56000429A4 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				64EBAF8F2CFECF09000429A4 /* Pow in Frameworks */,
+				64EBAF832CFECECE000429A4 /* Atomics in Frameworks */,
+				64EBAF932CFECF26000429A4 /* OrderedCollections in Frameworks */,
+				64EBAF862CFECEE4000429A4 /* ColorfulX in Frameworks */,
+				64EBAF8C2CFECEFE000429A4 /* LaunchAtLogin in Frameworks */,
+				64EBAF952CFECF7E000429A4 /* SkyLight.framework in Frameworks */,
+				64EBAF892CFECEF0000429A4 /* KeyboardShortcuts in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		64EBAE762CFECD56000429A4 = {
+			isa = PBXGroup;
+			children = (
+				64EBAE812CFECD56000429A4 /* Peninsula */,
+				64EBAF912CFECF26000429A4 /* Frameworks */,
+				64EBAE802CFECD56000429A4 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		64EBAE802CFECD56000429A4 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				64EBAE7F2CFECD56000429A4 /* Peninsula.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		64EBAF912CFECF26000429A4 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				64EBAF942CFECF7E000429A4 /* SkyLight.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		64EBAE7E2CFECD56000429A4 /* Peninsula */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 64EBAE8E2CFECD57000429A4 /* Build configuration list for PBXNativeTarget "Peninsula" */;
+			buildPhases = (
+				64EBAE7B2CFECD56000429A4 /* Sources */,
+				64EBAE7C2CFECD56000429A4 /* Frameworks */,
+				64EBAE7D2CFECD56000429A4 /* Resources */,
+				64EBAF972CFECF7E000429A4 /* Embed Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				64EBAE812CFECD56000429A4 /* Peninsula */,
+			);
+			name = Peninsula;
+			packageProductDependencies = (
+				64EBAF822CFECECE000429A4 /* Atomics */,
+				64EBAF852CFECEE4000429A4 /* ColorfulX */,
+				64EBAF882CFECEF0000429A4 /* KeyboardShortcuts */,
+				64EBAF8B2CFECEFE000429A4 /* LaunchAtLogin */,
+				64EBAF8E2CFECF09000429A4 /* Pow */,
+				64EBAF922CFECF26000429A4 /* OrderedCollections */,
+			);
+			productName = Peninsula;
+			productReference = 64EBAE7F2CFECD56000429A4 /* Peninsula.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		64EBAE772CFECD56000429A4 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1610;
+				LastUpgradeCheck = 1610;
+				TargetAttributes = {
+					64EBAE7E2CFECD56000429A4 = {
+						CreatedOnToolsVersion = 16.1;
+					};
+				};
+			};
+			buildConfigurationList = 64EBAE7A2CFECD56000429A4 /* Build configuration list for PBXProject "Peninsula" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 64EBAE762CFECD56000429A4;
+			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				64EBAF812CFECECE000429A4 /* XCRemoteSwiftPackageReference "swift-atomics" */,
+				64EBAF842CFECEE4000429A4 /* XCRemoteSwiftPackageReference "ColorfulX" */,
+				64EBAF872CFECEF0000429A4 /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */,
+				64EBAF8A2CFECEFE000429A4 /* XCRemoteSwiftPackageReference "LaunchAtLogin-Modern" */,
+				64EBAF8D2CFECF09000429A4 /* XCRemoteSwiftPackageReference "Pow" */,
+				64EBAF902CFECF19000429A4 /* XCRemoteSwiftPackageReference "swift-collections" */,
+			);
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 64EBAE802CFECD56000429A4 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				64EBAE7E2CFECD56000429A4 /* Peninsula */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		64EBAE7D2CFECD56000429A4 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		64EBAE7B2CFECD56000429A4 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		64EBAE8C2CFECD57000429A4 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		64EBAE8D2CFECD57000429A4 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = wholemodule;
+			};
+			name = Release;
+		};
+		64EBAE8F2CFECD57000429A4 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = Peninsula/Peninsula.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"Peninsula/Preview Content\"";
+				DEVELOPMENT_TEAM = 8TDYAWS6VC;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 0.0;
+				PRODUCT_BUNDLE_IDENTIFIER = Celve.Peninsula;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				SYSTEM_FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SYSTEM_LIBRARY_DIR)/PrivateFrameworks",
+				);
+			};
+			name = Debug;
+		};
+		64EBAE902CFECD57000429A4 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = Peninsula/Peninsula.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"Peninsula/Preview Content\"";
+				DEVELOPMENT_TEAM = 8TDYAWS6VC;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 0.0;
+				PRODUCT_BUNDLE_IDENTIFIER = Celve.Peninsula;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				SYSTEM_FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SYSTEM_LIBRARY_DIR)/PrivateFrameworks",
+				);
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		64EBAE7A2CFECD56000429A4 /* Build configuration list for PBXProject "Peninsula" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				64EBAE8C2CFECD57000429A4 /* Debug */,
+				64EBAE8D2CFECD57000429A4 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		64EBAE8E2CFECD57000429A4 /* Build configuration list for PBXNativeTarget "Peninsula" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				64EBAE8F2CFECD57000429A4 /* Debug */,
+				64EBAE902CFECD57000429A4 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		64EBAF812CFECECE000429A4 /* XCRemoteSwiftPackageReference "swift-atomics" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/apple/swift-atomics.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.2.0;
+			};
+		};
+		64EBAF842CFECEE4000429A4 /* XCRemoteSwiftPackageReference "ColorfulX" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/Lakr233/ColorfulX.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.5.2;
+			};
+		};
+		64EBAF872CFECEF0000429A4 /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/sindresorhus/KeyboardShortcuts";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.2.2;
+			};
+		};
+		64EBAF8A2CFECEFE000429A4 /* XCRemoteSwiftPackageReference "LaunchAtLogin-Modern" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/sindresorhus/LaunchAtLogin-Modern";
+			requirement = {
+				branch = main;
+				kind = branch;
+			};
+		};
+		64EBAF8D2CFECF09000429A4 /* XCRemoteSwiftPackageReference "Pow" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/EmergeTools/Pow";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.0.5;
+			};
+		};
+		64EBAF902CFECF19000429A4 /* XCRemoteSwiftPackageReference "swift-collections" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/apple/swift-collections.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.1.4;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		64EBAF822CFECECE000429A4 /* Atomics */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 64EBAF812CFECECE000429A4 /* XCRemoteSwiftPackageReference "swift-atomics" */;
+			productName = Atomics;
+		};
+		64EBAF852CFECEE4000429A4 /* ColorfulX */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 64EBAF842CFECEE4000429A4 /* XCRemoteSwiftPackageReference "ColorfulX" */;
+			productName = ColorfulX;
+		};
+		64EBAF882CFECEF0000429A4 /* KeyboardShortcuts */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 64EBAF872CFECEF0000429A4 /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */;
+			productName = KeyboardShortcuts;
+		};
+		64EBAF8B2CFECEFE000429A4 /* LaunchAtLogin */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 64EBAF8A2CFECEFE000429A4 /* XCRemoteSwiftPackageReference "LaunchAtLogin-Modern" */;
+			productName = LaunchAtLogin;
+		};
+		64EBAF8E2CFECF09000429A4 /* Pow */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 64EBAF8D2CFECF09000429A4 /* XCRemoteSwiftPackageReference "Pow" */;
+			productName = Pow;
+		};
+		64EBAF922CFECF26000429A4 /* OrderedCollections */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 64EBAF902CFECF19000429A4 /* XCRemoteSwiftPackageReference "swift-collections" */;
+			productName = OrderedCollections;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = 64EBAE772CFECD56000429A4 /* Project object */;
+}
