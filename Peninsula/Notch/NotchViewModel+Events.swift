@@ -79,9 +79,13 @@ extension NotchViewModel {
                 case .backward:
                     windowsCounter -= 1
                 case .off:
-                    notchClose()
-                    windows.inner[windowsPointer].focus()
-                    windowsCounter = 1
+                    if self.isFirst {
+                        self.isFirst = false
+                    } else {
+                        notchClose()
+                        windows.inner[windowsPointer].focus()
+                        windowsCounter = 1
+                    }
                 case .drop:
                     notchClose()
                     windowsCounter = 1

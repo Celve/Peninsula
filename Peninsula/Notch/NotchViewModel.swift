@@ -11,6 +11,7 @@ class NotchViewModel: NSObject, ObservableObject {
     var windowId: Int
     var window: NSWindow
     let inset: CGFloat
+    var isFirst: Bool = true
 
     init(inset: CGFloat = -4, window: NSWindow) {
         self.inset = inset
