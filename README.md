@@ -24,6 +24,8 @@ Replace the default Cmd-Tab with a more useful app switcher. Use `cmd + tab` to 
 
 This part of code mainly comes from [alt-tab-macos](https://github.com/lwouis/alt-tab-macos).
 
+https://github.com/user-attachments/assets/d58ce0d5-c685-44df-9a50-4afe99a710db
+
 ### Switch inside Peninsula
 
 Click the original notch to show Peninsula, and click again to move to next Peninsula window.
@@ -39,6 +41,8 @@ There are totally 5 Peninsula windows currently:
 
 This part of code mainly comes from [NotchDrop](https://github.com/Lakr233/NotchDrop).
 
+https://github.com/user-attachments/assets/876388d9-a1cf-4317-b799-48c8ba5b0c85
+
 ### Notification Center
 
 Add your favorite notification apps to Peninsula.
@@ -49,3 +53,6 @@ When any notification comes, Peninsula will show the app icon in the right hand 
 It will last for 6.18 seconds and then show the total number of notifications. Click the number to open the notification center.
 
 This part of code mainly comes from [Doll](https://github.com/xiaogdgenuine/Doll).
+
+https://github.com/user-attachments/assets/37d7d89c-57ad-49b9-a8cf-8bedd3971458
+
