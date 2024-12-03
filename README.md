@@ -2,6 +2,15 @@
 
 A macOS notch app that helps you manage your Mac.
 
+## Installation
+
+1. Go to [Releases](https://github.com/Celve/Peninsula/releases) to download the latest version (the zip).
+2. Unzip the file and run the Peninsula.app.
+3. Trust the app in Privacy & Security in System Settings.
+4. Grant access to Accessibility.
+
+Accessibility is required for Peninsula to get the app list and show the notification count. You can also build the app yourself with this GitHub repo.
+
 ## Features
 
 ### Cmd-Tab
