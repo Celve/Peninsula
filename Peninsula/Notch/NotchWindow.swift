@@ -21,7 +21,7 @@ class NotchWindow: NSWindow {
             defer: flag
         )
 
-        title = "Test"
+        title = "Peninsula"
         isOpaque = false
         alphaValue = 1
         titleVisibility = .hidden
@@ -34,12 +34,12 @@ class NotchWindow: NSWindow {
             .canJoinAllSpaces,
             .ignoresCycle,
         ]
-        level = .statusBar // kills ibar lol
+        level = .statusBar  // kills ibar lol
         hasShadow = false
         makeKey()
         makeKeyAndOrderFront(nil)
     }
-    
+
     override var canBecomeKey: Bool {
         true
     }

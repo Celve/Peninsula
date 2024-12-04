@@ -28,7 +28,7 @@ class Applications: ObservableObject {
         let runningApplications = NSWorkspace.shared.runningApplications
         runningApplications.forEach {
             if !$0.processIdentifier.isZombie() && isNotXpc($0) {
-                if let name = $0.localizedName, name != "Island" {
+                if let name = $0.localizedName, name != "Peninsula" {
                     inner.append(Application(runningApplication: $0))
                 }
             }
