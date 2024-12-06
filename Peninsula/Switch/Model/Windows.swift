@@ -9,6 +9,11 @@ class Windows: ObservableObject {
     @MainActor
     func addWindow(application: Application, axWindow: AxWindow) {
         let window = Window(application: application, axWindow: axWindow, globalOrder: Int32(inner.count))
+        for innerWindow in inner {
+            if innerWindow.axWindow == axWindow {
+                return 
+            }
+        }
         inner.append(window)
         application.windows.append(window)
         sort()
