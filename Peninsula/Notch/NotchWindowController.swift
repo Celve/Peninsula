@@ -8,6 +8,7 @@
 import Cocoa
 
 private let notchHeight: CGFloat = 800
+private let notchWidth: CGFloat = 150
 
 class NotchWindowController: NSWindowController {
     var vm: NotchViewModel?
@@ -26,7 +27,7 @@ class NotchWindowController: NSWindowController {
         contentViewController = NotchViewController(vm)
 
         if notchSize == .zero {
-            notchSize = .init(width: 150, height: 24)
+            notchSize = .init(width: notchWidth, height: 24)
         }
         vm.deviceNotchRect = CGRect(
             x: screen.frame.origin.x + (screen.frame.width - notchSize.width) / 2,
@@ -63,8 +64,10 @@ class NotchWindowController: NSWindowController {
             width: screen.frame.width,
             height: notchHeight
         )
-        window.setFrameOrigin(topRect.origin)
+        
+        // set content size first, otherwise whether it expands from top-right or from bottom-left is inconsistent between macOS major versions
         window.setContentSize(topRect.size)
+        window.setFrameOrigin(topRect.origin)
     }
 
     deinit {
