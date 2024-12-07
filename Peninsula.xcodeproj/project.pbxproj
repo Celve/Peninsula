@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		64D8065E2D04E23400745580 /* Sparkle in Frameworks */ = {isa = PBXBuildFile; productRef = 64D8065D2D04E23400745580 /* Sparkle */; };
 		64EBAF832CFECECE000429A4 /* Atomics in Frameworks */ = {isa = PBXBuildFile; productRef = 64EBAF822CFECECE000429A4 /* Atomics */; };
 		64EBAF862CFECEE4000429A4 /* ColorfulX in Frameworks */ = {isa = PBXBuildFile; productRef = 64EBAF852CFECEE4000429A4 /* ColorfulX */; };
 		64EBAF892CFECEF0000429A4 /* KeyboardShortcuts in Frameworks */ = {isa = PBXBuildFile; productRef = 64EBAF882CFECEF0000429A4 /* KeyboardShortcuts */; };
@@ -50,6 +51,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				64EBAF8F2CFECF09000429A4 /* Pow in Frameworks */,
+				64D8065E2D04E23400745580 /* Sparkle in Frameworks */,
 				64EBAF832CFECECE000429A4 /* Atomics in Frameworks */,
 				64EBAF932CFECF26000429A4 /* OrderedCollections in Frameworks */,
 				64EBAF862CFECEE4000429A4 /* ColorfulX in Frameworks */,
@@ -114,6 +116,7 @@
 				64EBAF8B2CFECEFE000429A4 /* LaunchAtLogin */,
 				64EBAF8E2CFECF09000429A4 /* Pow */,
 				64EBAF922CFECF26000429A4 /* OrderedCollections */,
+				64D8065D2D04E23400745580 /* Sparkle */,
 			);
 			productName = Peninsula;
 			productReference = 64EBAE7F2CFECD56000429A4 /* Peninsula.app */;
@@ -150,6 +153,7 @@
 				64EBAF8A2CFECEFE000429A4 /* XCRemoteSwiftPackageReference "LaunchAtLogin-Modern" */,
 				64EBAF8D2CFECF09000429A4 /* XCRemoteSwiftPackageReference "Pow" */,
 				64EBAF902CFECF19000429A4 /* XCRemoteSwiftPackageReference "swift-collections" */,
+				64D8065C2D04E23400745580 /* XCRemoteSwiftPackageReference "Sparkle" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 64EBAE802CFECD56000429A4 /* Products */;
@@ -388,6 +392,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		64D8065C2D04E23400745580 /* XCRemoteSwiftPackageReference "Sparkle" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/sparkle-project/Sparkle";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.6.4;
+			};
+		};
 		64EBAF812CFECECE000429A4 /* XCRemoteSwiftPackageReference "swift-atomics" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/apple/swift-atomics.git";
@@ -439,6 +451,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		64D8065D2D04E23400745580 /* Sparkle */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 64D8065C2D04E23400745580 /* XCRemoteSwiftPackageReference "Sparkle" */;
+			productName = Sparkle;
+		};
 		64EBAF822CFECECE000429A4 /* Atomics */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 64EBAF812CFECECE000429A4 /* XCRemoteSwiftPackageReference "swift-atomics" */;
