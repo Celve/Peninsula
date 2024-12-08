@@ -28,6 +28,15 @@ struct SwitchContentView: View {
                 .frame(width: nvm.notchOpenedSize.width - nvm.spacing * 2, height: SwitchContentView.HEIGHT, alignment: .leading)
                 .background(RoundedRectangle(cornerRadius: 16).fill(index == nvm.windowsPointer ? Color.white : Color.clear).frame(maxWidth: .infinity))
                 .id(index)
+                .onHover { hover in
+                    if nvm.isFirstHover {
+                        nvm.isFirstHover = false
+                    }
+                    else if hover != false {
+                        nvm.windowsCounter = index
+                    }
+                }
+
             }
             .animation(nvm.normalAnimation, value: nvm.windowsCounter)
             .transition(.blurReplace)

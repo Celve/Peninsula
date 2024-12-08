@@ -73,6 +73,7 @@ extension NotchViewModel {
                 switch input {
                 case .on:
                     windowsCounter = 1
+                    isFirstHover = true
                     notchOpen(.switching)
                 case .forward:
                     windowsCounter += 1
