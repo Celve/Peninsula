@@ -5,9 +5,10 @@
 //  Created by 曹丁杰 on 2024/7/29.
 //
 
-import LaunchAtLogin
-import SwiftUI
 import KeyboardShortcuts
+import LaunchAtLogin
+import Sparkle
+import SwiftUI
 
 struct SettingsView: View {
     @StateObject var vm: NotchViewModel
@@ -22,19 +23,22 @@ struct SettingsView: View {
                     }
                 }
                 .pickerStyle(MenuPickerStyle())
-                .frame(width: vm.selectedLanguage == .simplifiedChinese || vm.selectedLanguage == .traditionalChinese ? 220 : 160)
-                
+                .frame(
+                    width: vm.selectedLanguage == .simplifiedChinese
+                        || vm.selectedLanguage == .traditionalChinese ? 220 : 160)
+
                 Spacer()
                 LaunchAtLogin.Toggle {
                     Text(NSLocalizedString("Launch at Login", comment: ""))
                 }
-                
+
                 Spacer()
                 Toggle("Haptic Feedback ", isOn: $vm.hapticFeedback)
-                
+                Spacer()
+                Button("Check for Updates…", action: vm.updater.checkForUpdates)
                 Spacer()
             }
-            
+
             HStack {
                 Text("File Storage Time: ")
                 Picker(String(), selection: $tvm.selectedFileStorageTime) {
@@ -62,7 +66,7 @@ struct SettingsView: View {
             .padding()
         }
         .animation(vm.normalAnimation, value: vm.contentType)
-        .animation(vm.status == .opened ? vm.innerOnAnimation : vm.innerOffAnimation, value: vm.status)
+        .animation(
+            vm.status == .opened ? vm.innerOnAnimation : vm.innerOffAnimation, value: vm.status)
     }
 }
-

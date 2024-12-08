@@ -8,6 +8,7 @@
 import AppKit
 import Cocoa
 import LaunchAtLogin
+import Sparkle
 
 class AppDelegate: NSObject, NSApplicationDelegate {
     var isFirstOpen = true
@@ -15,7 +16,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     //    var mainWindowController: NotchWindowController?
     var windowControllers: [NotchWindowController] = []
     var counter = 0
-
+    private let updaterController: SPUStandardUpdaterController = SPUStandardUpdaterController(startingUpdater: true, updaterDelegate: nil, userDriverDelegate: nil)
     var timer: Timer?
 
     func applicationDidFinishLaunching(_: Notification) {
@@ -61,7 +62,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         windowControllers = []
         let screens = NSScreen.screens
         for screen in screens {
-            let windowController = NotchWindowController.init(screen: screen, app: app)
+            let windowController = NotchWindowController.init(screen: screen, app: app, updater: updaterController.updater)
             if isFirstOpen, !isLaunchedAtLogin {
                 windowController.openAfterCreate = true
             }

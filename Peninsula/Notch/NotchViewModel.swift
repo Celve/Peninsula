@@ -3,6 +3,7 @@ import Combine
 import Foundation
 import LaunchAtLogin
 import SwiftUI
+import Sparkle
 
 class NotchViewModel: NSObject, ObservableObject {
     @ObservedObject var nm = NotificationModel.shared
@@ -12,11 +13,14 @@ class NotchViewModel: NSObject, ObservableObject {
     var window: NSWindow
     let inset: CGFloat
     var isFirst: Bool = true
+    let updater: SPUUpdater
 
-    init(inset: CGFloat = -4, window: NSWindow) {
+
+    init(inset: CGFloat = -4, window: NSWindow, updater: SPUUpdater) {
         self.inset = inset
         self.window = window
         self.windowId = window.windowNumber
+        self.updater = updater
         super.init()
         setupCancellables()
     }

@@ -6,6 +6,7 @@
 //
 
 import Cocoa
+import Sparkle
 
 private let notchHeight: CGFloat = 800
 private let notchWidth: CGFloat = 150
@@ -16,13 +17,13 @@ class NotchWindowController: NSWindowController {
 
     var openAfterCreate: Bool = false
 
-    init(window: NSWindow, screen: NSScreen) {
+    init(window: NSWindow, screen: NSScreen, updater: SPUUpdater) {
         self.screen = screen
 
         super.init(window: window)
         var notchSize = screen.notchSize
 
-        let vm = NotchViewModel(inset: -4, window: window)
+        let vm = NotchViewModel(inset: -4, window: window, updater: updater)
         self.vm = vm
         contentViewController = NotchViewController(vm)
 
@@ -48,7 +49,7 @@ class NotchWindowController: NSWindowController {
     @available(*, unavailable)
     required init?(coder _: NSCoder) { fatalError() }
 
-    convenience init(screen: NSScreen, app: NSRunningApplication) {
+    convenience init(screen: NSScreen, app: NSRunningApplication, updater: SPUUpdater) {
         let window = NotchWindow(
             contentRect: screen.frame,
             styleMask: [.borderless, .fullSizeContentView],
@@ -56,7 +57,7 @@ class NotchWindowController: NSWindowController {
             defer: false,
             screen: screen
         )
-        self.init(window: window, screen: screen)
+        self.init(window: window, screen: screen, updater: updater)
 
         let topRect = CGRect(
             x: screen.frame.origin.x,
