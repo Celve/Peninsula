@@ -1,9 +1,9 @@
-import Foundation
-import Combine
-import SwiftUI
-import Cocoa
-import Carbon.HIToolbox
 import AppKit
+import Carbon.HIToolbox
+import Cocoa
+import Combine
+import Foundation
+import SwiftUI
 
 enum HotKeyEvent {
     case on
@@ -23,7 +23,7 @@ class HotKeyObserver {
     var eventTap: CFMachPort?
     var hotKeyToggle: CurrentValueSubject<HotKeyEvent, Never>
     var state: Bool = false
-    
+
     init(hotKeyToggle: CurrentValueSubject<HotKeyEvent, Never>) {
         self.hotKeyToggle = hotKeyToggle
     }
@@ -31,7 +31,7 @@ class HotKeyObserver {
     func start() {
         // Use an unmanaged pointer to pass the CurrentValueSubject instance
         let selfPointer = Unmanaged.passUnretained(self).toOpaque()
-        
+
         // Remove source if exists
         if let eventTap = eventTap {
             let runLoopSource = CFMachPortCreateRunLoopSource(kCFAllocatorDefault, eventTap, 0)
@@ -40,44 +40,51 @@ class HotKeyObserver {
             self.eventTap = nil
         }
 
-        let eventMask = (1 << CGEventType.keyDown.rawValue) | (1 << CGEventType.keyUp.rawValue) | (1 << CGEventType.flagsChanged.rawValue)
-        eventTap = CGEvent.tapCreate(tap: .cgSessionEventTap, place: .headInsertEventTap, options: .defaultTap, eventsOfInterest: CGEventMask(eventMask), callback: { (proxy, type, event, refcon) -> Unmanaged<CGEvent>? in
-            
-            // Retrieve the CurrentValueSubject instance from the unmanaged pointer
-            let this = Unmanaged<HotKeyObserver>.fromOpaque(refcon!).takeUnretainedValue()
+        let eventMask =
+            (1 << CGEventType.keyDown.rawValue) | (1 << CGEventType.keyUp.rawValue)
+            | (1 << CGEventType.flagsChanged.rawValue)
+        eventTap = CGEvent.tapCreate(
+            tap: .cgSessionEventTap, place: .headInsertEventTap, options: .defaultTap,
+            eventsOfInterest: CGEventMask(eventMask),
+            callback: { (proxy, type, event, refcon) -> Unmanaged<CGEvent>? in
 
-            if type == .keyDown {
-                let keyCode = event.getIntegerValueField(.keyboardEventKeycode)
-                let flags = event.flags
-                if keyCode == Key.tab.rawValue && flags.contains(.maskCommand) {
-                    if !this.state {
-                        this.state = true
-                        this.hotKeyToggle.send(.on)
-                    } else {
-                        this.hotKeyToggle.send(.forward)
+                // Retrieve the CurrentValueSubject instance from the unmanaged pointer
+                let this = Unmanaged<HotKeyObserver>.fromOpaque(refcon!).takeUnretainedValue()
+
+                if type == .keyDown {
+                    let keyCode = event.getIntegerValueField(.keyboardEventKeycode)
+                    let flags = event.flags
+                    if keyCode == Key.tab.rawValue && flags.contains(.maskCommand) {
+                        if !this.state {
+                            this.state = true
+                            this.hotKeyToggle.send(.on)
+                        } else {
+                            this.hotKeyToggle.send(.forward)
+                        }
+                        return nil
+                    } else if keyCode == Key.escape.rawValue && flags.contains(.maskCommand)
+                        && this.state
+                    {
+                        this.state = false
+                        this.hotKeyToggle.send(.drop)
+                        return nil
                     }
-                    return nil
-                } else if keyCode == Key.escape.rawValue && flags.contains(.maskCommand) {
-                    this.state = false
-                    this.hotKeyToggle.send(.drop)
-                    return nil
                 }
-            }
-            
-            if type == .flagsChanged && this.state == true {
-                let flags = event.flags
-                if !flags.contains(.maskCommand) {
-                    this.state = false
-                    this.hotKeyToggle.send(.off)
-                    return nil
+
+                if type == .flagsChanged && this.state == true {
+                    let flags = event.flags
+                    if !flags.contains(.maskCommand) {
+                        this.state = false
+                        this.hotKeyToggle.send(.off)
+                        return nil
+                    }
+                    if flags.contains(.maskShift) {
+                        this.hotKeyToggle.send(.backward)
+                        return nil
+                    }
                 }
-                if flags.contains(.maskShift) {
-                    this.hotKeyToggle.send(.backward)
-                    return nil
-                }
-            }
-            return Unmanaged.passRetained(event)
-        }, userInfo: selfPointer)
+                return Unmanaged.passRetained(event)
+            }, userInfo: selfPointer)
 
         if let eventTap = eventTap {
             let runLoopSource = CFMachPortCreateRunLoopSource(kCFAllocatorDefault, eventTap, 0)
@@ -88,4 +95,3 @@ class HotKeyObserver {
         }
     }
 }
-
