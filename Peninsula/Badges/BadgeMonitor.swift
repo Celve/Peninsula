@@ -33,14 +33,14 @@ class BadgeMonitor {
         timer?.fire()
     }
 
-    func observe(appName: String, onUpdate: @escaping (String?) -> Void) {
-        let app = ObservedApp(appName: appName, onBadgeUpdate: onUpdate)
-        observedApps[appName] = app
+    func observe(bundleId: String, onUpdate: @escaping (String?) -> Void) {
+        let app = ObservedApp(bundleId: bundleId, onBadgeUpdate: onUpdate)
+        observedApps[bundleId] = app
         app.tryUpdateElement()
     }
     
-    public func open(appName: String) {
-        if let cachedTargetAppElement = observedApps[appName]?.appElement {
+    public func open(bundleId: String) {
+        if let cachedTargetAppElement = observedApps[bundleId]?.appElement {
             AXUIElementPerformAction(cachedTargetAppElement, kAXPressAction as CFString)
         }
     }
@@ -121,14 +121,14 @@ class BadgeMonitor {
 }
 
 class ObservedApp {
-    let appName: String
+    let bundleId: String
     var appElement: AXUIElement?
     let onBadgeUpdate: (String?) -> Void
 
     init(
-        appName: String, appElement: AXUIElement? = nil, onBadgeUpdate: @escaping (String?) -> Void
+        bundleId: String, appElement: AXUIElement? = nil, onBadgeUpdate: @escaping (String?) -> Void
     ) {
-        self.appName = appName
+        self.bundleId = bundleId
         self.appElement = appElement
         self.onBadgeUpdate = onBadgeUpdate
         if self.appElement == nil {
@@ -138,7 +138,7 @@ class ObservedApp {
 
     func updateBadge() {
         guard let appElement = self.appElement else { return }
-
+        
         var statusLabel: AnyObject?
         AXUIElementCopyAttributeValue(appElement, "AXStatusLabel" as CFString, &statusLabel)
 
@@ -146,6 +146,17 @@ class ObservedApp {
     }
 
     func tryUpdateElement() {
+        // the AXTitle is equivalent to localizedName in NSRunningApp, so we have to retrieve from there
+        
+        var localizedName: String? = nil
+        for app in Applications.shared.inner {
+            if app.bundleId == self.bundleId {
+                localizedName = app.name
+            }
+        }
+        
+        guard let appName = localizedName else { return }
+        
         guard
             let dockProcessId = NSRunningApplication.runningApplications(
                 withBundleIdentifier: "com.apple.dock"
@@ -165,33 +176,6 @@ class ObservedApp {
 
             AXUIElementCopyAttributeValue(child, kAXTitleAttribute as CFString, &title)
             if let titleStr = title as? String, titleStr == appName {
-                self.appElement = child
-            }
-        }
-    }
-
-    private func tryGetAppElement() {
-        guard
-            let dockProcessId = NSRunningApplication.runningApplications(
-                withBundleIdentifier: "com.apple.dock"
-            ).last?.processIdentifier
-        else {
-            return
-        }
-
-        let dock = AXUIElementCreateApplication(dockProcessId)
-        guard let dockChildren = getSubElements(root: dock) else {
-            return
-        }
-
-        // Get badge text by lookup dock elements
-        for child in dockChildren {
-            var title: AnyObject?
-
-            AXUIElementCopyAttributeValue(child, kAXTitleAttribute as CFString, &title)
-            if let titleStr = title as? String,
-                titleStr == appName
-            {
                 self.appElement = child
             }
         }

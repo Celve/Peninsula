@@ -31,8 +31,7 @@ struct NotificationMenubarView: View {
                         else {
                             return
                         }
-                        nm.observe(
-                            name: appName, bundleId: appBundle.bundleIdentifier ?? "")
+                        nm.observe(bundleId: appBundle.bundleIdentifier ?? "")
                     } else {
                         vm.isExternal = false
                     }

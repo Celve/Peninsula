@@ -51,20 +51,18 @@ enum NotificationBadge: Equatable {
 }
 
 class NotificationItem: Equatable {
-    var name: String
     var bundleId: String
     var badge: NotificationInfo
     var icon: NSImage
 
-    init(name: String, bundleId: String, badge: NotificationInfo, icon: NSImage) {
-        self.name = name
+    init(bundleId: String, badge: NotificationInfo, icon: NSImage) {
         self.bundleId = bundleId
         self.badge = badge
         self.icon = icon
     }
 
     static func == (lhs: NotificationItem, rhs: NotificationItem) -> Bool {
-        return lhs.name == rhs.name && lhs.bundleId == rhs.bundleId
+        return lhs.bundleId == rhs.bundleId
     }
 }
 
@@ -87,22 +85,13 @@ class NotificationModel: ObservableObject {
     init() {
         let monitoredAppIds = UserDefaults.standard.stringArray(forKey: "monitoredAppIds") ?? []
         for bundleId in monitoredAppIds {
-            var appName = bundleId
-            if let appFullPath = NSWorkspace.shared.urlForApplication(
-                withBundleIdentifier: bundleId)?.absoluteURL.path,
-                let targetBundle = Bundle(path: appFullPath),
-                let name = targetBundle.object(forInfoDictionaryKey: kCFBundleNameKey as String)
-                    as? String
-            {
-                appName = name
-            }
-            self.observe(name: appName, bundleId: bundleId)
+            self.observe(bundleId: bundleId)
         }
     }
 
-    private func updateBadge(name: String, text: String?) {
+    private func updateBadge(bundleId: String, text: String?) {
         let badge = NotificationInfo.fromString(str: text)
-        guard let item = self.items[name] else { return }
+        guard let item = self.items[bundleId] else { return }
 
         if item.badge == badge {
             return
@@ -119,7 +108,7 @@ class NotificationModel: ObservableObject {
                 if !self.occupied {
                     self.displayedBadge = .icon(item.icon)
                     self.displayedNum = self.total
-                    self.displayedName = name
+                    self.displayedName = bundleId
                     
                     let version = self.version
                     self.displayedVersion = version
@@ -151,9 +140,9 @@ class NotificationModel: ObservableObject {
         }
     }
     
-    func open(name: String) {
+    func open(bundleId: String) {
         for app in self.apps.inner {
-            if app.name == name {
+            if app.bundleId == bundleId {
                 if let window = app.focusedWindow {
                     window.focus()
                     return
@@ -163,11 +152,11 @@ class NotificationModel: ObservableObject {
                 }
             }
         }
-        self.monitor.open(appName: name)
+        self.monitor.open(bundleId: bundleId)
     }
 
-    func observe(name: String, bundleId: String) {
-        if self.items.keys.contains(name) {
+    func observe(bundleId: String) {
+        if self.items.keys.contains(bundleId) {
             return
         }
 
@@ -194,17 +183,17 @@ class NotificationModel: ObservableObject {
         } else {
             icon = NSImage(systemSymbolName: "app.badge", accessibilityDescription: nil)!
         }
-        self.items[name] = NotificationItem(
-            name: name, bundleId: bundleId, badge: NotificationInfo.null, icon: icon)
+        self.items[bundleId] = NotificationItem(
+            bundleId: bundleId, badge: NotificationInfo.null, icon: icon)
         monitor.observe(
-            appName: name,
+            bundleId: bundleId,
             onUpdate: { text in
-                self.updateBadge(name: name, text: text)
+                self.updateBadge(bundleId: bundleId, text: text)
             })
     }
 
-    func unobserve(name: String) {
-        if let item = self.items.removeValue(forKey: name),
+    func unobserve(bundleId: String) {
+        if let item = self.items.removeValue(forKey: bundleId),
             let monitoredAppIds = UserDefaults.standard.stringArray(forKey: "monitoredAppIds")
         {
             let bundleId = item.bundleId

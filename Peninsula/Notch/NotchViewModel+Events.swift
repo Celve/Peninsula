@@ -45,7 +45,7 @@ extension NotchViewModel {
                         if true {
                             if abstractRect.insetBy(dx: inset, dy: inset).contains(mouseLocation) {
                                 if nm.displayedName != "" {
-                                    nm.open(name: nm.displayedName)
+                                    nm.open(bundleId: nm.displayedName)
                                 } else {
                                     notchOpen(.notification)
                                 }
