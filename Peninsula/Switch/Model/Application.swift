@@ -13,6 +13,7 @@ class Application {
     var isHidden: Bool = false
     var label: String? = nil
     var name: String? = nil
+    var bundleId: String? = nil
     
     static let notifications = [
         kAXApplicationActivatedNotification,
@@ -28,6 +29,7 @@ class Application {
         self.runningApplication = runningApplication
         self.icon = runningApplication.icon
         self.name = runningApplication.localizedName
+        self.bundleId = runningApplication.bundleIdentifier
         self.addObserver()
         manuallyUpdateWindows()
     }

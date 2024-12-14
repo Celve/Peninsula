@@ -16,14 +16,14 @@ struct NotificationContentView: View {
     var body: some View {
         HStack(alignment: .top, spacing: nvm.spacing) {
             ForEach(Array(nm.items.keys), id: \.self) { key in
-                AppIcon(name: key, image: nm.items[key]!.icon, vm: nvm)
+                AppIcon(bundleId: key, image: nm.items[key]!.icon, vm: nvm)
             }
         }.animation(nvm.normalAnimation, value: nm.items)
     }
 }
 
 private struct AppIcon: View {
-    let name: String
+    let bundleId: String
     let image: NSImage
     @ObservedObject var nm = NotificationModel.shared
     @StateObject var vm: NotchViewModel
@@ -57,7 +57,7 @@ private struct AppIcon: View {
                 )
                 .overlay(
                     ZStack {
-                        if let badge = nm.items.filter({ $0.value.name == name }).first?.value.badge
+                        if let badge = nm.items.filter({ $0.value.bundleId == bundleId }).first?.value.badge
                         {
                             switch badge {
                             case .count(let count):
@@ -98,10 +98,10 @@ private struct AppIcon: View {
                 }
                 .onTapGesture {
                     if vm.mode == .delete {
-                        nm.unobserve(name: name)
+                        nm.unobserve(bundleId: bundleId)
                     } else {
                         vm.notchClose()
-                        nm.open(name: name)
+                        nm.open(bundleId: bundleId)
                     }
                 }
                 .onChange(of: vm.mode) { newMode in
