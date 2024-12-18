@@ -14,6 +14,7 @@ enum HotKeyEvent {
 }
 
 class HotKeyObserver {
+    static let shared = HotKeyObserver()
     let signature = "peninsula".utf16.reduce(0) { ($0 << 8) + OSType($1) }
     let shortcutEventTarget = GetEventDispatcherTarget()
     var hotKeyPressedEventHandler: EventHandlerRef?
@@ -21,12 +22,8 @@ class HotKeyObserver {
     var shortcutsReference: EventHotKeyRef?
     var localMonitor: Any!
     var eventTap: CFMachPort?
-    var hotKeyToggle: CurrentValueSubject<HotKeyEvent, Never>
+    let hotKeyToggle: CurrentValueSubject<HotKeyEvent, Never> = .init(.off)
     var state: Bool = false
-
-    init(hotKeyToggle: CurrentValueSubject<HotKeyEvent, Never>) {
-        self.hotKeyToggle = hotKeyToggle
-    }
 
     func start() {
         // Use an unmanaged pointer to pass the CurrentValueSubject instance

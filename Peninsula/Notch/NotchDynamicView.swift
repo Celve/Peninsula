@@ -12,6 +12,7 @@ import UniformTypeIdentifiers
 
 struct NotchDynamicView: View {
     @StateObject var vm: NotchViewModel
+    @StateObject var notchModel = NotchModel.shared
     @StateObject var nm = NotificationModel.shared
     
     var body: some View {
@@ -42,6 +43,7 @@ struct NotchDynamicView: View {
             .animation(vm.status == .opened ? vm.outerOnAnimation : vm.status == .closed ? vm.outerOffAnimation : vm.normalAnimation, value: vm.status)
             .animation(vm.outerOnAnimation, value: vm.contentType)
             .animation(vm.normalAnimation, value: vm.abstractSize)
+            .animation(vm.outerOnAnimation, value: vm.notchOpenedSize)
     }
     
     var notchBackgroundMaskGroup: some View {

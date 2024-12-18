@@ -12,8 +12,8 @@ import LaunchAtLogin
 class AppDelegate: NSObject, NSApplicationDelegate {
     var isFirstOpen = true
     var isLaunchedAtLogin = false
-    //    var mainWindowController: NotchWindowController?
     var windowControllers: [NotchWindowController] = []
+    let notchViewModels: NotchViewModels = NotchViewModels.shared
     var counter = 0
 
     var timer: Timer?
@@ -58,7 +58,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         for windowController in windowControllers {
             windowController.destroy()
         }
-        windowControllers = []
+        windowControllers.removeAll()
+        notchViewModels.inner.removeAll()
         let screens = NSScreen.screens
         for screen in screens {
             let windowController = NotchWindowController.init(screen: screen, app: app)
@@ -66,18 +67,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                 windowController.openAfterCreate = true
             }
             windowControllers.append(windowController)
+            notchViewModels.inner.append(windowController.vm)
         }
-        EventMonitors.shared.hotKeyEvent.start()
-
-        //        if let mainWindowController {
-        //            mainWindowController.destroy()
-        //        }
-        //        mainWindowController = nil
-        //        guard let mainScreen = findScreenFitsOurNeeds() else { return }
-        //        mainWindowController = .init(screen: mainScreen)
-        //        if isFirstOpen, !isLaunchedAtLogin {
-        //            mainWindowController?.openAfterCreate = true
-        //        }
+        HotKeyObserver.shared.start()
     }
 
     func determineIfProcessIdentifierMatches() {
@@ -95,8 +87,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     func makeKeyAndVisibleIfNeeded() {
         for windowController in windowControllers {
             guard let window = windowController.window,
-                let vm = windowController.vm,
-                vm.status == .opened
+                  windowController.vm.status == .opened
             else { return }
             window.makeKeyAndOrderFront(nil)
         }
@@ -104,8 +95,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     func applicationShouldHandleReopen(_: NSApplication, hasVisibleWindows _: Bool) -> Bool {
         for windowController in windowControllers {
-            guard let vm = windowController.vm
-            else { return true }
+            let vm = windowController.vm
             vm.notchOpen(.tray)
         }
         return true

@@ -49,7 +49,7 @@ struct NotchContainerView: View {
             case .settings:
                 SettingsView(vm: vm).transition(.blurReplace)
             case .switching:
-                SwitchContentView(nvm: vm).transition(.blurReplace)
+                SwitchContentView(notchViewModel: vm).transition(.blurReplace)
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)

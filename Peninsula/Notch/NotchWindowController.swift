@@ -11,19 +11,18 @@ private let notchHeight: CGFloat = 800
 private let notchWidth: CGFloat = 150
 
 class NotchWindowController: NSWindowController {
-    var vm: NotchViewModel?
+    var vm: NotchViewModel
     weak var screen: NSScreen?
 
     var openAfterCreate: Bool = false
 
     init(window: NSWindow, screen: NSScreen) {
+        let vm = NotchViewModel(inset: -4, window: window)
+        self.vm = vm
         self.screen = screen
-
         super.init(window: window)
         var notchSize = screen.notchSize
 
-        let vm = NotchViewModel(inset: -4, window: window)
-        self.vm = vm
         contentViewController = NotchViewController(vm)
 
         if notchSize == .zero {
@@ -75,8 +74,7 @@ class NotchWindowController: NSWindowController {
     }
 
     func destroy() {
-        vm?.destroy()
-        vm = nil
+        vm.destroy()
         window?.close()
         contentViewController = nil
         window = nil

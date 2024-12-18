@@ -61,7 +61,6 @@ TrayDrop.shared.cleanExpiredFiles()
 
 _ = NotificationModel.shared
 
-
 private let delegate = AppDelegate()
 NSApplication.shared.delegate = delegate
 _ = AXIsProcessTrustedWithOptions(

@@ -44,12 +44,14 @@ extension NotchViewModel {
                         // touch inside, open
                         if true {
                             if abstractRect.insetBy(dx: inset, dy: inset).contains(mouseLocation) {
-                                if nm.displayedName != "" {
-                                    nm.open(bundleId: nm.displayedName)
+                                if notifModel.displayedName != "" {
+                                    notifModel.open(bundleId: notifModel.displayedName)
                                 } else {
                                     notchOpen(.notification)
                                 }
-                            } else if notchRect.insetBy(dx: inset, dy: inset).contains(mouseLocation) {
+                            } else if notchRect.insetBy(dx: inset, dy: inset).contains(
+                                mouseLocation)
+                            {
                                 notchOpen(.apps)
                             }
                         }
@@ -65,36 +67,7 @@ extension NotchViewModel {
                 optionKeyPressed = input
             }
             .store(in: &cancellables)
-        
-        events.hotKeyToggle
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] input in
-                guard let self else { return }
-                switch input {
-                case .on:
-                    windowsCounter = 1
-                    notchOpen(.switching)
-                case .forward:
-                    windowsCounter += 1
-                case .backward:
-                    windowsCounter -= 1
-                case .off:
-                    if self.isFirst {
-                        self.isFirst = false
-                    } else {
-                        notchClose()
-                        if windowsPointer < windows.inner.count {
-                            windows.inner[windowsPointer].focus()
-                        }
-                        windowsCounter = 1
-                    }
-                case .drop:
-                    notchClose()
-                    windowsCounter = 1
-                }
-            }
-            .store(in: &cancellables)
-        
+
         events.mouseLocation
             .receive(on: DispatchQueue.main)
             .sink { [weak self] mouseLocation in

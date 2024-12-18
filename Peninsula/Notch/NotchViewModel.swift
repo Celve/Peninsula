@@ -5,8 +5,9 @@ import LaunchAtLogin
 import SwiftUI
 
 class NotchViewModel: NSObject, ObservableObject {
-    @ObservedObject var nm = NotificationModel.shared
+    @ObservedObject var notifModel = NotificationModel.shared
     @ObservedObject var windows = Windows.shared
+    @ObservedObject var notchModel = NotchModel.shared
     var cancellables: Set<AnyCancellable> = []
     var windowId: Int
     var window: NSWindow
@@ -37,7 +38,7 @@ class NotchViewModel: NSObject, ObservableObject {
         case .switching:
             .init(
                 width: 600,
-                height: CGFloat((windowsEnd - windowsBegin)) * SwitchContentView.HEIGHT
+                height: CGFloat((notchModel.globalWindowsEnd - notchModel.globalWindowsBegin)) * SwitchContentView.HEIGHT
                     + deviceNotchRect.height + spacing * CGFloat(3))
         default:
             .init(width: 600, height: 200 + 1)
@@ -102,7 +103,7 @@ class NotchViewModel: NSObject, ObservableObject {
         if status == .opened {
             0
         } else {
-            switch nm.displayedBadge {
+            switch notifModel.displayedBadge {
             case .icon(_):
                 deviceNotchRect.height + deviceNotchRect.height / 4
             case .num(_):
@@ -189,21 +190,6 @@ class NotchViewModel: NSObject, ObservableObject {
     @Published var optionKeyPressed: Bool = false
     @Published var notchVisible: Bool = true
     @Published var mode: Mode = .normal
-    @Published var windowsCounter = 0
-
-    var windowsPointer: Int {
-        if windows.inner.count == 0 {
-            0
-        } else {
-            (windowsCounter % windows.inner.count + windows.inner.count) % windows.inner.count
-        }
-    }
-    var windowsBegin: Int {
-        (windowsPointer / SwitchContentView.COUNT) * SwitchContentView.COUNT
-    }
-    var windowsEnd: Int {
-        min(windowsBegin + SwitchContentView.COUNT, windows.inner.count)
-    }
 
     @PublishedPersist(key: "selectedLanguage", defaultValue: .system)
     var selectedLanguage: Language

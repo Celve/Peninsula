@@ -15,13 +15,13 @@ class EventMonitors {
     private var mouseDownEvent: EventMonitor!
     private var mouseDraggingFileEvent: EventMonitor!
     private var optionKeyPressEvent: EventMonitor!
-    var hotKeyEvent: HotKeyObserver!
+//    var hotKeyEvent: HotKeyObserver!
 
     let mouseLocation: CurrentValueSubject<NSPoint, Never> = .init(.zero)
     let mouseDown: PassthroughSubject<Void, Never> = .init()
     let mouseDraggingFile: PassthroughSubject<Void, Never> = .init()
     let optionKeyPress: CurrentValueSubject<Bool, Never> = .init(false)
-    let hotKeyToggle: CurrentValueSubject<HotKeyEvent, Never> = .init(.off)
+//    let hotKeyToggle: CurrentValueSubject<HotKeyEvent, Never> = .init(.off)
 
     private init() {
         mouseMoveEvent = EventMonitor(mask: .mouseMoved) { [weak self] _ in
@@ -52,7 +52,7 @@ class EventMonitors {
             }
         }
         optionKeyPressEvent.start()
-        hotKeyEvent = HotKeyObserver(hotKeyToggle: hotKeyToggle)
+//        hotKeyEvent = HotKeyObserver(hotKeyToggle: hotKeyToggle)
         // following will start in other place
 //        hotKeyEvent.start()
     }

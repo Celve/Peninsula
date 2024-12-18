@@ -9,6 +9,7 @@ import SwiftUI
 
 struct NotchView: View {
     @StateObject var vm: NotchViewModel
+    @ObservedObject var notchModel = NotchModel.shared
 
     @State var dropTargeting: Bool = false
 
