@@ -5,9 +5,14 @@
 //  Created by 曹丁杰 on 2024/7/29.
 //
 
-import KeyboardShortcuts
 import LaunchAtLogin
 import SwiftUI
+
+func accessibilityGranted() -> Bool {
+    return AXIsProcessTrustedWithOptions(
+        [kAXTrustedCheckOptionPrompt.takeRetainedValue(): false] as CFDictionary)
+}
+
 
 struct SettingsView: View {
     @StateObject var vm: NotchViewModel
@@ -60,6 +65,14 @@ struct SettingsView: View {
                     .frame(width: 200)
                 }
                 Spacer()
+                Text("Accessibility: ")
+                Button(action: {
+                    if !accessibilityGranted() {
+                        NSWorkspace.shared.open(URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility")!)
+                    }
+                }) {
+                    Text("Grant")
+                }
             }
             .padding()
         }
