@@ -13,6 +13,83 @@ enum HotKeyEvent {
     case drop
 }
 
+enum HotKeyState {
+    case none
+    case cmdBtick
+    case cmdTab
+    case optBtick
+    case optTab
+    
+    func isCmd() -> Bool {
+        return self == .cmdBtick || self == .cmdTab
+    }
+    
+    func getKeyCode() -> Int {
+        if self == .cmdBtick || self == .optBtick {
+            return Key.backtick.rawValue
+        } else {
+            return Key.tab.rawValue
+        }
+    }
+}
+
+func onlyCmd(_ flags: CGEventFlags) -> Bool {
+    return flags.contains(.maskCommand) && !flags.contains(.maskAlternate)
+}
+
+func onlyOption(_ flags: CGEventFlags) -> Bool {
+    return !flags.contains(.maskCommand) && flags.contains(.maskAlternate)
+}
+
+class HotKeyToggle {
+    let toggle: CurrentValueSubject<HotKeyEvent, Never> = .init(.off)
+    let state: HotKeyState
+    
+    init(state: HotKeyState) {
+        self.state = state
+    }
+    
+    func checkFlags(_ flags: CGEventFlags) -> Bool {
+        if self.state.isCmd() {
+            return onlyCmd(flags)
+        } else {
+            return onlyOption(flags)
+        }
+    }
+    
+    func process(globalState: inout HotKeyState, type: CGEventType, keyCode: Int, flags: CGEventFlags) -> Bool {
+        if type == .keyDown {
+            if globalState == .none && checkFlags(flags) && keyCode == state.getKeyCode() {
+                globalState = self.state
+                toggle.send(.on)
+                return true
+            }
+            if globalState == state && checkFlags(flags) && keyCode == state.getKeyCode() {
+                globalState = self.state
+                toggle.send(.forward)
+                return true
+            }
+            if globalState == state && checkFlags(flags) && keyCode == Key.escape.rawValue {
+                globalState = .none
+                toggle.send(.drop)
+                return true
+            }
+        }
+        if type == .flagsChanged {
+            if globalState == state && !checkFlags(flags) {
+                globalState = .none
+                toggle.send(.off)
+                return true
+            }
+            if globalState == state && checkFlags(flags) && flags.contains(.maskShift) {
+                toggle.send(.backward)
+                return true
+            }
+        }
+        return false
+    }
+}
+
 class HotKeyObserver {
     static let shared = HotKeyObserver()
     let signature = "peninsula".utf16.reduce(0) { ($0 << 8) + OSType($1) }
@@ -22,8 +99,16 @@ class HotKeyObserver {
     var shortcutsReference: EventHotKeyRef?
     var localMonitor: Any!
     var eventTap: CFMachPort?
-    let hotKeyToggle: CurrentValueSubject<HotKeyEvent, Never> = .init(.off)
-    var state: Bool = false
+    let cmdBtickTogggle = HotKeyToggle(state: .cmdBtick)
+    let cmdTabToggle = HotKeyToggle(state: .cmdTab)
+    let optBtickTogggle = HotKeyToggle(state: .optBtick)
+    let optTabToggle = HotKeyToggle(state: .optTab)
+    var toggles: [HotKeyToggle] = []
+    var state: HotKeyState = .none
+    
+    init() {
+        toggles = [cmdBtickTogggle, cmdTabToggle, optBtickTogggle, optTabToggle]
+    }
 
     func start() {
         // Use an unmanaged pointer to pass the CurrentValueSubject instance
@@ -44,42 +129,16 @@ class HotKeyObserver {
             tap: .cgSessionEventTap, place: .headInsertEventTap, options: .defaultTap,
             eventsOfInterest: CGEventMask(eventMask),
             callback: { (proxy, type, event, refcon) -> Unmanaged<CGEvent>? in
-
                 // Retrieve the CurrentValueSubject instance from the unmanaged pointer
                 let this = Unmanaged<HotKeyObserver>.fromOpaque(refcon!).takeUnretainedValue()
-
-                if type == .keyDown {
-                    let keyCode = event.getIntegerValueField(.keyboardEventKeycode)
-                    let flags = event.flags
-                    if keyCode == Key.tab.rawValue && flags.contains(.maskCommand) {
-                        if !this.state {
-                            this.state = true
-                            this.hotKeyToggle.send(.on)
-                        } else {
-                            this.hotKeyToggle.send(.forward)
-                        }
-                        return nil
-                    } else if keyCode == Key.escape.rawValue && flags.contains(.maskCommand)
-                        && this.state
-                    {
-                        this.state = false
-                        this.hotKeyToggle.send(.drop)
+                let keyCode = event.getIntegerValueField(.keyboardEventKeycode)
+                let flags = event.flags
+                for toggle in this.toggles {
+                    if toggle.process(globalState: &this.state, type: type, keyCode: Int(keyCode), flags: flags) {
                         return nil
                     }
                 }
 
-                if type == .flagsChanged && this.state == true {
-                    let flags = event.flags
-                    if !flags.contains(.maskCommand) {
-                        this.state = false
-                        this.hotKeyToggle.send(.off)
-                        return nil
-                    }
-                    if flags.contains(.maskShift) {
-                        this.hotKeyToggle.send(.backward)
-                        return nil
-                    }
-                }
                 return Unmanaged.passRetained(event)
             }, userInfo: selfPointer)
 

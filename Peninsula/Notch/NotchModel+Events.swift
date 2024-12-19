@@ -14,7 +14,7 @@ import SwiftUI
 extension NotchModel {
     func setupCancellables() {
         let hotKeyObserver = HotKeyObserver.shared
-        let hotKeyToggle = hotKeyObserver.hotKeyToggle
+        let hotKeyToggle = hotKeyObserver.cmdTabToggle.toggle
         hotKeyToggle
             .receive(on: DispatchQueue.main)
             .sink { [weak self] input in
