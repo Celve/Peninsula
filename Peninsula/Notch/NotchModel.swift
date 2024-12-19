@@ -19,6 +19,7 @@ class NotchModel: NSObject, ObservableObject {
     
     var cancellables: Set<AnyCancellable> = []
     @Published var windowsCounter: Int = 1
+    var externalWindowsCounter: Int? = nil
     
     override init() {
         super.init()
@@ -41,30 +42,33 @@ class NotchModel: NSObject, ObservableObject {
         min(globalWindowsBegin + SwitchContentView.COUNT, windows.inner.count)
     }
     
-    func updatePointer(pointer: Int) {
-        if isFirstTouch {
-            isFirstTouch = false
-        } else {
+    func updateExternalPointer(pointer: Int?) {
+        externalWindowsCounter = pointer
+        if let pointer = pointer, !isFirstTouch {
             windowsCounter = pointer
         }
     }
     
-    func incrementPointer() {
-        if globalWindowsPointer != 0 && globalWindowsPointer % SwitchContentView.COUNT == SwitchContentView.COUNT - 1 {
-            isFirstTouch = true
+    func touch() {
+        isFirstTouch = false
+        if let counter = externalWindowsCounter {
+            windowsCounter = counter
         }
+    }
+    
+    func incrementPointer() {
+        isFirstTouch = true
         windowsCounter += 1
     }
     
     func decrementPointer() {
-        if globalWindowsPointer != 0 && globalWindowsPointer % SwitchContentView.COUNT == 0 {
-            isFirstTouch = true
-        }
+        isFirstTouch = true
         windowsCounter -= 1
     }
     
     func initPointer(pointer: Int) {
         isFirstTouch = true
+        externalWindowsCounter = nil
         windowsCounter = pointer
     }
 }

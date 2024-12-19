@@ -31,7 +31,9 @@ struct SwitchContentView: View {
                 .id(index)
                 .onHover { hover in
                     if hover {
-                        NotchModel.shared.updatePointer(pointer: index)
+                        notchModel.updateExternalPointer(pointer: index)
+                    } else {
+                        notchModel.updateExternalPointer(pointer: nil)
                     }
                 }
             }

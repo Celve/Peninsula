@@ -94,10 +94,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     func applicationShouldHandleReopen(_: NSApplication, hasVisibleWindows _: Bool) -> Bool {
-        for windowController in windowControllers {
-            let vm = windowController.vm
-            vm.notchOpen(.tray)
-        }
         return true
     }
 }
