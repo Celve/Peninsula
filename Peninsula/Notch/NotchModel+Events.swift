@@ -12,6 +12,16 @@ import SwiftUI
 
 
 extension NotchModel {
+    func closeAndFocus() {
+        for viewModel in notchViewModels.inner {
+            viewModel.notchClose()
+        }
+        if globalWindowsPointer < windows.inner.count {
+            windows.inner[globalWindowsPointer].focus()
+        }
+        initPointer(pointer: 0)
+    }
+    
     func setupCancellables() {
         let hotKeyObserver = HotKeyObserver.shared
         let hotKeyToggle = hotKeyObserver.cmdTabToggle.toggle
@@ -27,19 +37,19 @@ extension NotchModel {
                     }
                 case .forward:
                     incrementPointer()
+                    for viewModel in notchViewModels.inner {
+                        viewModel.notchOpen(.switching)
+                    }
                 case .backward:
                     decrementPointer()
+                    for viewModel in notchViewModels.inner {
+                        viewModel.notchOpen(.switching)
+                    }
                 case .off:
                     if self.isFirstOpen {
                         self.isFirstOpen = false
                     } else {
-                        for viewModel in notchViewModels.inner {
-                            viewModel.notchClose()
-                        }
-                        if globalWindowsPointer < windows.inner.count {
-                            windows.inner[globalWindowsPointer].focus()
-                        }
-                        initPointer(pointer: 1)
+                        closeAndFocus()
                     }
                 case .drop:
                     for viewModel in notchViewModels.inner {

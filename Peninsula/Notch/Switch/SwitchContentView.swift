@@ -36,6 +36,9 @@ struct SwitchContentView: View {
                         notchModel.updateExternalPointer(pointer: nil)
                     }
                 }
+                .onTapGesture {
+                    notchModel.closeAndFocus()
+                }
             }
             .animation(notchViewModel.normalAnimation, value: notchModel.windowsCounter)
             .transition(.blurReplace)
