@@ -57,11 +57,17 @@ class NotchModel: NSObject, ObservableObject {
     }
     
     func incrementPointer() {
+        if globalWindowsPointer != 0 && globalWindowsPointer % SwitchContentView.COUNT == SwitchContentView.COUNT - 1 {
+            externalWindowsCounter = nil
+        }
         isFirstTouch = true
         windowsCounter += 1
     }
     
     func decrementPointer() {
+        if globalWindowsPointer != 0 && globalWindowsPointer % SwitchContentView.COUNT == 0 {
+            externalWindowsCounter = nil
+        }
         isFirstTouch = true
         windowsCounter -= 1
     }
