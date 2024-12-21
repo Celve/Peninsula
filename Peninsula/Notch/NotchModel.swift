@@ -14,8 +14,7 @@ class NotchModel: NSObject, ObservableObject {
     let notchViewModels = NotchViewModels.shared
     @Published var isFirstOpen: Bool = true // for first open the app
     @Published var isFirstTouch: Bool = true // for first touch in the switch window
-    
-    @ObservedObject var windows = Windows.shared
+    @Published var switches: [Displayable] = []
     
     var cancellables: Set<AnyCancellable> = []
     @Published var windowsCounter: Int = 1
@@ -27,10 +26,10 @@ class NotchModel: NSObject, ObservableObject {
     }
     
     var globalWindowsPointer: Int {
-        if windows.inner.count == 0 {
+        if switches.count == 0 {
             0
         } else {
-            (windowsCounter % windows.inner.count + windows.inner.count) % windows.inner.count
+            (windowsCounter % switches.count + switches.count) % switches.count
         }
     }
     
@@ -39,7 +38,7 @@ class NotchModel: NSObject, ObservableObject {
     }
     
     var globalWindowsEnd: Int {
-        min(globalWindowsBegin + SwitchContentView.COUNT, windows.inner.count)
+        min(globalWindowsBegin + SwitchContentView.COUNT, switches.count)
     }
     
     func updateExternalPointer(pointer: Int?) {

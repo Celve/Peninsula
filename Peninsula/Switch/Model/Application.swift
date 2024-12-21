@@ -2,7 +2,7 @@ import Foundation
 import ApplicationServices.HIServices.AXNotificationConstants
 import AppKit
 
-class Application {
+class Application: Displayable {
     var pid: pid_t
     var icon: NSImage?
     var runningApplication: NSRunningApplication
@@ -34,6 +34,22 @@ class Application {
         manuallyUpdateWindows()
     }
     
+    func getIcon() -> NSImage? {
+        return icon
+    }
+    
+    func getTitle() -> String? {
+        return name
+    }
+    
+    func focus() {
+        if focusedWindow != nil {
+            focusedWindow?.focus()
+        } else if windows.count > 0 {
+            windows[0].focus()
+        }
+    }
+
     func manuallyUpdateWindows() {
         retryAxCallUntilTimeout(timeoutInSeconds: 5) { [weak self] in
             guard let self = self else { return }

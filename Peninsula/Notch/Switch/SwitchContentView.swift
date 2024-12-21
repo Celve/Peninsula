@@ -8,23 +8,19 @@
 import Foundation
 import SwiftUI
 
-class SwitchContentViewModel: ObservableObject {
-}
-
 struct SwitchContentView: View {
     @StateObject var windows = Windows.shared
     @StateObject var notchViewModel: NotchViewModel
     @StateObject var notchModel: NotchModel = NotchModel.shared
-    @StateObject var svm = SwitchContentViewModel()
     static let HEIGHT: CGFloat = 50
     static let COUNT: Int = 8
     
     var body: some View {
         VStack(spacing: 0) {
-            ForEach(Array(windows.inner.enumerated())[notchModel.globalWindowsBegin..<notchModel.globalWindowsEnd], id: \.offset) { index, window in
+            ForEach(Array(notchModel.switches.enumerated())[notchModel.globalWindowsBegin..<notchModel.globalWindowsEnd], id: \.offset) { index, window in
                 HStack {
-                    AppIcon(name: window.title, image: (window.application.icon ?? NSImage(systemSymbolName: "app.fill", accessibilityDescription: nil)!), svm: svm)
-                    Text(window.title).foregroundStyle(index == notchModel.globalWindowsPointer ? .black : .white).lineLimit(1)
+                    AppIcon(name: window.getTitle() ?? "", image: (window.getIcon() ?? NSImage(systemSymbolName: "app.fill", accessibilityDescription: nil)!))
+                    Text(window.getTitle() ?? "").foregroundStyle(index == notchModel.globalWindowsPointer ? .black : .white).lineLimit(1)
                 }
                 .frame(width: notchViewModel.notchOpenedSize.width - notchViewModel.spacing * 2, height: SwitchContentView.HEIGHT, alignment: .leading)
                 .background(RoundedRectangle(cornerRadius: 16).fill(index == notchModel.globalWindowsPointer ? Color.white : Color.clear).frame(maxWidth: .infinity))
@@ -37,6 +33,7 @@ struct SwitchContentView: View {
                     }
                 }
                 .onTapGesture {
+                    HotKeyObserver.shared.state = .none
                     notchModel.closeAndFocus()
                 }
             }
@@ -53,7 +50,6 @@ struct SwitchContentView: View {
 private struct AppIcon: View {
     let name: String
     let image: NSImage
-    @StateObject var svm: SwitchContentViewModel
 
     var body: some View {
         ZStack {

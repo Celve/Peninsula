@@ -12,39 +12,71 @@ import SwiftUI
 
 
 extension NotchModel {
-    func closeAndFocus() {
+    func notchOpen() {
+        for viewModel in notchViewModels.inner {
+            viewModel.notchOpen(.switching)
+        }
+    }
+    
+    func notchClose() {
         for viewModel in notchViewModels.inner {
             viewModel.notchClose()
         }
-        if globalWindowsPointer < windows.inner.count {
-            windows.inner[globalWindowsPointer].focus()
+    }
+    
+    func closeAndFocus() {
+        notchClose()
+        if globalWindowsPointer < switches.count {
+            switches[globalWindowsPointer].focus()
         }
         initPointer(pointer: 0)
     }
     
-    func setupCancellables() {
+    enum SwitchType {
+        case windows
+        case apps
+        case innerApp
+    }
+    
+    func setupEachCancellable(toggleType: HotKeyState, triggeredType: SwitchType) {
         let hotKeyObserver = HotKeyObserver.shared
-        let hotKeyToggle = hotKeyObserver.cmdTabToggle.toggle
-        hotKeyToggle
+        let hotKeyToggle = switch toggleType {
+        case .cmdBtick:
+            hotKeyObserver.cmdBtickTogggle
+        case .cmdTab:
+            hotKeyObserver.cmdTabToggle
+        case .optBtick:
+            hotKeyObserver.optBtickTogggle
+        case .optTab:
+            hotKeyObserver.optTabToggle
+        case .none:
+            hotKeyObserver.optTabToggle // should not happen, just a placeholder
+        }
+            
+        hotKeyToggle.toggle
             .receive(on: DispatchQueue.main)
             .sink { [weak self] input in
                 guard let self else { return }
                 switch input {
                 case .on:
-                    initPointer(pointer: 1)
-                    for viewModel in notchViewModels.inner {
-                        viewModel.notchOpen(.switching)
+                    switch triggeredType {
+                    case .windows:
+                        switches = Windows.shared.inner
+                    case .apps:
+                        switches = Applications.shared.inner
+                    case .innerApp:
+                        if Windows.shared.inner.count > 0 {
+                            let window = Windows.shared.inner[0]
+                            let application = window.application
+                            switches = application.windows
+                        }
                     }
+                    initPointer(pointer: 1)
+                    notchOpen()
                 case .forward:
                     incrementPointer()
-                    for viewModel in notchViewModels.inner {
-                        viewModel.notchOpen(.switching)
-                    }
                 case .backward:
                     decrementPointer()
-                    for viewModel in notchViewModels.inner {
-                        viewModel.notchOpen(.switching)
-                    }
                 case .off:
                     if self.isFirstOpen {
                         self.isFirstOpen = false
@@ -60,6 +92,12 @@ extension NotchModel {
             }
             .store(in: &cancellables)
         
+    }
+    
+    func setupCancellables() {
+        setupEachCancellable(toggleType: .cmdTab, triggeredType: .windows)
+        setupEachCancellable(toggleType: .optTab, triggeredType: .apps)
+        setupEachCancellable(toggleType: .cmdBtick, triggeredType: .innerApp)
         let events = EventMonitors.shared
         events.mouseLocation
             .receive(on: DispatchQueue.main)

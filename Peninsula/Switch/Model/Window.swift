@@ -4,7 +4,7 @@ import AppKit
 import ApplicationServices.HIServices
 
 
-class Window: Equatable {
+class Window: Equatable, Displayable {
     var application: Application
     var axWindow: AxWindow
     var id: CGWindowID
@@ -27,6 +27,14 @@ class Window: Equatable {
     
     static func == (lhs: Window, rhs: Window) -> Bool {
         return lhs.axWindow == rhs.axWindow
+    }
+    
+    func getIcon() -> NSImage? {
+        return self.application.getIcon()
+    }
+    
+    func getTitle() -> String? {
+        return self.title
     }
     
     init(application: Application, axWindow: AxWindow, globalOrder: Int32) {
