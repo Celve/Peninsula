@@ -41,11 +41,12 @@ class NotchModel: NSObject, ObservableObject {
     @Published var isFirstOpen: Bool = true // for first open the app
     @Published var isFirstTouch: Bool = true // for first touch in the switch window
     @Published var state: SwitchState = .none
-    
-    
     var cancellables: Set<AnyCancellable> = []
     @Published var windowsCounter: Int = 1
     var externalWindowsCounter: Int? = nil
+    
+    @PublishedPersist(key: "fasterSwitch", defaultValue: false)
+    var fasterSwitch: Bool
     
     override init() {
         super.init()

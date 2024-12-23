@@ -55,7 +55,15 @@ extension NotchModel {
                 case .on:
                     self.state = triggeredState
                     initPointer(pointer: 1)
-                    notchOpen()
+                    if fasterSwitch {
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) { [weak self] in
+                            if self?.state == triggeredState {
+                                self?.notchOpen()
+                            }
+                        }
+                    } else {
+                        notchOpen()
+                    }
                 case .forward:
                     incrementPointer()
                 case .backward:

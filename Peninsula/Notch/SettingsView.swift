@@ -16,6 +16,7 @@ func accessibilityGranted() -> Bool {
 
 struct SettingsView: View {
     @StateObject var vm: NotchViewModel
+    @StateObject var notchModel = NotchModel.shared
     @StateObject var tvm: TrayDrop = .shared
 
     var body: some View {
@@ -64,6 +65,9 @@ struct SettingsView: View {
                     .pickerStyle(MenuPickerStyle())
                     .frame(width: 200)
                 }
+                Spacer()
+                Text("")
+                Toggle("Faster switch", isOn: $notchModel.fasterSwitch)
                 Spacer()
                 Text("Accessibility: ")
                 Button(action: {
