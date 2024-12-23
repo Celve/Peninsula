@@ -1,42 +1,34 @@
 import Foundation
 
-// Static only.
-class Windows: ObservableObject {
+class Windows: ObservableObject, Switches {
     static let shared = Windows()
     @Published var focusedWindow: Window? = nil
     @Published var inner: [Window] = []
     
+    func getSwitches() -> [any Switchable] {
+        return inner
+    }
+    
     @MainActor
-    func addWindow(application: Application, axWindow: AxWindow) {
-        let window = Window(application: application, axWindow: axWindow, globalOrder: Int32(inner.count))
+    func addWindow(window: Window) {
         for innerWindow in inner {
-            if innerWindow.axWindow == axWindow {
-                return 
+            if innerWindow.axWindow == window.axWindow {
+                return
             }
         }
         inner.append(window)
-        application.windows.append(window)
         sort()
     }
     
     @MainActor
-    func focusOrAddWindow(application: Application, axWindow: AxWindow) -> Window {
-        if let focusedWindow = inner.first(where: { axWindow == $0.axWindow }) {
-            for window in inner {
-                if window.globalOrder > focusedWindow.globalOrder {
-                    window.globalOrder -= 1
-                }
+    func peekWindow(window: Window) {
+        for other in inner {
+            if other.globalOrder > window.globalOrder {
+                other.globalOrder -= 1
             }
-            focusedWindow.globalOrder = Int32(inner.count) - 1
-            sort()
-            return focusedWindow
-        } else {
-            let window = Window(application: application, axWindow: axWindow, globalOrder: Int32(inner.count))
-            inner.append(window)
-            application.windows.append(window)
-            sort()
-            return window
         }
+        window.globalOrder = inner.count - 1
+        sort()
     }
     
     @MainActor

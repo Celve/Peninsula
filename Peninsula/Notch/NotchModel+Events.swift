@@ -26,19 +26,13 @@ extension NotchModel {
     
     func closeAndFocus() {
         notchClose()
-        if globalWindowsPointer < switches.count {
-            switches[globalWindowsPointer].focus()
+        if globalWindowsPointer < state.expand().count {
+            state.expand()[globalWindowsPointer].focus()
         }
         initPointer(pointer: 0)
     }
     
-    enum SwitchType {
-        case windows
-        case apps
-        case innerApp
-    }
-    
-    func setupEachCancellable(toggleType: HotKeyState, triggeredType: SwitchType) {
+    func setupEachCancellable(toggleType: HotKeyState, triggeredState: SwitchState) {
         let hotKeyObserver = HotKeyObserver.shared
         let hotKeyToggle = switch toggleType {
         case .cmdBtick:
@@ -59,18 +53,7 @@ extension NotchModel {
                 guard let self else { return }
                 switch input {
                 case .on:
-                    switch triggeredType {
-                    case .windows:
-                        switches = Windows.shared.inner
-                    case .apps:
-                        switches = Applications.shared.inner
-                    case .innerApp:
-                        if Windows.shared.inner.count > 0 {
-                            let window = Windows.shared.inner[0]
-                            let application = window.application
-                            switches = application.windows
-                        }
-                    }
+                    self.state = triggeredState
                     initPointer(pointer: 1)
                     notchOpen()
                 case .forward:
@@ -83,11 +66,22 @@ extension NotchModel {
                     } else {
                         closeAndFocus()
                     }
-                case .drop:
-                    for viewModel in notchViewModels.inner {
-                        viewModel.notchClose()
+                    self.state = .none
+                case .hide:
+                    print("hide")
+                case .minimize:
+                    print("mini")
+                case .close:
+                    print("close")
+                    if globalWindowsPointer < state.expand().count {
+                        state.expand()[globalWindowsPointer].close()
                     }
+                case .quit:
+                    print("quit")
+                case .drop:
+                    notchClose()
                     initPointer(pointer: 1)
+                    self.state = .none
                 }
             }
             .store(in: &cancellables)
@@ -95,9 +89,9 @@ extension NotchModel {
     }
     
     func setupCancellables() {
-        setupEachCancellable(toggleType: .cmdTab, triggeredType: .windows)
-        setupEachCancellable(toggleType: .optTab, triggeredType: .apps)
-        setupEachCancellable(toggleType: .cmdBtick, triggeredType: .innerApp)
+        setupEachCancellable(toggleType: .cmdTab, triggeredState: .interWindows)
+        setupEachCancellable(toggleType: .optTab, triggeredState: .interApps)
+        setupEachCancellable(toggleType: .cmdBtick, triggeredState: .intraApp)
         let events = EventMonitors.shared
         events.mouseLocation
             .receive(on: DispatchQueue.main)

@@ -9,6 +9,10 @@ enum HotKeyEvent {
     case on
     case forward
     case backward
+    case quit
+    case close
+    case minimize
+    case hide
     case off
     case drop
 }
@@ -65,13 +69,28 @@ class HotKeyToggle {
                 return true
             }
             if globalState == state && checkFlags(flags) && keyCode == state.getKeyCode() {
-                globalState = self.state
                 toggle.send(.forward)
                 return true
             }
             if globalState == state && checkFlags(flags) && keyCode == Key.escape.rawValue {
                 globalState = .none
                 toggle.send(.drop)
+                return true
+            }
+            if globalState == state && checkFlags(flags) && keyCode == Key.q.rawValue {
+                toggle.send(.quit)
+                return true
+            }
+            if globalState == state && checkFlags(flags) && keyCode == Key.w.rawValue {
+                toggle.send(.close)
+                return true
+            }
+            if globalState == state && checkFlags(flags) && keyCode == Key.m.rawValue {
+                toggle.send(.minimize)
+                return true
+            }
+            if globalState == state && checkFlags(flags) && keyCode == Key.h.rawValue {
+                toggle.send(.hide)
                 return true
             }
         }

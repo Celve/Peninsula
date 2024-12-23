@@ -11,6 +11,7 @@ import UniformTypeIdentifiers
 
 struct NotchContainerView: View {
     @StateObject var vm: NotchViewModel
+    @ObservedObject var windows = Windows.shared
     var headline: some View {
         Text("\(vm.contentType.toTitle())").contentTransition(.numericText())
     }

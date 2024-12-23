@@ -4,12 +4,13 @@ import AppKit
 import ApplicationServices.HIServices
 
 
-class Window: Equatable, Displayable {
+class Window: Equatable, Switchable {
     var application: Application
     var axWindow: AxWindow
     var id: CGWindowID
     var observer: AXObserver? = nil
-    var globalOrder: Int32 // maintained by Windows
+    var globalOrder: Int // maintained by Windows
+    var localOrder: Int
     var title: String!
     var isHidden: Bool { get { application.isHidden } }
     var label: String? { get { application.label } }
@@ -37,13 +38,46 @@ class Window: Equatable, Displayable {
         return self.title
     }
     
-    init(application: Application, axWindow: AxWindow, globalOrder: Int32) {
+    init(application: Application, axWindow: AxWindow, globalOrder: Int, localOrder: Int) {
         self.application = application
         self.axWindow = axWindow
         self.globalOrder = globalOrder
+        self.localOrder = localOrder
         self.id = try! axWindow.cgWindowId() ?? 0
         self.title = tryTitle()
         self.addObserver()
+    }
+    
+    @MainActor
+    static func join(app: Application, axWindow: AxWindow) -> Window {
+        for window in app.windows {
+            if window.axWindow == axWindow {
+                return window
+            }
+        }
+        let window = Window(application: app, axWindow: axWindow, globalOrder: Windows.shared.inner.count, localOrder: app.windows.count)
+        Windows.shared.inner.append(window)
+        app.windows.append(window)
+        app.focusedWindow = window
+        Applications.shared.peekApp(app: app)
+        return window
+    }
+    
+    @MainActor
+    func peek() {
+        Windows.shared.peekWindow(window: self)
+        self.application.peekWindow(window: self)
+        Applications.shared.peekApp(app: self.application)
+    }
+    
+    @MainActor
+    static func joinOrPeek(app: Application, axWindow: AxWindow) -> Window {
+        if let focusedWindow = app.windows.first(where: { axWindow == $0.axWindow }) {
+            focusedWindow.peek()
+            return focusedWindow
+        } else {
+            return join(app: app, axWindow: axWindow)
+        }
     }
     
     func tryTitle() -> String {
@@ -107,6 +141,17 @@ class Window: Equatable, Displayable {
         }
     }
     
+    func close() {
+        BackgroundWork.axCallsQueue.async { [weak self] in
+            guard let self = self else { return }
+//            if self.isFullscreen {
+//                self.axUiElement.setAttribute(kAXFullscreenAttribute, false)
+//            }
+            if let closeButton = try? self.axWindow.closeButton() {
+                closeButton.performAction(action: kAXPressAction)
+            }
+        }
+    }
     
     func handleEvent(notificationType: String, element: AXUIElement) throws {
         let element = AxWindow(element: element)

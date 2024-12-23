@@ -14,6 +14,7 @@ struct NotchDynamicView: View {
     @StateObject var vm: NotchViewModel
     @StateObject var notchModel = NotchModel.shared
     @StateObject var nm = NotificationModel.shared
+    @ObservedObject var windows = Windows.shared
     
     var body: some View {
         Rectangle()

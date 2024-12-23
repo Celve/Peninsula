@@ -85,6 +85,14 @@ class AxElement: Equatable  {
         let result: [AXUIElement]? = try attribute(kAXChildrenAttribute, [AXUIElement].self)
         return result?.map { AxElement(element: $0) } 
     }
+    func closeButton() throws -> AxElement? {
+        let element = try attribute(kAXCloseButtonAttribute, AXUIElement.self)
+        if element == nil {
+            return nil
+        } else {
+            return AxElement(element: element!)
+        }
+    }
 }
 
 extension AxElement: Hashable {

@@ -9,12 +9,39 @@ import Foundation
 import SwiftUICore
 import Combine
 
+enum SwitchState {
+    case none
+    case interWindows
+    case interApps
+    case intraApp
+    
+    func expand() -> [Switchable] {
+        switch self {
+        case .interWindows:
+            return Windows.shared.inner
+        case .interApps:
+            return Applications.shared.inner
+        case .intraApp:
+            if Windows.shared.inner.count > 0 {
+                let window = Windows.shared.inner[0]
+                let application = window.application
+                return application.windows
+            } else {
+                return []
+            }
+        case .none:
+            return []
+        }
+    }
+}
+
 class NotchModel: NSObject, ObservableObject {
     static let shared = NotchModel()
     let notchViewModels = NotchViewModels.shared
     @Published var isFirstOpen: Bool = true // for first open the app
     @Published var isFirstTouch: Bool = true // for first touch in the switch window
-    @Published var switches: [Displayable] = []
+    @Published var state: SwitchState = .none
+    
     
     var cancellables: Set<AnyCancellable> = []
     @Published var windowsCounter: Int = 1
@@ -26,10 +53,11 @@ class NotchModel: NSObject, ObservableObject {
     }
     
     var globalWindowsPointer: Int {
-        if switches.count == 0 {
-            0
+        let count = state.expand().count
+        if count == 0 {
+            return 0
         } else {
-            (windowsCounter % switches.count + switches.count) % switches.count
+            return (windowsCounter % count + count) % count
         }
     }
     
@@ -38,7 +66,7 @@ class NotchModel: NSObject, ObservableObject {
     }
     
     var globalWindowsEnd: Int {
-        min(globalWindowsBegin + SwitchContentView.COUNT, switches.count)
+        min(globalWindowsBegin + SwitchContentView.COUNT, state.expand().count)
     }
     
     func updateExternalPointer(pointer: Int?) {
