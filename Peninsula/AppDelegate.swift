@@ -40,6 +40,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         self.timer = timer
 
         rebuildApplicationWindows()
+        HotKeyObserver.shared.start()
     }
 
     func applicationWillTerminate(_: Notification) {
@@ -69,7 +70,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             windowControllers.append(windowController)
             notchViewModels.inner.append(windowController.vm)
         }
-        HotKeyObserver.shared.start()
     }
 
     func determineIfProcessIdentifierMatches() {
