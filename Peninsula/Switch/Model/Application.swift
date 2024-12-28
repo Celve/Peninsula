@@ -2,7 +2,7 @@ import Foundation
 import ApplicationServices.HIServices.AXNotificationConstants
 import AppKit
 
-class Application: Switchable, Switches {
+class Application: Switchable {
     var pid: pid_t
     var icon: NSImage?
     var runningApplication: NSRunningApplication
@@ -33,7 +33,7 @@ class Application: Switchable, Switches {
         self.bundleId = runningApplication.bundleIdentifier
         self.globalOrder = globalOrder
         self.addObserver()
-        manuallyUpdateWindows()
+        updateWindows()
     }
     
     func getIcon() -> NSImage? {
@@ -56,11 +56,12 @@ class Application: Switchable, Switches {
         
     }
     
-    func getSwitches() -> [any Switchable] {
-        return windows
+    @MainActor
+    func joinWindow(axWindow: AxWindow) {
+        _ = Window.join(app: self, axWindow: axWindow)
     }
 
-    func manuallyUpdateWindows() {
+    func updateWindows() {
         retryAxCallUntilTimeout(timeoutInSeconds: 5) { [weak self] in
             guard let self = self else { return }
             guard let axApplication = self.axApplication else { return }
@@ -70,7 +71,7 @@ class Application: Switchable, Switches {
                     if axWindow.isActual(runningApp: self.runningApplication) {
                         BackgroundWork.synchronizationQueue.taskRestricted {
                             await MainActor.run {
-                                _ = Window.join(app: self, axWindow: axWindow)
+                                self.joinWindow(axWindow: axWindow)
                             }
                         }
                     }
