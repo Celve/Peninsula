@@ -11,7 +11,7 @@ func isNotXpc(_ app: NSRunningApplication) -> Bool {
 }
 
 
-class Applications: ObservableObject, Switches {
+class Applications: ObservableObject {
     static let shared = Applications()
     
     @Published var inner: [Application] = []

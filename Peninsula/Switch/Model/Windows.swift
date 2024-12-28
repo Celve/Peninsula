@@ -1,6 +1,6 @@
 import Foundation
 
-class Windows: ObservableObject, Switches {
+class Windows: ObservableObject {
     static let shared = Windows()
     @Published var focusedWindow: Window? = nil
     @Published var inner: [Window] = []

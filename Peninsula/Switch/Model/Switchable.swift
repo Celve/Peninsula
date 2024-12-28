@@ -13,13 +13,3 @@ protocol Switchable {
     func focus()
     func close()
 }
-
-protocol Switches {
-    func getSwitches() -> [Switchable]
-}
-
-class EmptySwitches: Switches {
-    func getSwitches() -> [Switchable] {
-        return []
-    }
-}
