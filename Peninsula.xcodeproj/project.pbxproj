@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		64B1484C2D222CC7006A93C3 /* DominantColors in Frameworks */ = {isa = PBXBuildFile; productRef = 64B1484B2D222CC7006A93C3 /* DominantColors */; };
 		64EBAF832CFECECE000429A4 /* Atomics in Frameworks */ = {isa = PBXBuildFile; productRef = 64EBAF822CFECECE000429A4 /* Atomics */; };
 		64EBAF862CFECEE4000429A4 /* ColorfulX in Frameworks */ = {isa = PBXBuildFile; productRef = 64EBAF852CFECEE4000429A4 /* ColorfulX */; };
 		64EBAF8C2CFECEFE000429A4 /* LaunchAtLogin in Frameworks */ = {isa = PBXBuildFile; productRef = 64EBAF8B2CFECEFE000429A4 /* LaunchAtLogin */; };
@@ -35,6 +36,7 @@
 			files = (
 				64EBAF8F2CFECF09000429A4 /* Pow in Frameworks */,
 				64EBAF832CFECECE000429A4 /* Atomics in Frameworks */,
+				64B1484C2D222CC7006A93C3 /* DominantColors in Frameworks */,
 				64EBAF932CFECF26000429A4 /* OrderedCollections in Frameworks */,
 				64EBAF862CFECEE4000429A4 /* ColorfulX in Frameworks */,
 				64EBAF8C2CFECEFE000429A4 /* LaunchAtLogin in Frameworks */,
@@ -95,6 +97,7 @@
 				64EBAF8B2CFECEFE000429A4 /* LaunchAtLogin */,
 				64EBAF8E2CFECF09000429A4 /* Pow */,
 				64EBAF922CFECF26000429A4 /* OrderedCollections */,
+				64B1484B2D222CC7006A93C3 /* DominantColors */,
 			);
 			productName = Peninsula;
 			productReference = 64EBAE7F2CFECD56000429A4 /* Peninsula.app */;
@@ -130,6 +133,7 @@
 				64EBAF8A2CFECEFE000429A4 /* XCRemoteSwiftPackageReference "LaunchAtLogin-Modern" */,
 				64EBAF8D2CFECF09000429A4 /* XCRemoteSwiftPackageReference "Pow" */,
 				64EBAF902CFECF19000429A4 /* XCRemoteSwiftPackageReference "swift-collections" */,
+				64B1484A2D222CC7006A93C3 /* XCRemoteSwiftPackageReference "DominantColors" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 64EBAE802CFECD56000429A4 /* Products */;
@@ -372,6 +376,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		64B1484A2D222CC7006A93C3 /* XCRemoteSwiftPackageReference "DominantColors" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/DenDmitriev/DominantColors.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.2.1;
+			};
+		};
 		64EBAF812CFECECE000429A4 /* XCRemoteSwiftPackageReference "swift-atomics" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/apple/swift-atomics.git";
@@ -415,6 +427,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		64B1484B2D222CC7006A93C3 /* DominantColors */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 64B1484A2D222CC7006A93C3 /* XCRemoteSwiftPackageReference "DominantColors" */;
+			productName = DominantColors;
+		};
 		64EBAF822CFECECE000429A4 /* Atomics */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 64EBAF812CFECECE000429A4 /* XCRemoteSwiftPackageReference "swift-atomics" */;

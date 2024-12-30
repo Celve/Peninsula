@@ -69,6 +69,8 @@ struct SettingsView: View {
                 Text("")
                 Toggle("Faster switch", isOn: $notchModel.fasterSwitch)
                 Spacer()
+                Toggle("Smaller notch", isOn: $notchModel.smallerNotch)
+                Spacer()
                 Text("Accessibility: ")
                 Button(action: {
                     if !accessibilityGranted() {

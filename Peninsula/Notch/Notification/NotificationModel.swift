@@ -1,4 +1,6 @@
 import Cocoa
+import UIImageColors
+import DominantColors
 import Foundation
 import Atomics
 import SwiftUI
@@ -45,7 +47,7 @@ enum NotificationInfo: CustomStringConvertible, Equatable {
 
 enum NotificationBadge: Equatable {
     case num(Int32)
-    case icon(NSImage)
+    case icon(NSImage, NSColor)
     case time(Int32, Int32)
     case none
 }
@@ -54,11 +56,13 @@ class NotificationItem: Equatable {
     var bundleId: String
     var badge: NotificationInfo
     var icon: NSImage
+    var color: NSColor
 
-    init(bundleId: String, badge: NotificationInfo, icon: NSImage) {
+    init(bundleId: String, badge: NotificationInfo, icon: NSImage, color: NSColor) {
         self.bundleId = bundleId
         self.badge = badge
         self.icon = icon
+        self.color = color
     }
 
     static func == (lhs: NotificationItem, rhs: NotificationItem) -> Bool {
@@ -106,7 +110,7 @@ class NotificationModel: ObservableObject {
         if new > old {
             lock.withLock {
                 if !self.occupied {
-                    self.displayedBadge = .icon(item.icon)
+                    self.displayedBadge = .icon(item.icon, item.color)
                     self.displayedNum = self.total
                     self.displayedName = bundleId
                     
@@ -168,6 +172,7 @@ class NotificationModel: ObservableObject {
             .absoluteURL.path
         let icon: NSImage
         if let appFullPath = appFullPath {
+            print(appFullPath)
             let desiredSize = NSSize(width: 128, height: 128)
             let desiredRect = NSRect(origin: .zero, size: desiredSize)
             let smallIcon = NSWorkspace.shared.icon(forFile: appFullPath)
@@ -184,7 +189,7 @@ class NotificationModel: ObservableObject {
             icon = NSImage(systemSymbolName: "app.badge", accessibilityDescription: nil)!
         }
         self.items[bundleId] = NotificationItem(
-            bundleId: bundleId, badge: NotificationInfo.null, icon: icon)
+            bundleId: bundleId, badge: NotificationInfo.null, icon: icon, color: (try? icon.dominantColors(max: 1))![0])
         monitor.observe(
             bundleId: bundleId,
             onUpdate: { text in

@@ -35,48 +35,66 @@ struct AbstractView: View {
 
     var body: some View {
         ZStack {
-            switch model.displayedBadge {
-            case .num(let num):
-                QuiverView(
-                    inner: ScaledPaddingView(
-                        inner: Image(systemName: "\(num).square.fill").resizable().aspectRatio(
-                            contentMode: .fit
-                        ),
-                        percentage: 0.1
-                    ).padding(vm.deviceNotchRect.height / 8)
-                )
-            case .icon(let icon):
-                QuiverView(
-                    inner: Image(nsImage: icon).resizable().aspectRatio(contentMode: .fit).padding(
-                        vm.deviceNotchRect.height / 8))
-            case .time(let hour, let min):
-                HStack(spacing: vm.deviceNotchRect.height / 8) {
-                    ScaledPaddingView(
-                        inner: Image(systemName: "\(hour / 10).square.fill").resizable().aspectRatio(
-                            contentMode: .fit
-                        ),
-                        percentage: 0.1
+            switch vm.status {
+            case .sliced:
+                switch model.displayedBadge {
+                case .num, .time:
+                    QuiverView(inner: RoundedRectangle(cornerRadius: 4)
+                        .fill(Color.white)
+                        .frame(width: vm.abstractSize - 4 * vm.deviceNotchRect.height / 8, height: 2))
+                case .icon(_, let color):
+                    QuiverView(inner: RoundedRectangle(cornerRadius: 4)
+                        .fill(Color(color))
+                        .frame(width: vm.abstractSize - 4 * vm.deviceNotchRect.height / 8, height: 2))
+                case .none:
+                    EmptyView()
+                }
+            case .notched, .popping:
+                switch model.displayedBadge {
+                case .num(let num):
+                    QuiverView(
+                        inner: ScaledPaddingView(
+                            inner: Image(systemName: "\(num).square.fill").resizable().aspectRatio(
+                                contentMode: .fit
+                            ),
+                            percentage: 0.1
+                        ).padding(vm.deviceNotchRect.height / 8)
                     )
-                    ScaledPaddingView(
-                        inner: Image(systemName: "\(hour % 10).square.fill").resizable().aspectRatio(
-                            contentMode: .fit
-                        ),
-                        percentage: 0.1
-                    )
-                    ScaledPaddingView(
-                        inner: Image(systemName: "\(min / 10).square").resizable().aspectRatio(
-                            contentMode: .fit
-                        ),
-                        percentage: 0.1
-                    )
-                    ScaledPaddingView(
-                        inner: Image(systemName: "\(min % 10).square").resizable().aspectRatio(
-                            contentMode: .fit
-                        ),
-                        percentage: 0.1
-                    )
-                }.padding(vm.deviceNotchRect.height / 8)
-            case .none:
+                case .icon(let icon, _):
+                    QuiverView(
+                        inner: Image(nsImage: icon).resizable().aspectRatio(contentMode: .fit).padding(
+                            vm.deviceNotchRect.height / 8))
+                case .time(let hour, let min):
+                    HStack(spacing: vm.deviceNotchRect.height / 8) {
+                        ScaledPaddingView(
+                            inner: Image(systemName: "\(hour / 10).square.fill").resizable().aspectRatio(
+                                contentMode: .fit
+                            ),
+                            percentage: 0.1
+                        )
+                        ScaledPaddingView(
+                            inner: Image(systemName: "\(hour % 10).square.fill").resizable().aspectRatio(
+                                contentMode: .fit
+                            ),
+                            percentage: 0.1
+                        )
+                        ScaledPaddingView(
+                            inner: Image(systemName: "\(min / 10).square").resizable().aspectRatio(
+                                contentMode: .fit
+                            ),
+                            percentage: 0.1
+                        )
+                        ScaledPaddingView(
+                            inner: Image(systemName: "\(min % 10).square").resizable().aspectRatio(
+                                contentMode: .fit
+                            ),
+                            percentage: 0.1
+                        )
+                    }.padding(vm.deviceNotchRect.height / 8)
+                case .none:
+                    EmptyView()
+                }
+            case .opened:
                 EmptyView()
             }
         }.animation(.spring, value: model.displayedBadge)

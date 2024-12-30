@@ -13,8 +13,17 @@ class NotchViewModel: NSObject, ObservableObject {
     var window: NSWindow
     let inset: CGFloat
     var isFirst: Bool = true
+    var isBuiltin: Bool
+    var baseStatus: Status {
+        if !isBuiltin && notchModel.smallerNotch {
+            .sliced
+        } else {
+            .notched
+        }
+    }
 
-    init(inset: CGFloat = -4, window: NSWindow) {
+    init(inset: CGFloat = -4, window: NSWindow, isBuiltin: Bool) {
+        self.isBuiltin = isBuiltin
         self.inset = inset
         self.window = window
         self.windowId = window.windowNumber
@@ -38,7 +47,8 @@ class NotchViewModel: NSObject, ObservableObject {
         case .switching:
             .init(
                 width: 600,
-                height: CGFloat((notchModel.globalWindowsEnd - notchModel.globalWindowsBegin)) * SwitchContentView.HEIGHT
+                height: CGFloat((notchModel.globalWindowsEnd - notchModel.globalWindowsBegin))
+                    * SwitchContentView.HEIGHT
                     + deviceNotchRect.height + spacing * CGFloat(3))
         default:
             .init(width: 600, height: 200 + 1)
@@ -47,7 +57,8 @@ class NotchViewModel: NSObject, ObservableObject {
     let dropDetectorRange: CGFloat = 32
 
     enum Status: String, Codable, Hashable, Equatable {
-        case closed
+        case sliced
+        case notched
         case opened
         case popping
     }
@@ -108,7 +119,7 @@ class NotchViewModel: NSObject, ObservableObject {
                 deviceNotchRect.height + deviceNotchRect.height / 4
             case .num(_):
                 deviceNotchRect.height + deviceNotchRect.height / 4
-            case .time(_):
+            case .time(_, _):
                 deviceNotchRect.height * 4 + deviceNotchRect.height / 4
             case .none:
                 0
@@ -127,7 +138,12 @@ class NotchViewModel: NSObject, ObservableObject {
 
     var notchSize: CGSize {
         switch status {
-        case .closed:
+        case .sliced:
+            return CGSize(
+                width: deviceNotchRect.width + abstractSize,
+                height: 10
+            )
+        case .notched:
             var ans = CGSize(
                 width: deviceNotchRect.width + abstractSize,
                 height: deviceNotchRect.height + 1
@@ -165,7 +181,8 @@ class NotchViewModel: NSObject, ObservableObject {
 
     var notchCornerRadius: CGFloat {
         switch status {
-        case .closed: 8
+        case .sliced: 8
+        case .notched: 8
         case .opened: 32
         case .popping: 10
         }
@@ -177,7 +194,7 @@ class NotchViewModel: NSObject, ObservableObject {
             : "Notch Drop"
     }
 
-    @Published private(set) var status: Status = .closed
+    @Published private(set) var status: Status = .notched
     @Published var isExternal: Bool = false
     @Published var openReason: OpenReason = .unknown
     @Published var contentType: ContentType = .tray
@@ -207,7 +224,7 @@ class NotchViewModel: NSObject, ObservableObject {
 
     func notchClose() {
         openReason = .unknown
-        status = .closed
+        status = baseStatus
     }
 
     func showSettings() {

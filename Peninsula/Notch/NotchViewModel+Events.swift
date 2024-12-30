@@ -40,7 +40,7 @@ extension NotchViewModel {
                             } while contentType == .switching
                             mode = .normal
                         }
-                    case .closed, .popping:
+                    case .sliced, .notched, .popping:
                         // touch inside, open
                         if true {
                             if abstractRect.insetBy(dx: inset, dy: inset).contains(mouseLocation) {
@@ -74,13 +74,13 @@ extension NotchViewModel {
                 guard let self else { return }
                 let mouseLocation: NSPoint = NSEvent.mouseLocation
                 let aboutToOpen = notchRect.insetBy(dx: inset, dy: inset).contains(mouseLocation)
-                if status == .closed, aboutToOpen { notchPop() }
+                if status == .notched || status == .sliced, aboutToOpen { notchPop() }
                 if status == .popping, !aboutToOpen { notchClose() }
             }
             .store(in: &cancellables)
 
         $status
-            .filter { $0 != .closed }
+            .filter { $0 != .notched }
             .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
                 withAnimation { self?.notchVisible = true }
@@ -109,7 +109,7 @@ extension NotchViewModel {
 
         $status
             .debounce(for: 0.5, scheduler: DispatchQueue.global())
-            .filter { $0 == .closed }
+            .filter { $0 == .notched }
             .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
                 withAnimation {

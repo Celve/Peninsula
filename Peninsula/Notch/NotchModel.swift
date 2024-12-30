@@ -48,6 +48,9 @@ class NotchModel: NSObject, ObservableObject {
     @PublishedPersist(key: "fasterSwitch", defaultValue: false)
     var fasterSwitch: Bool
     
+    @PublishedPersist(key: "smallerNotch", defaultValue: false)
+    var smallerNotch: Bool
+
     override init() {
         super.init()
         setupCancellables()
