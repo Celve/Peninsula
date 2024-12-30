@@ -7,8 +7,8 @@
 
 import AppKit
 
-let productPage = URL(string: "https://github.com/Lakr233/NotchDrop")!
-let sponsorPage = URL(string: "https://github.com/sponsors/Lakr233")!
+let productPage = URL(string: "https://github.com/Celve/Peninsula")!
+let sponsorPage = URL(string: "https://github.com/sponsors/Celve")!
 
 let bundleIdentifier = Bundle.main.bundleIdentifier!
 let appVersion =
@@ -18,7 +18,10 @@ private let availableDirectories = FileManager
     .default
     .urls(for: .documentDirectory, in: .userDomainMask)
 let documentsDirectory = availableDirectories[0]
-    .appendingPathComponent("NotchDrop")
+    .deletingLastPathComponent()
+    .appendingPathComponent(".config")
+    .appendingPathComponent("peninsula")
+print(documentsDirectory.path())
 let temporaryDirectory = URL(fileURLWithPath: NSTemporaryDirectory())
     .appendingPathComponent(bundleIdentifier)
 try? FileManager.default.removeItem(at: temporaryDirectory)
