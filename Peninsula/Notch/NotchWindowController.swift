@@ -40,7 +40,7 @@ class NotchWindowController: NSWindowController {
             vm?.screenRect = screen.frame
             vm?.cgScreenRect = screen.frame
             vm?.cgScreenRect.origin.y = NSMaxY(NSScreen.screens[0].frame) - NSMaxY(screen.frame)
-            if self.openAfterCreate { vm?.notchOpen(.tray) }
+            if self.openAfterCreate { vm?.notchOpen(contentType: .tray) }
         }
     }
 

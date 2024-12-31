@@ -21,7 +21,6 @@ let documentsDirectory = availableDirectories[0]
     .deletingLastPathComponent()
     .appendingPathComponent(".config")
     .appendingPathComponent("peninsula")
-print(documentsDirectory.path())
 let temporaryDirectory = URL(fileURLWithPath: NSTemporaryDirectory())
     .appendingPathComponent(bundleIdentifier)
 try? FileManager.default.removeItem(at: temporaryDirectory)

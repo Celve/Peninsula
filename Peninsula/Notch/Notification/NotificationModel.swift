@@ -172,7 +172,6 @@ class NotificationModel: ObservableObject {
             .absoluteURL.path
         let icon: NSImage
         if let appFullPath = appFullPath {
-            print(appFullPath)
             let desiredSize = NSSize(width: 128, height: 128)
             let desiredRect = NSRect(origin: .zero, size: desiredSize)
             let smallIcon = NSWorkspace.shared.icon(forFile: appFullPath)

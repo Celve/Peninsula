@@ -57,7 +57,7 @@ struct MenuView: View {
             title: LocalizedStringKey("Settings")
         )
         .onTapGesture {
-            vm.showSettings()
+//            vm.showSettings()
         }
         .clipShape(RoundedRectangle(cornerRadius: vm.cornerRadius))
     }

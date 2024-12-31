@@ -29,16 +29,9 @@ extension NotchViewModel {
                         } else if headlineOpenedRect.insetBy(dx: inset, dy: inset).contains(
                             mouseLocation)
                         {
+                            self.contentType = contentType.next(invisibles: notchModel.invisibleContentTypes)
                             // for clicking headline which mouse event may handled by another app
                             // open the menu
-                            repeat {
-                                if let nextValue = ContentType(rawValue: contentType.rawValue + 1) {
-                                    contentType = nextValue
-                                } else {
-                                    contentType = ContentType(rawValue: 0)!
-                                }
-                            } while contentType == .switching
-                            mode = .normal
                         }
                     case .sliced, .notched, .popping:
                         // touch inside, open
@@ -47,12 +40,12 @@ extension NotchViewModel {
                                 if notifModel.displayedName != "" {
                                     notifModel.open(bundleId: notifModel.displayedName)
                                 } else {
-                                    notchOpen(.notification)
+                                    notchOpen(contentType: .notification)
                                 }
                             } else if notchRect.insetBy(dx: inset, dy: inset).contains(
                                 mouseLocation)
                             {
-                                notchOpen(.apps)
+                                notchOpen(contentType: NotchContentType(rawValue: 0)!)
                             }
                         }
                     }

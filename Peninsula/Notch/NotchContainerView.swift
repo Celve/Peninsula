@@ -21,6 +21,8 @@ struct NotchContainerView: View {
             switch vm.contentType {
             case .notification:
                 NotificationMenubarView(vm: vm)
+            case .tray:
+                TrayDropMenubarView(notchViewModel: vm)
             default:
                 EmptyView()
             }
@@ -39,6 +41,8 @@ struct NotchContainerView: View {
                         .animation(vm.normalAnimation, value: vm.contentType)
                         .animation(vm.status == .opened ? vm.innerOnAnimation : vm.innerOffAnimation, value: vm.status)
                 }
+            case .traySettings:
+                TryDropSettingsView(notchViewModel: vm, trayDrop: TrayDrop.shared)
             case .menu:
                 MenuView(vm: vm).transition(.blurReplace)
             case .apps:

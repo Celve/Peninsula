@@ -35,6 +35,51 @@ enum SwitchState {
     }
 }
 
+enum NotchContentType: Int, Codable, Hashable, Equatable {
+    case apps
+    case notification
+    case tray
+    case traySettings
+    case menu
+    case settings
+    case switching
+    
+    func toTitle() -> String {
+        switch self {
+        case .apps:
+            return "Apps"
+        case .tray:
+            return "Tray"
+        case .traySettings:
+            return "TraySettings"
+        case .menu:
+            return "Menu"
+        case .notification:
+            return "Notification"
+        case .settings:
+            return "Settings"
+        case .switching:
+            return "Switch"
+        }
+    }
+    
+    func next(invisibles: Dictionary<Self, Self>) -> Self {
+        var contentType = self
+        if let nextContentType = invisibles[contentType]{
+            return nextContentType
+        } else {
+            repeat {
+                if let nextValue = NotchContentType(rawValue: contentType.rawValue + 1) {
+                    contentType = nextValue
+                } else {
+                    contentType = NotchContentType(rawValue: 0)!
+                }
+            } while invisibles.keys.contains(where: { $0 == contentType })
+        }
+        return contentType
+    }
+}
+
 class NotchModel: NSObject, ObservableObject {
     static let shared = NotchModel()
     let notchViewModels = NotchViewModels.shared
@@ -44,6 +89,7 @@ class NotchModel: NSObject, ObservableObject {
     var cancellables: Set<AnyCancellable> = []
     @Published var windowsCounter: Int = 1
     var externalWindowsCounter: Int? = nil
+    @Published var invisibleContentTypes: Dictionary<NotchContentType, NotchContentType> = Dictionary()
     
     @PublishedPersist(key: "fasterSwitch", defaultValue: false)
     var fasterSwitch: Bool
@@ -54,6 +100,12 @@ class NotchModel: NSObject, ObservableObject {
     override init() {
         super.init()
         setupCancellables()
+        setupInvisibleViews()
+    }
+    
+    func setupInvisibleViews() {
+        invisibleContentTypes[.traySettings] = .tray
+        invisibleContentTypes[.switching] = .tray
     }
     
     var globalWindowsPointer: Int {

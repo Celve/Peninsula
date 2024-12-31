@@ -55,7 +55,7 @@ struct NotchView: View {
             .onChange(of: dropTargeting) { isTargeted in
                 if isTargeted, vm.status == .notched {
                     // Open the notch when a file is dragged over it
-                    vm.notchOpen(.tray)
+                    vm.notchOpen(contentType: .tray)
                     vm.hapticSender.send()
                 } else if !isTargeted {
                     // Close the notch when the dragged item leaves the area

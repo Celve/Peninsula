@@ -70,31 +70,6 @@ class NotchViewModel: NSObject, ObservableObject {
         case unknown
     }
 
-    enum ContentType: Int, Codable, Hashable, Equatable {
-        case apps
-        case notification
-        case tray
-        case menu
-        case settings
-        case switching
-
-        func toTitle() -> String {
-            switch self {
-            case .apps:
-                return "Apps"
-            case .tray:
-                return "Tray"
-            case .menu:
-                return "Menu"
-            case .notification:
-                return "Notification"
-            case .settings:
-                return "Settings"
-            case .switching:
-                return "Switch"
-            }
-        }
-    }
 
     enum Mode: Int, Codable, Hashable, Equatable {
         case normal
@@ -191,13 +166,13 @@ class NotchViewModel: NSObject, ObservableObject {
     var header: String {
         contentType == .settings
             ? "Version: \(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "Unknown") (Build: \(Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "Unknown"))"
-            : "Notch Drop"
+            : "Peninsula"
     }
 
     @Published private(set) var status: Status = .notched
     @Published var isExternal: Bool = false
     @Published var openReason: OpenReason = .unknown
-    @Published var contentType: ContentType = .tray
+    @Published var contentType: NotchContentType = NotchContentType(rawValue: 0)!
     @Published var spacing: CGFloat = 16
     @Published var cornerRadius: CGFloat = 16
     @Published var deviceNotchRect: CGRect = .zero
@@ -216,19 +191,15 @@ class NotchViewModel: NSObject, ObservableObject {
 
     let hapticSender = PassthroughSubject<Void, Never>()
 
-    func notchOpen(_ contentType: ContentType) {
+    func notchOpen(contentType: NotchContentType) {
         openReason = .unknown
         status = .opened
         self.contentType = contentType
     }
-
+    
     func notchClose() {
         openReason = .unknown
         status = baseStatus
-    }
-
-    func showSettings() {
-        contentType = .settings
     }
 
     func notchPop() {

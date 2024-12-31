@@ -14,7 +14,7 @@ import SwiftUI
 extension NotchModel {
     func notchOpen() {
         for viewModel in notchViewModels.inner {
-            viewModel.notchOpen(.switching)
+            viewModel.notchOpen(contentType: .switching)
         }
     }
     
@@ -93,7 +93,6 @@ extension NotchModel {
                 }
             }
             .store(in: &cancellables)
-        
     }
     
     func setupCancellables() {
