@@ -55,3 +55,7 @@ It will last for 6.18 seconds and then show the total number of notifications. C
 This part of code mainly comes from [Doll](https://github.com/xiaogdgenuine/Doll).
 
 <https://github.com/user-attachments/assets/37d7d89c-57ad-49b9-a8cf-8bedd3971458>
+
+## Support Me
+
+<a href="https://www.buymeacoffee.com/linyu" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" ></a>
