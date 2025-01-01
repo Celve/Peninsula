@@ -15,6 +15,13 @@ struct TryDropSettingsView: View {
     var body: some View {
         VStack(spacing: notchViewModel.spacing) {
             HStack {
+                Button(action: {
+                    trayDrop.removeAll()
+                    notchModel.notchClose()
+                }) {
+                    Text("Clear")
+                }
+                Spacer()
                 Text("File Storage Time: ")
                 Picker(String(), selection: $trayDrop.selectedFileStorageTime) {
                     ForEach(TrayDrop.FileStorageTime.allCases) { time in

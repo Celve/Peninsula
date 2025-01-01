@@ -1,5 +1,4 @@
 import Cocoa
-import UIImageColors
 import DominantColors
 import Foundation
 import Atomics

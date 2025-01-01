@@ -43,8 +43,6 @@ struct NotchContainerView: View {
                 }
             case .traySettings:
                 TryDropSettingsView(notchViewModel: vm, trayDrop: TrayDrop.shared)
-            case .menu:
-                MenuView(vm: vm).transition(.blurReplace)
             case .apps:
                 AppsContentView(vm: vm).transition(.blurReplace)
                     .animation(vm.normalAnimation, value: vm.contentType)
