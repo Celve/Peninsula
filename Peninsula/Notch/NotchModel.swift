@@ -40,7 +40,6 @@ enum NotchContentType: Int, Codable, Hashable, Equatable {
     case notification
     case tray
     case traySettings
-    case menu
     case settings
     case switching
     
@@ -52,8 +51,6 @@ enum NotchContentType: Int, Codable, Hashable, Equatable {
             return "Tray"
         case .traySettings:
             return "TraySettings"
-        case .menu:
-            return "Menu"
         case .notification:
             return "Notification"
         case .settings:
