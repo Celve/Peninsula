@@ -116,7 +116,7 @@ class NotchViewModel: NSObject, ObservableObject {
         case .sliced:
             return CGSize(
                 width: deviceNotchRect.width + abstractSize,
-                height: 10
+                height: 4
             )
         case .notched:
             var ans = CGSize(
@@ -156,8 +156,7 @@ class NotchViewModel: NSObject, ObservableObject {
 
     var notchCornerRadius: CGFloat {
         switch status {
-        case .sliced: 8
-        case .notched: 8
+        case .sliced, .notched: 8
         case .opened: 32
         case .popping: 10
         }

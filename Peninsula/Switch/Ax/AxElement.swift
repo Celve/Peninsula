@@ -90,11 +90,11 @@ class AxElement: Equatable  {
     }
     
     func performAction(action: String) {
-        print(AXUIElementPerformAction(element, action as CFString).rawValue)
+        AXUIElementPerformAction(element, action as CFString)
     }
     
     func setAttribute(_ key: String, _ value: Any) {
-        print(AXUIElementSetAttributeValue(element, key as CFString, value as CFTypeRef).rawValue)
+        AXUIElementSetAttributeValue(element, key as CFString, value as CFTypeRef)
     }
     
     func children() throws -> [AxElement]? {
