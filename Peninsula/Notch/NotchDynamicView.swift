@@ -5,15 +5,17 @@
 //  Created by Celve on 9/20/24.
 //
 
-import Foundation
 import ColorfulX
+import Foundation
 import SwiftUI
 import UniformTypeIdentifiers
 
 struct NotchDynamicView: View {
     @StateObject var vm: NotchViewModel
+    @StateObject var notchModel = NotchModel.shared
     @StateObject var nm = NotificationModel.shared
-    
+    @ObservedObject var windows = Windows.shared
+
     var body: some View {
         Rectangle()
             .foregroundStyle(.black)
@@ -39,11 +41,17 @@ struct NotchDynamicView: View {
                 radius: 16
             )
             .offset(x: vm.abstractSize / 2, y: 0)
-            .animation(vm.status == .opened ? vm.outerOnAnimation : vm.status == .closed ? vm.outerOffAnimation : vm.normalAnimation, value: vm.status)
+            .animation(
+                vm.status == .opened
+                    ? vm.outerOnAnimation
+                    : vm.status == .notched ? vm.outerOffAnimation : vm.normalAnimation,
+                value: vm.status
+            )
             .animation(vm.outerOnAnimation, value: vm.contentType)
             .animation(vm.normalAnimation, value: vm.abstractSize)
+            .animation(vm.outerOnAnimation, value: vm.notchOpenedSize)
     }
-    
+
     var notchBackgroundMaskGroup: some View {
         Rectangle()
             .foregroundStyle(.black)
@@ -51,10 +59,12 @@ struct NotchDynamicView: View {
                 width: vm.notchSize.width,
                 height: vm.notchSize.height
             )
-            .clipShape(.rect(
-                bottomLeadingRadius: vm.notchCornerRadius,
-                bottomTrailingRadius: vm.notchCornerRadius
-            ))
+            .clipShape(
+                .rect(
+                    bottomLeadingRadius: vm.notchCornerRadius,
+                    bottomTrailingRadius: vm.notchCornerRadius
+                )
+            )
             .overlay {
                 ZStack(alignment: .topTrailing) {
                     Rectangle()
@@ -93,4 +103,3 @@ struct NotchDynamicView: View {
             }
     }
 }
-

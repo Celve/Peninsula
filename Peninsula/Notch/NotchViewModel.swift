@@ -5,15 +5,25 @@ import LaunchAtLogin
 import SwiftUI
 
 class NotchViewModel: NSObject, ObservableObject {
-    @ObservedObject var nm = NotificationModel.shared
+    @ObservedObject var notifModel = NotificationModel.shared
     @ObservedObject var windows = Windows.shared
+    @ObservedObject var notchModel = NotchModel.shared
     var cancellables: Set<AnyCancellable> = []
     var windowId: Int
     var window: NSWindow
     let inset: CGFloat
     var isFirst: Bool = true
+    var isBuiltin: Bool
+    var baseStatus: Status {
+        if !isBuiltin && notchModel.smallerNotch {
+            .sliced
+        } else {
+            .notched
+        }
+    }
 
-    init(inset: CGFloat = -4, window: NSWindow) {
+    init(inset: CGFloat = -4, window: NSWindow, isBuiltin: Bool) {
+        self.isBuiltin = isBuiltin
         self.inset = inset
         self.window = window
         self.windowId = window.windowNumber
@@ -37,7 +47,8 @@ class NotchViewModel: NSObject, ObservableObject {
         case .switching:
             .init(
                 width: 600,
-                height: CGFloat((windowsEnd - windowsBegin)) * SwitchContentView.HEIGHT
+                height: CGFloat((notchModel.globalWindowsEnd - notchModel.globalWindowsBegin))
+                    * SwitchContentView.HEIGHT
                     + deviceNotchRect.height + spacing * CGFloat(3))
         default:
             .init(width: 600, height: 200 + 1)
@@ -46,7 +57,8 @@ class NotchViewModel: NSObject, ObservableObject {
     let dropDetectorRange: CGFloat = 32
 
     enum Status: String, Codable, Hashable, Equatable {
-        case closed
+        case sliced
+        case notched
         case opened
         case popping
     }
@@ -58,31 +70,6 @@ class NotchViewModel: NSObject, ObservableObject {
         case unknown
     }
 
-    enum ContentType: Int, Codable, Hashable, Equatable {
-        case apps
-        case notification
-        case tray
-        case menu
-        case settings
-        case switching
-
-        func toTitle() -> String {
-            switch self {
-            case .apps:
-                return "Apps"
-            case .tray:
-                return "Tray"
-            case .menu:
-                return "Menu"
-            case .notification:
-                return "Notification"
-            case .settings:
-                return "Settings"
-            case .switching:
-                return "Switch"
-            }
-        }
-    }
 
     enum Mode: Int, Codable, Hashable, Equatable {
         case normal
@@ -102,12 +89,12 @@ class NotchViewModel: NSObject, ObservableObject {
         if status == .opened {
             0
         } else {
-            switch nm.displayedBadge {
+            switch notifModel.displayedBadge {
             case .icon(_):
                 deviceNotchRect.height + deviceNotchRect.height / 4
             case .num(_):
                 deviceNotchRect.height + deviceNotchRect.height / 4
-            case .time(_):
+            case .time(_, _):
                 deviceNotchRect.height * 4 + deviceNotchRect.height / 4
             case .none:
                 0
@@ -126,7 +113,12 @@ class NotchViewModel: NSObject, ObservableObject {
 
     var notchSize: CGSize {
         switch status {
-        case .closed:
+        case .sliced:
+            return CGSize(
+                width: deviceNotchRect.width + abstractSize,
+                height: 4
+            )
+        case .notched:
             var ans = CGSize(
                 width: deviceNotchRect.width + abstractSize,
                 height: deviceNotchRect.height + 1
@@ -164,7 +156,7 @@ class NotchViewModel: NSObject, ObservableObject {
 
     var notchCornerRadius: CGFloat {
         switch status {
-        case .closed: 8
+        case .sliced, .notched: 8
         case .opened: 32
         case .popping: 10
         }
@@ -173,13 +165,13 @@ class NotchViewModel: NSObject, ObservableObject {
     var header: String {
         contentType == .settings
             ? "Version: \(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "Unknown") (Build: \(Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "Unknown"))"
-            : "Notch Drop"
+            : "Peninsula"
     }
 
-    @Published private(set) var status: Status = .closed
+    @Published private(set) var status: Status = .notched
     @Published var isExternal: Bool = false
     @Published var openReason: OpenReason = .unknown
-    @Published var contentType: ContentType = .tray
+    @Published var contentType: NotchContentType = NotchContentType(rawValue: 0)!
     @Published var spacing: CGFloat = 16
     @Published var cornerRadius: CGFloat = 16
     @Published var deviceNotchRect: CGRect = .zero
@@ -189,21 +181,6 @@ class NotchViewModel: NSObject, ObservableObject {
     @Published var optionKeyPressed: Bool = false
     @Published var notchVisible: Bool = true
     @Published var mode: Mode = .normal
-    @Published var windowsCounter = 0
-
-    var windowsPointer: Int {
-        if windows.inner.count == 0 {
-            0
-        } else {
-            (windowsCounter % windows.inner.count + windows.inner.count) % windows.inner.count
-        }
-    }
-    var windowsBegin: Int {
-        (windowsPointer / SwitchContentView.COUNT) * SwitchContentView.COUNT
-    }
-    var windowsEnd: Int {
-        min(windowsBegin + SwitchContentView.COUNT, windows.inner.count)
-    }
 
     @PublishedPersist(key: "selectedLanguage", defaultValue: .system)
     var selectedLanguage: Language
@@ -213,19 +190,15 @@ class NotchViewModel: NSObject, ObservableObject {
 
     let hapticSender = PassthroughSubject<Void, Never>()
 
-    func notchOpen(_ contentType: ContentType) {
+    func notchOpen(contentType: NotchContentType) {
         openReason = .unknown
         status = .opened
         self.contentType = contentType
     }
-
+    
     func notchClose() {
         openReason = .unknown
-        status = .closed
-    }
-
-    func showSettings() {
-        contentType = .settings
+        status = baseStatus
     }
 
     func notchPop() {

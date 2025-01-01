@@ -11,6 +11,7 @@ import UniformTypeIdentifiers
 
 struct NotchContainerView: View {
     @StateObject var vm: NotchViewModel
+    @ObservedObject var windows = Windows.shared
     var headline: some View {
         Text("\(vm.contentType.toTitle())").contentTransition(.numericText())
     }
@@ -20,6 +21,8 @@ struct NotchContainerView: View {
             switch vm.contentType {
             case .notification:
                 NotificationMenubarView(vm: vm)
+            case .tray:
+                TrayDropMenubarView(notchViewModel: vm)
             default:
                 EmptyView()
             }
@@ -38,6 +41,8 @@ struct NotchContainerView: View {
                         .animation(vm.normalAnimation, value: vm.contentType)
                         .animation(vm.status == .opened ? vm.innerOnAnimation : vm.innerOffAnimation, value: vm.status)
                 }
+            case .traySettings:
+                TryDropSettingsView(notchViewModel: vm, trayDrop: TrayDrop.shared)
             case .menu:
                 MenuView(vm: vm).transition(.blurReplace)
             case .apps:
@@ -49,7 +54,7 @@ struct NotchContainerView: View {
             case .settings:
                 SettingsView(vm: vm).transition(.blurReplace)
             case .switching:
-                SwitchContentView(nvm: vm).transition(.blurReplace)
+                SwitchContentView(notchViewModel: vm).transition(.blurReplace)
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)

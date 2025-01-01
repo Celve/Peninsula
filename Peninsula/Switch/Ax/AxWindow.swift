@@ -34,7 +34,7 @@ class AxWindow: AxElement {
     
     func frame() throws -> CGRect? {
         guard let position = try? position() else { return nil };
-        guard let size = try? size() else { print("no", position); return nil }
+        guard let size = try? size() else { return nil }
         let result = CGRect(origin: position, size: size)
         return result
     }

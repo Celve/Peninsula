@@ -32,6 +32,14 @@ class AxElement: Equatable  {
         return try axCallWhichCanThrow(AXUIElementCopyAttributeValue(element, key as CFString, &value), &value) as? T
     }
     
+    func attributes<T>(_ key: String, _ _: T.Type) throws -> [T]? {
+        // maybe useless compared to attribute
+        var count: CFIndex = 0
+        _ = try axCallWhichCanThrow(AXUIElementGetAttributeValueCount(element, key as CFString, &count), &count)
+        var value: CFArray?
+        return try axCallWhichCanThrow(AXUIElementCopyAttributeValues(element, key as CFString, 0, count, &value), &value) as? [T]
+    }
+   
     func value<T>(_ key: String, _ target: T, _ type: AXValueType) throws -> T? {
         if let a = try attribute(key, AXValue.self) {
             var value = target
@@ -58,6 +66,10 @@ class AxElement: Equatable  {
         return try attribute(kAXSubroleAttribute, String.self)
     }
     
+    func identifier() throws -> String? {
+        return try attribute(kAXIdentifierAttribute, String.self)
+    }
+    
     func appIsRunning() throws -> Bool? {
         return try attribute(kAXIsApplicationRunningAttribute, Bool.self)
     }
@@ -81,9 +93,22 @@ class AxElement: Equatable  {
         AXUIElementPerformAction(element, action as CFString)
     }
     
+    func setAttribute(_ key: String, _ value: Any) {
+        AXUIElementSetAttributeValue(element, key as CFString, value as CFTypeRef)
+    }
+    
     func children() throws -> [AxElement]? {
         let result: [AXUIElement]? = try attribute(kAXChildrenAttribute, [AXUIElement].self)
         return result?.map { AxElement(element: $0) } 
+    }
+    
+    func closeButton() throws -> AxElement? {
+        let element = try attribute(kAXCloseButtonAttribute, AXUIElement.self)
+        if element == nil {
+            return nil
+        } else {
+            return AxElement(element: element!)
+        }
     }
 }
 

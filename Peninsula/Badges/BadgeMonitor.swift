@@ -21,10 +21,10 @@ class BadgeMonitor {
         self.observedApps = [:]
         self.checkInterval = checkInterval
         let routine: (Timer) -> Void = { timer in
-            if self.appCreateObserver == nil || self.appDestroyObserver == nil {
-                self.setupAxObserversOnDock()
-            }
-
+//            if self.appCreateObserver == nil || self.appDestroyObserver == nil {
+//                self.setupAxObserversOnDock()
+//            }
+            self.reloadAppElements()
             self.observedApps.values.forEach { app in
                 app.updateBadge()
             }
@@ -45,73 +45,75 @@ class BadgeMonitor {
         }
     }
 
-    private func setupAxObserversOnDock() {
-        guard
-            let dockProcessId = NSRunningApplication.runningApplications(
-                withBundleIdentifier: "com.apple.dock"
-            ).last?.processIdentifier
-        else {
-            return
-        }
-
-        AXObserverCreateWithInfoCallback(
-            dockProcessId,
-            { (observer, element, notification, userData, refCon) in
-                if let refCon = refCon {
-                    let this = Unmanaged<BadgeMonitor>.fromOpaque(refCon)
-                        .takeUnretainedValue()
-                    this.reloadAppElements()
-                }
-            }, &appCreateObserver)
-
-        AXObserverCreateWithInfoCallback(
-            dockProcessId,
-            { (observer, element, notification, userData, refCon) in
-                if let refCon = refCon {
-                    let this = Unmanaged<BadgeMonitor>.fromOpaque(refCon)
-                        .takeUnretainedValue()
-                    this.reloadAppElements()
-                }
-            }, &appDestroyObserver)
-
-        if let observer = appCreateObserver {
-            let callbackPTR = UnsafeMutableRawPointer(Unmanaged.passUnretained(self).toOpaque())
-
-            if AXObserverAddNotification(
-                observer, AXUIElementCreateApplication(dockProcessId),
-                kAXCreatedNotification as CFString, callbackPTR) == .success
-            {
-                print("Successfully added element created Notification!")
-            } else {
-                appCreateObserver = nil
-            }
-
-            CFRunLoopAddSource(
-                RunLoop.current.getCFRunLoop(), AXObserverGetRunLoopSource(observer),
-                CFRunLoopMode.defaultMode)
-        }
-
-        if let observer = appDestroyObserver {
-            let callbackPTR = UnsafeMutableRawPointer(Unmanaged.passUnretained(self) .toOpaque())
-
-            if AXObserverAddNotification(
-                observer, AXUIElementCreateApplication(dockProcessId),
-                kAXUIElementDestroyedNotification as CFString, callbackPTR) == .success
-            {
-                print("Successfully added element destroyed Notification!")
-            } else {
-                appDestroyObserver = nil
-            }
-
-            CFRunLoopAddSource(
-                RunLoop.current.getCFRunLoop(), AXObserverGetRunLoopSource(observer),
-                CFRunLoopMode.defaultMode)
-        }
-
-        if appCreateObserver != nil && appDestroyObserver != nil {
-            reloadAppElements()
-        }
-    }
+//    private func setupAxObserversOnDock() {
+//        guard
+//            let dockProcessId = NSRunningApplication.runningApplications(
+//                withBundleIdentifier: "com.apple.dock"
+//            ).last?.processIdentifier
+//        else {
+//            return
+//        }
+//
+//        AXObserverCreateWithInfoCallback(
+//            dockProcessId,
+//            { (observer, element, notification, userData, refCon) in
+//                print(notification)
+//                if let refCon = refCon {
+//                    let this = Unmanaged<BadgeMonitor>.fromOpaque(refCon)
+//                        .takeUnretainedValue()
+//                    this.reloadAppElements()
+//                }
+//            }, &appCreateObserver)
+//
+//        AXObserverCreateWithInfoCallback(
+//            dockProcessId,
+//            { (observer, element, notification, userData, refCon) in
+//                print(notification)
+//                if let refCon = refCon {
+//                    let this = Unmanaged<BadgeMonitor>.fromOpaque(refCon)
+//                        .takeUnretainedValue()
+//                    this.reloadAppElements()
+//                }
+//            }, &appDestroyObserver)
+//
+//        if let observer = appCreateObserver {
+//            let callbackPTR = UnsafeMutableRawPointer(Unmanaged.passUnretained(self).toOpaque())
+//
+//            if AXObserverAddNotification(
+//                observer, AXUIElementCreateApplication(dockProcessId),
+//                kAXCreatedNotification as CFString, callbackPTR) == .success
+//            {
+//                print("Successfully added element created Notification!")
+//            } else {
+//                appCreateObserver = nil
+//            }
+//
+//            CFRunLoopAddSource(
+//                RunLoop.current.getCFRunLoop(), AXObserverGetRunLoopSource(observer),
+//                CFRunLoopMode.defaultMode)
+//        }
+//
+//        if let observer = appDestroyObserver {
+//            let callbackPTR = UnsafeMutableRawPointer(Unmanaged.passUnretained(self) .toOpaque())
+//
+//            if AXObserverAddNotification(
+//                observer, AXUIElementCreateApplication(dockProcessId),
+//                kAXUIElementDestroyedNotification as CFString, callbackPTR) == .success
+//            {
+//                print("Successfully added element destroyed Notification!")
+//            } else {
+//                appDestroyObserver = nil
+//            }
+//
+//            CFRunLoopAddSource(
+//                RunLoop.current.getCFRunLoop(), AXObserverGetRunLoopSource(observer),
+//                CFRunLoopMode.defaultMode)
+//        }
+//
+//        if appCreateObserver != nil && appDestroyObserver != nil {
+//            reloadAppElements()
+//        }
+//    }
 
     private func reloadAppElements() {
         observedApps.values.forEach { app in

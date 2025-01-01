@@ -29,28 +29,23 @@ extension NotchViewModel {
                         } else if headlineOpenedRect.insetBy(dx: inset, dy: inset).contains(
                             mouseLocation)
                         {
+                            self.contentType = contentType.next(invisibles: notchModel.invisibleContentTypes)
                             // for clicking headline which mouse event may handled by another app
                             // open the menu
-                            repeat {
-                                if let nextValue = ContentType(rawValue: contentType.rawValue + 1) {
-                                    contentType = nextValue
-                                } else {
-                                    contentType = ContentType(rawValue: 0)!
-                                }
-                            } while contentType == .switching
-                            mode = .normal
                         }
-                    case .closed, .popping:
+                    case .sliced, .notched, .popping:
                         // touch inside, open
                         if true {
                             if abstractRect.insetBy(dx: inset, dy: inset).contains(mouseLocation) {
-                                if nm.displayedName != "" {
-                                    nm.open(bundleId: nm.displayedName)
+                                if notifModel.displayedName != "" {
+                                    notifModel.open(bundleId: notifModel.displayedName)
                                 } else {
-                                    notchOpen(.notification)
+                                    notchOpen(contentType: .notification)
                                 }
-                            } else if notchRect.insetBy(dx: inset, dy: inset).contains(mouseLocation) {
-                                notchOpen(.apps)
+                            } else if notchRect.insetBy(dx: inset, dy: inset).contains(
+                                mouseLocation)
+                            {
+                                notchOpen(contentType: NotchContentType(rawValue: 0)!)
                             }
                         }
                     }
@@ -65,49 +60,20 @@ extension NotchViewModel {
                 optionKeyPressed = input
             }
             .store(in: &cancellables)
-        
-        events.hotKeyToggle
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] input in
-                guard let self else { return }
-                switch input {
-                case .on:
-                    windowsCounter = 1
-                    notchOpen(.switching)
-                case .forward:
-                    windowsCounter += 1
-                case .backward:
-                    windowsCounter -= 1
-                case .off:
-                    if self.isFirst {
-                        self.isFirst = false
-                    } else {
-                        notchClose()
-                        if windowsPointer < windows.inner.count {
-                            windows.inner[windowsPointer].focus()
-                        }
-                        windowsCounter = 1
-                    }
-                case .drop:
-                    notchClose()
-                    windowsCounter = 1
-                }
-            }
-            .store(in: &cancellables)
-        
+
         events.mouseLocation
             .receive(on: DispatchQueue.main)
             .sink { [weak self] mouseLocation in
                 guard let self else { return }
                 let mouseLocation: NSPoint = NSEvent.mouseLocation
                 let aboutToOpen = notchRect.insetBy(dx: inset, dy: inset).contains(mouseLocation)
-                if status == .closed, aboutToOpen { notchPop() }
+                if status == .notched || status == .sliced, aboutToOpen { notchPop() }
                 if status == .popping, !aboutToOpen { notchClose() }
             }
             .store(in: &cancellables)
 
         $status
-            .filter { $0 != .closed }
+            .filter { $0 != .notched }
             .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
                 withAnimation { self?.notchVisible = true }
@@ -136,7 +102,7 @@ extension NotchViewModel {
 
         $status
             .debounce(for: 0.5, scheduler: DispatchQueue.global())
-            .filter { $0 == .closed }
+            .filter { $0 == .notched }
             .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
                 withAnimation {

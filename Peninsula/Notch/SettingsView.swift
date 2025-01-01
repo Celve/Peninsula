@@ -16,6 +16,7 @@ func accessibilityGranted() -> Bool {
 
 struct SettingsView: View {
     @StateObject var vm: NotchViewModel
+    @StateObject var notchModel = NotchModel.shared
     @StateObject var tvm: TrayDrop = .shared
 
     var body: some View {
@@ -30,41 +31,6 @@ struct SettingsView: View {
                 .frame(
                     width: vm.selectedLanguage == .simplifiedChinese
                         || vm.selectedLanguage == .traditionalChinese ? 220 : 160)
-
-                Spacer()
-                LaunchAtLogin.Toggle {
-                    Text(NSLocalizedString("Launch at Login", comment: ""))
-                }
-
-                Spacer()
-                Toggle("Haptic Feedback ", isOn: $vm.hapticFeedback)
-
-                Spacer()
-            }
-
-            HStack {
-                Text("File Storage Time: ")
-                Picker(String(), selection: $tvm.selectedFileStorageTime) {
-                    ForEach(TrayDrop.FileStorageTime.allCases) { time in
-                        Text(time.localized).tag(time)
-                    }
-                }
-                .pickerStyle(MenuPickerStyle())
-                .frame(width: 100)
-                if tvm.selectedFileStorageTime == .custom {
-                    TextField("Days", value: $tvm.customStorageTime, formatter: NumberFormatter())
-                        .textFieldStyle(RoundedBorderTextFieldStyle())
-                        .frame(width: 50)
-                        .padding(.leading, 10)
-                    Picker("Time Unit", selection: $tvm.customStorageTimeUnit) {
-                        ForEach(TrayDrop.CustomstorageTimeUnit.allCases) { unit in
-                            Text(unit.localized).tag(unit)
-                        }
-                    }
-                    .pickerStyle(MenuPickerStyle())
-                    .frame(width: 200)
-                }
-                Spacer()
                 Text("Accessibility: ")
                 Button(action: {
                     if !accessibilityGranted() {
@@ -73,6 +39,27 @@ struct SettingsView: View {
                 }) {
                     Text("Grant")
                 }
+                Text("Exit: ")
+                Button(action: {
+                    vm.notchClose()
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
+                        NSApp.terminate(nil)
+                    }
+                }) {
+                    Text("X")
+                }
+            }
+            HStack {
+                Spacer()
+                Toggle("Haptic Feedback ", isOn: $vm.hapticFeedback)
+                LaunchAtLogin.Toggle {
+                    Text(NSLocalizedString("Launch at Login", comment: ""))
+                }
+                Spacer()
+                Toggle("Faster switch", isOn: $notchModel.fasterSwitch)
+                Spacer()
+                Toggle("Smaller notch", isOn: $notchModel.smallerNotch)
+                Spacer()
             }
             .padding()
         }

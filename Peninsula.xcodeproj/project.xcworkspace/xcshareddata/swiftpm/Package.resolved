@@ -1,5 +1,5 @@
 {
-  "originHash" : "25998549df2f8f51ff31b7a9add7c7bcb178de04249d9ae7ec7aa62d1df2afd0",
+  "originHash" : "655ba86ffa1f084749f93d917591b28ee74c35dea7f109481b1a2de683d0497c",
   "pins" : [
     {
       "identity" : "colorfulx",
@@ -17,6 +17,15 @@
       "state" : {
         "revision" : "031ce6ce65c0b347fb192302aa8ec4a17cc1494f",
         "version" : "1.0.3"
+      }
+    },
+    {
+      "identity" : "dominantcolors",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/DenDmitriev/DominantColors.git",
+      "state" : {
+        "revision" : "c2b8ad9768fd984729624eaa8203aa9a23b06909",
+        "version" : "1.2.1"
       }
     },
     {

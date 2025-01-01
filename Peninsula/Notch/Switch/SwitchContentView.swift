@@ -8,41 +8,49 @@
 import Foundation
 import SwiftUI
 
-class SwitchContentViewModel: ObservableObject {
-}
-
 struct SwitchContentView: View {
     @StateObject var windows = Windows.shared
-    @StateObject var nvm: NotchViewModel
-    @StateObject var svm = SwitchContentViewModel()
+    @StateObject var notchViewModel: NotchViewModel
+    @StateObject var notchModel: NotchModel = NotchModel.shared
     static let HEIGHT: CGFloat = 50
     static let COUNT: Int = 8
     
     var body: some View {
         VStack(spacing: 0) {
-            ForEach(Array(windows.inner.enumerated())[nvm.windowsBegin..<nvm.windowsEnd], id: \.offset) { index, window in
+            ForEach(Array(notchModel.state.expand().enumerated())[notchModel.globalWindowsBegin..<notchModel.globalWindowsEnd], id: \.offset) { index, window in
                 HStack {
-                    AppIcon(name: window.title, image: (window.application.icon ?? NSImage(systemSymbolName: "app.fill", accessibilityDescription: nil)!), svm: svm)
-                    Text(window.title).foregroundStyle(index == nvm.windowsPointer ? .black : .white).lineLimit(1)
+                    AppIcon(name: window.getTitle() ?? "", image: (window.getIcon() ?? NSImage(systemSymbolName: "app.fill", accessibilityDescription: nil)!))
+                    Text(window.getTitle() ?? "").foregroundStyle(index == notchModel.globalWindowsPointer ? .black : .white).lineLimit(1)
                 }
-                .frame(width: nvm.notchOpenedSize.width - nvm.spacing * 2, height: SwitchContentView.HEIGHT, alignment: .leading)
-                .background(RoundedRectangle(cornerRadius: 16).fill(index == nvm.windowsPointer ? Color.white : Color.clear).frame(maxWidth: .infinity))
+                .frame(width: notchViewModel.notchOpenedSize.width - notchViewModel.spacing * 2, height: SwitchContentView.HEIGHT, alignment: .leading)
+                .background(RoundedRectangle(cornerRadius: 16).fill(index == notchModel.globalWindowsPointer ? Color.white : Color.clear).frame(maxWidth: .infinity))
                 .id(index)
+                .onHover { hover in
+                    if hover {
+                        notchModel.updateExternalPointer(pointer: index)
+                    } else {
+                        notchModel.updateExternalPointer(pointer: nil)
+                    }
+                }
+                .onTapGesture {
+                    HotKeyObserver.shared.state = .none
+                    notchModel.closeAndFocus()
+                }
             }
-            .animation(nvm.normalAnimation, value: nvm.windowsCounter)
+            .animation(notchViewModel.normalAnimation, value: notchModel.windowsCounter)
+            .animation(notchViewModel.normalAnimation, value: notchModel.state)
             .transition(.blurReplace)
         }
-        .animation(nvm.normalAnimation, value: nvm.windowsCounter)
+        .animation(notchViewModel.normalAnimation, value: notchModel.windowsCounter)
         .transition(.blurReplace)
         .aspectRatio(contentMode: .fit)
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
     }
 }
 
 private struct AppIcon: View {
     let name: String
     let image: NSImage
-    @StateObject var svm: SwitchContentViewModel
 
     var body: some View {
         ZStack {

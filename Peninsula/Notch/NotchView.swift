@@ -9,6 +9,7 @@ import SwiftUI
 
 struct NotchView: View {
     @StateObject var vm: NotchViewModel
+    @ObservedObject var notchModel = NotchModel.shared
 
     @State var dropTargeting: Bool = false
 
@@ -22,7 +23,9 @@ struct NotchView: View {
                     NotchContainerView(vm: vm)
                         .padding(.top, vm.deviceNotchRect.height - vm.spacing + 1)
                         .padding(vm.spacing)
-                        .frame(maxWidth: vm.notchOpenedSize.width, maxHeight: vm.notchOpenedSize.height)
+                        .frame(
+                            maxWidth: vm.notchOpenedSize.width, maxHeight: vm.notchOpenedSize.height
+                        )
                         .zIndex(1)
                 }
             }
@@ -30,7 +33,9 @@ struct NotchView: View {
                 .blurReplace
             )
         }
-        .animation(vm.status == .opened ? vm.innerOnAnimation : vm.innerOffAnimation, value: vm.status)
+        .animation(
+            vm.status == .opened ? vm.innerOnAnimation : vm.innerOffAnimation, value: vm.status
+        )
         .animation(vm.normalAnimation, value: vm.contentType)
         .background(dragDetector)
         .preferredColorScheme(.dark)
@@ -40,19 +45,24 @@ struct NotchView: View {
     @ViewBuilder
     var dragDetector: some View {
         RoundedRectangle(cornerRadius: vm.notchCornerRadius)
-            .foregroundStyle(Color.black.opacity(0.001)) // fuck you apple and 0.001 is the smallest we can have
+            .foregroundStyle(Color.black.opacity(0.001))  // fuck you apple and 0.001 is the smallest we can have
             .contentShape(Rectangle())
-            .frame(width: vm.notchSize.width + vm.dropDetectorRange, height: vm.notchSize.height + vm.dropDetectorRange)
+            .frame(
+                width: vm.notchSize.width + vm.dropDetectorRange,
+                height: vm.notchSize.height + vm.dropDetectorRange
+            )
             .onDrop(of: [.data], isTargeted: $dropTargeting) { _ in true }
             .onChange(of: dropTargeting) { isTargeted in
-                if isTargeted, vm.status == .closed {
+                if isTargeted, vm.status == .notched {
                     // Open the notch when a file is dragged over it
-                    vm.notchOpen(.tray)
+                    vm.notchOpen(contentType: .tray)
                     vm.hapticSender.send()
                 } else if !isTargeted {
                     // Close the notch when the dragged item leaves the area
                     let mouseLocation: NSPoint = NSEvent.mouseLocation
-                    if !vm.notchOpenedRect.insetBy(dx: vm.inset, dy: vm.inset).contains(mouseLocation) {
+                    if !vm.notchOpenedRect.insetBy(dx: vm.inset, dy: vm.inset).contains(
+                        mouseLocation)
+                    {
                         vm.notchClose()
                     }
                 }

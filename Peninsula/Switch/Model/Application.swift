@@ -2,7 +2,7 @@ import Foundation
 import ApplicationServices.HIServices.AXNotificationConstants
 import AppKit
 
-class Application {
+class Application: Switchable {
     var pid: pid_t
     var icon: NSImage?
     var runningApplication: NSRunningApplication
@@ -14,6 +14,7 @@ class Application {
     var label: String? = nil
     var name: String? = nil
     var bundleId: String? = nil
+    var globalOrder: Int // maintained by Applications
     
     static let notifications = [
         kAXApplicationActivatedNotification,
@@ -24,27 +25,53 @@ class Application {
         kAXApplicationShownNotification,
     ]
     
-    init(runningApplication: NSRunningApplication) {
+    init(runningApplication: NSRunningApplication, globalOrder: Int) {
         self.pid = runningApplication.processIdentifier
         self.runningApplication = runningApplication
         self.icon = runningApplication.icon
         self.name = runningApplication.localizedName
         self.bundleId = runningApplication.bundleIdentifier
+        self.globalOrder = globalOrder
         self.addObserver()
-        manuallyUpdateWindows()
+        updateWindows()
     }
     
-    func manuallyUpdateWindows() {
+    func getIcon() -> NSImage? {
+        return icon
+    }
+    
+    func getTitle() -> String? {
+        return name
+    }
+    
+    func focus() {
+        if focusedWindow != nil {
+            focusedWindow?.focus()
+        } else if windows.count > 0 {
+            windows[0].focus()
+        }
+    }
+    
+    func close() {
+        
+    }
+    
+    @MainActor
+    func joinWindow(axWindow: AxWindow) {
+        _ = Window.join(app: self, axWindow: axWindow)
+    }
+
+    func updateWindows() {
         retryAxCallUntilTimeout(timeoutInSeconds: 5) { [weak self] in
             guard let self = self else { return }
             guard let axApplication = self.axApplication else { return }
             if let axWindows = try axApplication.windows(), axWindows.count > 0 {
                 // bug in macOS: sometimes the OS returns multiple duplicate windows (e.g. Mail.app starting at login)
-                Array(Set(axWindows)).forEach { axWindow in
+                axWindows.forEach { axWindow in
                     if axWindow.isActual(runningApp: self.runningApplication) {
                         BackgroundWork.synchronizationQueue.taskRestricted {
                             await MainActor.run {
-                                Windows.shared.addWindow(application: self, axWindow: axWindow)
+                                self.joinWindow(axWindow: axWindow)
                             }
                         }
                     }
@@ -90,8 +117,7 @@ class Application {
         if axFocusedWindow.isActual(runningApp: self.runningApplication) {
             BackgroundWork.synchronizationQueue.taskRestricted {
                 await MainActor.run {
-                    let focusedWindow = Windows.shared.focusOrAddWindow(application: self, axWindow: axFocusedWindow)
-                    self.focusedWindow = focusedWindow
+                    _ = Window.joinOrPeek(app: self, axWindow: axFocusedWindow)
                 }
             }
         }
@@ -101,8 +127,7 @@ class Application {
         if element.isActual(runningApp: self.runningApplication) {
             BackgroundWork.synchronizationQueue.taskRestricted {
                 await MainActor.run {
-                    let focusedWindow = Windows.shared.focusOrAddWindow(application: self, axWindow: element)
-                    self.focusedWindow = focusedWindow
+                    _ = Window.joinOrPeek(app: self, axWindow: element)
                 }
             }
         }
@@ -114,11 +139,22 @@ class Application {
         windows.remove(at: index)
     }
     
+    @MainActor
+    func peekWindow(window: Window) {
+        for other in windows {
+            if other.localOrder > window.localOrder {
+                other.localOrder -= 1
+            }
+        }
+        window.localOrder = windows.count - 1
+        sort()
+    }
+    
     func windowCreated(element: AxWindow) throws {
         BackgroundWork.synchronizationQueue.taskRestricted {
             await MainActor.run {
                 if element.isActual(runningApp: self.runningApplication) {
-                    Windows.shared.addWindow(application: self, axWindow: element) // RAII
+                    _ = Window.joinOrPeek(app: self, axWindow: element)
                 }
             }
         }
@@ -130,6 +166,12 @@ class Application {
     
     func applicationShown(element: AxApplication) throws {
         isHidden = false
+    }
+    
+    func sort() {
+        windows.sort {
+            return $0.localOrder > $1.localOrder
+        }
     }
 }
 
