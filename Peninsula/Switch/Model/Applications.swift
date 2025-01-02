@@ -15,6 +15,7 @@ class Applications: ObservableObject {
     static let shared = Applications()
     
     @Published var inner: [Application] = []
+    @Published var useableInner: [Application] = []
     var timer: DispatchSourceTimer? = nil
     
     init() {
@@ -73,6 +74,7 @@ class Applications: ObservableObject {
         let application = Application(runningApplication: runningApp, globalOrder: inner.count)
         inner.append(application)
         sort()
+        select()
     }
     
     @MainActor
@@ -84,6 +86,7 @@ class Applications: ObservableObject {
         }
         app.globalOrder = inner.count - 1
         sort()
+        select()
     }
     
     @MainActor
@@ -97,7 +100,9 @@ class Applications: ObservableObject {
     
     @MainActor
     func removeApp(runningApp: NSRunningApplication) {
-        if let app = inner.first(where: { $0.runningApplication == runningApp }) {
+        if let appId = inner.firstIndex(where: { $0.runningApplication == runningApp }) {
+            let app = inner[appId]
+            inner.remove(at: appId)
             for other in inner {
                 if other.globalOrder > app.globalOrder {
                     other.globalOrder -= 1
@@ -106,6 +111,7 @@ class Applications: ObservableObject {
             for window in app.windows {
                 Windows.shared.removeWindow(axWindow: window.axWindow)
             }
+            select()
         }
     }
     
@@ -115,12 +121,17 @@ class Applications: ObservableObject {
             self.inner.removeAll { $0.runningApplication.isEqual(runningApp) }
             Windows.shared.inner.removeAll { $0.application.runningApplication.isEqual(runningApp) }
         }
+        select()
     }
     
     func sort() {
         inner.sort {
             return $0.globalOrder > $1.globalOrder
         }
+    }
+    
+    func select() {
+        useableInner = inner.filter { if let name = $0.name { Dock.shared.apps.contains(name) } else { false } }
     }
 }
 
@@ -136,6 +147,7 @@ class WorkspaceEvents {
     static func observerCallback<A>(_ application: NSWorkspace, _ change: NSKeyValueObservedChange<A>) {
         let workspaceApps = Set(NSWorkspace.shared.runningApplications)
         // TODO: symmetricDifference has bad performance
+        Dock.shared.refresh()
         let diff = Array(workspaceApps.symmetricDifference(previousValueOfRunningApps))
         if change.kind == .insertion {
             BackgroundWork.synchronizationQueue.taskRestricted {
@@ -150,6 +162,7 @@ class WorkspaceEvents {
                 }
             }
         }
+        Applications.shared.select()
         previousValueOfRunningApps = workspaceApps
     }
 }

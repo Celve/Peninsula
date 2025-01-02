@@ -62,6 +62,7 @@ _ = TrayDrop.shared
 TrayDrop.shared.cleanExpiredFiles()
 
 _ = NotificationModel.shared
+_ = Dock.shared
 
 private let delegate = AppDelegate()
 NSApplication.shared.delegate = delegate

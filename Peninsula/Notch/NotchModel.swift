@@ -20,7 +20,7 @@ enum SwitchState {
         case .interWindows:
             return Windows.shared.inner
         case .interApps:
-            return Applications.shared.inner
+            return Applications.shared.useableInner 
         case .intraApp:
             if Windows.shared.inner.count > 0 {
                 let window = Windows.shared.inner[0]
