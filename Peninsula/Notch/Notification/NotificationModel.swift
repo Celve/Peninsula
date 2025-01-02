@@ -1,5 +1,5 @@
 import Cocoa
-import DominantColors
+//import DominantColors
 import Foundation
 import Atomics
 import SwiftUI
@@ -186,8 +186,9 @@ class NotificationModel: ObservableObject {
         } else {
             icon = NSImage(systemSymbolName: "app.badge", accessibilityDescription: nil)!
         }
-        self.items[bundleId] = NotificationItem(
-            bundleId: bundleId, badge: NotificationInfo.null, icon: icon, color: (try? icon.dominantColors(max: 1))![0])
+//        self.items[bundleId] = NotificationItem(
+//            bundleId: bundleId, badge: NotificationInfo.null, icon: icon, color: (try? icon.dominantColors(max: 1))![0])
+        self.items[bundleId] = NotificationItem(bundleId: bundleId, badge: NotificationInfo.null, icon: icon, color: NSColor(red: 1.0, green: 1.0, blue: 1.0, alpha: 1.0))
         monitor.observe(
             bundleId: bundleId,
             onUpdate: { text in

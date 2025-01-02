@@ -18,7 +18,8 @@ class NotchViewModel: NSObject, ObservableObject {
         if !isBuiltin && notchModel.smallerNotch {
             .sliced
         } else {
-            .notched
+            .sliced
+//            .notched
         }
     }
 
