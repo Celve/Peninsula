@@ -16,28 +16,18 @@ func axCallWhichCanThrow<T>(_ result: AXError, _ successValue: inout T) throws -
     }
 }
 
-class AxElement: Equatable  {
-    var element: AXUIElement
-    
-    init(element: AXUIElement) {
-        self.element = element
-    }
-    
-    static func == (lhs: AxElement, rhs: AxElement) -> Bool {
-        return lhs.element == rhs.element
-    }
-
+extension AXUIElement {
     func attribute<T>(_ key: String, _ _: T.Type) throws -> T? {
         var value: AnyObject?
-        return try axCallWhichCanThrow(AXUIElementCopyAttributeValue(element, key as CFString, &value), &value) as? T
+        return try axCallWhichCanThrow(AXUIElementCopyAttributeValue(self, key as CFString, &value), &value) as? T
     }
     
     func attributes<T>(_ key: String, _ _: T.Type) throws -> [T]? {
         // maybe useless compared to attribute
         var count: CFIndex = 0
-        _ = try axCallWhichCanThrow(AXUIElementGetAttributeValueCount(element, key as CFString, &count), &count)
+        _ = try axCallWhichCanThrow(AXUIElementGetAttributeValueCount(self, key as CFString, &count), &count)
         var value: CFArray?
-        return try axCallWhichCanThrow(AXUIElementCopyAttributeValues(element, key as CFString, 0, count, &value), &value) as? [T]
+        return try axCallWhichCanThrow(AXUIElementCopyAttributeValues(self, key as CFString, 0, count, &value), &value) as? [T]
     }
    
     func value<T>(_ key: String, _ target: T, _ type: AXValueType) throws -> T? {
@@ -51,7 +41,7 @@ class AxElement: Equatable  {
     
     func pid() throws -> pid_t? {
         var pid = pid_t(0)
-        return try axCallWhichCanThrow(AXUIElementGetPid(element, &pid), &pid)
+        return try axCallWhichCanThrow(AXUIElementGetPid(self, &pid), &pid)
     }
     
     func title() throws -> String? {
@@ -75,45 +65,27 @@ class AxElement: Equatable  {
     }
     
     func subscribeToNotification(_ axObserver: AXObserver, _ notification: String, _ ref: UnsafeMutableRawPointer?) throws {
-        let result = AXObserverAddNotification(axObserver, element, notification as CFString, ref)
+        let result = AXObserverAddNotification(axObserver, self, notification as CFString, ref)
         if result != .success && result != .notificationAlreadyRegistered && result != .notificationUnsupported && result != .notImplemented {
             throw AxError.runtimeError
         }
     }
     
-    func toAxWindow() -> AxWindow {
-        AxWindow(element: element)
-    }
-    
-    func toAxApplication() -> AxApplication {
-        AxApplication(element: element)
-    }
-    
     func performAction(action: String) {
-        AXUIElementPerformAction(element, action as CFString)
+        AXUIElementPerformAction(self, action as CFString)
     }
     
     func setAttribute(_ key: String, _ value: Any) {
-        AXUIElementSetAttributeValue(element, key as CFString, value as CFTypeRef)
+        AXUIElementSetAttributeValue(self, key as CFString, value as CFTypeRef)
     }
     
-    func children() throws -> [AxElement]? {
+    func children() throws -> [AXUIElement]? {
         let result: [AXUIElement]? = try attribute(kAXChildrenAttribute, [AXUIElement].self)
-        return result?.map { AxElement(element: $0) } 
+        return result
     }
     
-    func closeButton() throws -> AxElement? {
-        let element = try attribute(kAXCloseButtonAttribute, AXUIElement.self)
-        if element == nil {
-            return nil
-        } else {
-            return AxElement(element: element!)
-        }
+    func closeButton() throws -> AXUIElement? {
+        return try attribute(kAXCloseButtonAttribute, AXUIElement.self)
     }
 }
 
-extension AxElement: Hashable {
-    func hash(into hasher: inout Hasher) {
-        hasher.combine(element)
-    }
-}

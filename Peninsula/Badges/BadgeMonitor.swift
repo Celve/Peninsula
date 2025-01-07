@@ -151,7 +151,7 @@ class ObservedApp {
         // the AXTitle is equivalent to localizedName in NSRunningApp, so we have to retrieve from there
         
         var localizedName: String? = nil
-        for app in Applications.shared.inner {
+        for app in Apps.shared.coll {
             if app.bundleId == self.bundleId {
                 localizedName = app.name
             }

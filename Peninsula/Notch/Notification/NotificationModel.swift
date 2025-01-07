@@ -71,7 +71,7 @@ class NotificationItem: Equatable {
 
 class NotificationModel: ObservableObject {
     static let shared = NotificationModel()
-    @ObservedObject var apps = Applications.shared
+    @ObservedObject var apps = Apps.shared
 
     var total: Int32 = 0
     var version: UInt64 = 1
@@ -144,12 +144,9 @@ class NotificationModel: ObservableObject {
     }
     
     func open(bundleId: String) {
-        for app in self.apps.inner {
+        for app in self.apps.coll {
             if app.bundleId == bundleId {
-                if let window = app.focusedWindow {
-                    window.focus()
-                    return
-                } else if let window = app.windows.first {
+                if let window = app.windows.coll.first {
                     window.focus()
                     return
                 }

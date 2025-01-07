@@ -10,6 +10,7 @@ import SwiftUI
 
 struct SwitchContentView: View {
     @StateObject var windows = Windows.shared
+    @StateObject var apps = Apps.shared
     @StateObject var notchViewModel: NotchViewModel
     @StateObject var notchModel: NotchModel = NotchModel.shared
     static let HEIGHT: CGFloat = 50

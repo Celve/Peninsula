@@ -11,11 +11,17 @@ func isNotXpc(_ app: NSRunningApplication) -> Bool {
 }
 
 
-class Applications: ObservableObject {
-    static let shared = Applications()
+final class Apps: Collection, ObservableObject {
+    var id = UUID()
+    @Published var coll: [App] = [] {
+        didSet {
+            useableInner = coll.filter {  Dock.shared.apps.contains($0.name) }
+        }
+    }
+    @Published var useableInner: [App] = []
     
-    @Published var inner: [Application] = []
-    @Published var useableInner: [Application] = []
+    static let shared = Apps()
+    
     var timer: DispatchSourceTimer? = nil
     
     init() {
@@ -25,15 +31,13 @@ class Applications: ObservableObject {
         autoRefresh()
     }
     
-    func getSwitches() -> [any Switchable] {
-        return inner
-    }
-    
     func addInitials() {
         let runningApplications = NSWorkspace.shared.runningApplications
         BackgroundWork.synchronizationQueue.taskRestricted {
             await MainActor.run {
-                self.addApps(runningApplications)
+                for runningApp in runningApplications {
+                    _ = App(nsApp: runningApp)
+                }
             }
         }
     }
@@ -49,13 +53,13 @@ class Applications: ObservableObject {
     
     func refreshBadges() {
         retryAxCallUntilTimeout {
-            if let dockApp = (self.inner.first { $0.runningApplication.bundleIdentifier == "com.apple.dock" }),
-               let axList = try dockApp.axApplication?.children()?.first { try $0.role() == kAXListRole },
+            if let dockApp = (self.coll.first { $0.nsApp.bundleIdentifier == "com.apple.dock" }),
+               let axList = try dockApp.axElement.children()?.first { try $0.role() == kAXListRole },
             let axAppDockItem = (try axList.children()?.filter { try $0.subrole() == kAXApplicationDockItemSubrole && ($0.appIsRunning() ?? false) }) {
                 let axAppDockItemUrlAndLabel = try axAppDockItem.map { try ($0.attribute(kAXURLAttribute, URL.self), $0.attribute(kAXStatusLabelAttribute, String.self)) }
                 DispatchQueue.main.async {
                     axAppDockItemUrlAndLabel.forEach { url, label in
-                        let app = self.inner.first { $0.runningApplication.bundleURL == url  }
+                        let app = self.coll.first { $0.nsApp.bundleURL == url  }
                         app?.label = label
                     }
                 }
@@ -67,71 +71,6 @@ class Applications: ObservableObject {
         // an app can start with .activationPolicy == .prohibited, then transition to != .prohibited later
         // an app can be both activationPolicy == .accessory and XPC (e.g. com.apple.dock.etci)
         return (isNotXpc(app)) && !app.processIdentifier.isZombie()
-    }
-    
-    @MainActor
-    func addApp(_ runningApp: NSRunningApplication) {
-        let application = Application(runningApplication: runningApp, globalOrder: inner.count)
-        inner.append(application)
-        sort()
-        select()
-    }
-    
-    @MainActor
-    func peekApp(app: Application) {
-        for other in inner {
-            if other.globalOrder > app.globalOrder {
-                other.globalOrder -= 1
-            }
-        }
-        app.globalOrder = inner.count - 1
-        sort()
-        select()
-    }
-    
-    @MainActor
-    func addApps(_ runningApps: [NSRunningApplication]) {
-        runningApps.forEach {
-            if isActualApplication($0) && $0.localizedName != "Peninsula" {
-                addApp($0)
-            }
-        }
-    }
-    
-    @MainActor
-    func removeApp(runningApp: NSRunningApplication) {
-        if let appId = inner.firstIndex(where: { $0.runningApplication == runningApp }) {
-            let app = inner[appId]
-            inner.remove(at: appId)
-            for other in inner {
-                if other.globalOrder > app.globalOrder {
-                    other.globalOrder -= 1
-                }
-            }
-            for window in app.windows {
-                Windows.shared.removeWindow(axWindow: window.axWindow)
-            }
-            select()
-        }
-    }
-    
-    func removeApps(_ runningApps: [NSRunningApplication]) {
-        for runningApp in runningApps {
-            // comparing pid here can fail here, as it can be already nil; we use isEqual here to avoid the issue
-            self.inner.removeAll { $0.runningApplication.isEqual(runningApp) }
-            Windows.shared.inner.removeAll { $0.application.runningApplication.isEqual(runningApp) }
-        }
-        select()
-    }
-    
-    func sort() {
-        inner.sort {
-            return $0.globalOrder > $1.globalOrder
-        }
-    }
-    
-    func select() {
-        useableInner = inner.filter { if let name = $0.name { Dock.shared.apps.contains(name) } else { false } }
     }
 }
 
@@ -152,17 +91,24 @@ class WorkspaceEvents {
         if change.kind == .insertion {
             BackgroundWork.synchronizationQueue.taskRestricted {
                 await MainActor.run {
-                    Applications.shared.addApps(diff)
+                    for app in diff {
+                        _ = App(nsApp: app)
+                    }
                 }
             }
         } else if change.kind == .removal {
             BackgroundWork.synchronizationQueue.taskRestricted {
                 await MainActor.run {
-                    Applications.shared.removeApps(diff)
+                    let apps = Apps.shared
+                    for runningApp in diff {
+                        if let appId = apps.coll.firstIndex(where: { $0.nsApp == runningApp }) {
+                            let app = apps.coll[appId]
+                            app.destroy()
+                        }
+                    }
                 }
             }
         }
-        Applications.shared.select()
         previousValueOfRunningApps = workspaceApps
     }
 }

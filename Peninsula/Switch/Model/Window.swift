@@ -4,13 +4,15 @@ import AppKit
 import ApplicationServices.HIServices
 
 
-class Window: Equatable, Switchable {
-    var application: Application
-    var axWindow: AxWindow
+final class Window: Element, Switchable {
+    typealias C = Windows
+    var axElement: AXUIElement
+    var colls: [(Windows, Int)] = []
+    var covs: [any Element]
+    
+    var application: App
     var id: CGWindowID
     var observer: AXObserver? = nil
-    var globalOrder: Int // maintained by Windows
-    var localOrder: Int
     var title: String!
     var isHidden: Bool { get { application.isHidden } }
     var label: String? { get { application.label } }
@@ -26,10 +28,6 @@ class Window: Equatable, Switchable {
         kAXWindowResizedNotification,
     ]
     
-    static func == (lhs: Window, rhs: Window) -> Bool {
-        return lhs.axWindow == rhs.axWindow
-    }
-    
     func getIcon() -> NSImage? {
         return self.application.getIcon()
     }
@@ -38,57 +36,29 @@ class Window: Equatable, Switchable {
         return self.title
     }
     
-    init(application: Application, axWindow: AxWindow, globalOrder: Int, localOrder: Int) {
-        self.application = application
-        self.axWindow = axWindow
-        self.globalOrder = globalOrder
-        self.localOrder = localOrder
+    init(app: App, axWindow: AXUIElement) {
+        self.axElement = axWindow
+        self.application = app
+        self.covs = [app]
         self.id = try! axWindow.cgWindowId() ?? 0
         self.title = tryTitle()
         self.addObserver()
-    }
-    
-    @MainActor
-    static func join(app: Application, axWindow: AxWindow) -> Window {
-        for window in app.windows {
-            if window.axWindow == axWindow {
-                return window
-            }
-        }
-        let window = Window(application: app, axWindow: axWindow, globalOrder: Windows.shared.inner.count, localOrder: app.windows.count)
-        Windows.shared.inner.append(window)
-        app.windows.append(window)
-        app.focusedWindow = window
-        Applications.shared.peekApp(app: app)
-        return window
-    }
-    
-    @MainActor
-    func peek() {
-        Windows.shared.peekWindow(window: self)
-        self.application.peekWindow(window: self)
-        Applications.shared.peekApp(app: self.application)
-    }
-    
-    @MainActor
-    static func joinOrPeek(app: Application, axWindow: AxWindow) -> Window {
-        if let focusedWindow = app.windows.first(where: { axWindow == $0.axWindow }) {
-            focusedWindow.peek()
-            return focusedWindow
-        } else {
-            return join(app: app, axWindow: axWindow)
+        self.add(coll: Windows.shared)
+        self.add(coll: app.windows)
+        for cov in self.covs {
+            cov.peek()
         }
     }
     
     func tryTitle() -> String {
-        let axTitle = try? axWindow.title()
+        let axTitle = try? axElement.title()
         if let axTitle = axTitle, !axTitle.isEmpty {
             return axTitle
         }
-        if let cgWindowId = (try? axWindow.cgWindowId()), let cgTitle = cgWindowId.title(), !cgTitle.isEmpty {
+        if let cgWindowId = (try? axElement.cgWindowId()), let cgTitle = cgWindowId.title(), !cgTitle.isEmpty {
             return cgTitle
         }
-        return application.runningApplication.localizedName ?? ""
+        return application.nsApp.localizedName ?? ""
     }
     
     func addObserver() {
@@ -103,7 +73,7 @@ class Window: Equatable, Switchable {
             retryAxCallUntilTimeout { [weak self] in
                 guard let self = self else { return }
                 let ref = UnsafeMutableRawPointer(Unmanaged.passUnretained(self).toOpaque())
-                try self.axWindow.subscribeToNotification(observer, notification, ref)
+                try self.axElement.subscribeToNotification(observer, notification, ref)
             }
         }
         CFRunLoopAddSource(BackgroundWork.accessibilityEventsThread.runLoop, AXObserverGetRunLoopSource(observer), .defaultMode)
@@ -116,7 +86,7 @@ class Window: Equatable, Switchable {
             GetProcessForPID(self.application.pid, &psn)
             _SLPSSetFrontProcessWithOptions(&psn, self.id, SLPSMode.userGenerated.rawValue)
             self.makeKeyWindow(psn)
-            self.axWindow.focus()
+            self.axElement.focus()
         }
     }
     
@@ -147,14 +117,13 @@ class Window: Equatable, Switchable {
 //            if self.isFullscreen {
 //                self.axUiElement.setAttribute(kAXFullscreenAttribute, false)
 //            }
-            if let closeButton = try? self.axWindow.closeButton() {
+            if let closeButton = try? self.axElement.closeButton() {
                 closeButton.performAction(action: kAXPressAction)
             }
         }
     }
     
     func handleEvent(notificationType: String, element: AXUIElement) throws {
-        let element = AxWindow(element: element)
         switch notificationType {
         case kAXUIElementDestroyedNotification: try windowDestroyed(element: element)
         case kAXTitleChangedNotification: try windowTitleChanged(element: element)
@@ -165,31 +134,27 @@ class Window: Equatable, Switchable {
         }
     }
     
-    func windowDestroyed(element: AxWindow) throws {
+    func windowDestroyed(element: AXUIElement) throws {
         BackgroundWork.synchronizationQueue.taskRestricted {
             await MainActor.run {
-                if self.application.focusedWindow == self {
-                    self.application.focusedWindow = nil
-                }
-                self.application.removeWindow(window: self)
-                Windows.shared.removeWindow(axWindow: element)
+                self.destroy()
             }
         }
     }
     
-    func windowTitleChanged(element: AxWindow) throws {
+    func windowTitleChanged(element: AXUIElement) throws {
         title = tryTitle()
     }
     
-    func windowMiniaturized(element: AxWindow) throws {
+    func windowMiniaturized(element: AXUIElement) throws {
         isMinimized = true
     }
     
-    func windowDeminiaturized(element: AxWindow) throws {
+    func windowDeminiaturized(element: AXUIElement) throws {
         isMinimized = false
     }
     
-    func windowMoved(element: AxWindow) throws {
+    func windowMoved(element: AXUIElement) throws {
     }
 }
 

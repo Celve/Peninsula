@@ -9,7 +9,7 @@ import AppKit
 
 class Dock {
     static var shared = Dock()
-    var axList: AxElement!
+    var axList: AXUIElement!
     var apps: [String] = []
     
     init() {
@@ -23,7 +23,7 @@ class Dock {
             ).last?.processIdentifier
         else { return }
 
-        let dock = AxElement(element: AXUIElementCreateApplication(dockProcessId))
+        let dock = AXUIElementCreateApplication(dockProcessId)
         self.axList = try? dock.children()?.first { try $0.role() == kAXListRole }
     }
     

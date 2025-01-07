@@ -18,14 +18,14 @@ enum SwitchState {
     func expand() -> [Switchable] {
         switch self {
         case .interWindows:
-            return Windows.shared.inner
+            return Windows.shared.coll
         case .interApps:
-            return Applications.shared.useableInner 
+            return Apps.shared.useableInner
         case .intraApp:
-            if Windows.shared.inner.count > 0 {
-                let window = Windows.shared.inner[0]
+            if Windows.shared.coll.count > 0 {
+                let window = Windows.shared.coll[0]
                 let application = window.application
-                return application.windows
+                return application.windows.coll
             } else {
                 return []
             }

@@ -56,7 +56,7 @@ do {
 }
 
 BackgroundWork.start()
-_ = Applications.shared
+_ = Apps.shared
 
 _ = TrayDrop.shared
 TrayDrop.shared.cleanExpiredFiles()

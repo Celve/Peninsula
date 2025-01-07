@@ -1,14 +1,10 @@
 import ApplicationServices.HIServices.AXUIElement
 import AppKit
 
-class AxWindow: AxElement {
-    override init(element: AXUIElement) {
-        super.init(element: element)
-    }
-    
+extension AXUIElement {
     func cgWindowId() throws -> CGWindowID? {
         var id = CGWindowID(0)
-        return try axCallWhichCanThrow(_AXUIElementGetWindow(element, &id), &id)
+        return try axCallWhichCanThrow(_AXUIElementGetWindow(self, &id), &id)
     }
     
     func level() throws -> CGWindowLevel? {
@@ -49,35 +45,35 @@ class AxWindow: AxElement {
 
         return cgWid != 0 && (
             (
-                AxWindow.books(runningApp) ||
-                AxWindow.keynote(runningApp) ||
-                AxWindow.preview(runningApp, subrole) ||
-                AxWindow.iina(runningApp) ||
-                AxWindow.openFlStudio(runningApp, title) ||
-                AxWindow.crossoverWindow(runningApp, role, subrole, level) ||
-                AxWindow.isAlwaysOnTopScrcpy(runningApp, level, role, subrole)
+                AXUIElement.books(runningApp) ||
+                AXUIElement.keynote(runningApp) ||
+                AXUIElement.preview(runningApp, subrole) ||
+                AXUIElement.iina(runningApp) ||
+                AXUIElement.openFlStudio(runningApp, title) ||
+                AXUIElement.crossoverWindow(runningApp, role, subrole, level) ||
+                AXUIElement.isAlwaysOnTopScrcpy(runningApp, level, role, subrole)
             ) || (
                 level == CGWindowLevel.normalLevel && (
                     [kAXStandardWindowSubrole, kAXDialogSubrole].contains(subrole) ||
-                    AxWindow.openBoard(runningApp) ||
-                    AxWindow.adobeAudition(runningApp, subrole) ||
-                    AxWindow.adobeAfterEffects(runningApp, subrole) ||
-                    AxWindow.steam(runningApp, title, role) ||
-                    AxWindow.worldOfWarcraft(runningApp, role) ||
-                    AxWindow.battleNetBootstrapper(runningApp, role) ||
-                    AxWindow.firefox(runningApp, role, size) ||
-                    AxWindow.vlcFullscreenVideo(runningApp, role) ||
-                    AxWindow.sanGuoShaAirWD(runningApp) ||
-                    AxWindow.dvdFab(runningApp) ||
-                    AxWindow.drBetotte(runningApp) ||
-                    AxWindow.autocad(runningApp, subrole)
+                    AXUIElement.openBoard(runningApp) ||
+                    AXUIElement.adobeAudition(runningApp, subrole) ||
+                    AXUIElement.adobeAfterEffects(runningApp, subrole) ||
+                    AXUIElement.steam(runningApp, title, role) ||
+                    AXUIElement.worldOfWarcraft(runningApp, role) ||
+                    AXUIElement.battleNetBootstrapper(runningApp, role) ||
+                    AXUIElement.firefox(runningApp, role, size) ||
+                    AXUIElement.vlcFullscreenVideo(runningApp, role) ||
+                    AXUIElement.sanGuoShaAirWD(runningApp) ||
+                    AXUIElement.dvdFab(runningApp) ||
+                    AXUIElement.drBetotte(runningApp) ||
+                    AXUIElement.autocad(runningApp, subrole)
                 ) && (
-                    AxWindow.mustHaveIfJetbrainApp(runningApp, title, subrole, size) &&
-                    AxWindow.mustHaveIfSteam(runningApp, title, role) &&
-                    AxWindow.mustHaveIfColorSlurp(runningApp, title, subrole)
+                    AXUIElement.mustHaveIfJetbrainApp(runningApp, title, subrole, size) &&
+                    AXUIElement.mustHaveIfSteam(runningApp, title, role) &&
+                    AXUIElement.mustHaveIfColorSlurp(runningApp, title, subrole)
                 )
             ) || (
-                level == CGWindowLevel.mainMenuWindow && AxWindow.arc(runningApp, role)
+                level == CGWindowLevel.mainMenuWindow && AXUIElement.arc(runningApp, role)
             )
         )
     }
