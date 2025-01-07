@@ -4,7 +4,7 @@ import AppKit
 import ApplicationServices.HIServices
 
 
-final class Window: Element, Switchable {
+class Window: Element, Switchable {
     typealias C = Windows
     var axElement: AXUIElement
     var colls: [(Windows, Int)] = []
@@ -12,12 +12,12 @@ final class Window: Element, Switchable {
     
     var application: App
     var id: CGWindowID
-    var observer: AXObserver? = nil
     var title: String!
     var isHidden: Bool { get { application.isHidden } }
     var label: String? { get { application.label } }
     var isMinimized: Bool = false
     var log: String? = nil
+    var observer: WindowObserver = WindowObserver()
     
     static let notifications = [
         kAXUIElementDestroyedNotification,
@@ -42,7 +42,8 @@ final class Window: Element, Switchable {
         self.covs = [app]
         self.id = try! axWindow.cgWindowId() ?? 0
         self.title = tryTitle()
-        self.addObserver()
+        self.observer.window = self
+        self.observer.addObserver()
         self.add(coll: Windows.shared)
         self.add(coll: app.windows)
         for cov in self.covs {
@@ -61,24 +62,6 @@ final class Window: Element, Switchable {
         return application.nsApp.localizedName ?? ""
     }
     
-    func addObserver() {
-        let callback: @convention(c) (AXObserver, AXUIElement, CFString, UnsafeMutableRawPointer?) -> Void = { observer, element, notification, ref in
-            let this = Unmanaged<Window>.fromOpaque(ref!).takeUnretainedValue()
-            retryAxCallUntilTimeout { try this.handleEvent(notificationType: notification as String, element: element) }
-        }
-        
-        AXObserverCreate(application.pid, callback, &observer)
-        guard let observer = observer else { return }
-        for notification in Window.notifications {
-            retryAxCallUntilTimeout { [weak self] in
-                guard let self = self else { return }
-                let ref = UnsafeMutableRawPointer(Unmanaged.passUnretained(self).toOpaque())
-                try self.axElement.subscribeToNotification(observer, notification, ref)
-            }
-        }
-        CFRunLoopAddSource(BackgroundWork.accessibilityEventsThread.runLoop, AXObserverGetRunLoopSource(observer), .defaultMode)
-    }
-    
     func focus() {
         BackgroundWork.commandQueue.asyncRestricted { [weak self] in
             guard let self = self else { return }
@@ -87,6 +70,18 @@ final class Window: Element, Switchable {
             _SLPSSetFrontProcessWithOptions(&psn, self.id, SLPSMode.userGenerated.rawValue)
             self.makeKeyWindow(psn)
             self.axElement.focus()
+        }
+    }
+    
+    func close() {
+        BackgroundWork.axCallsQueue.async { [weak self] in
+            guard let self = self else { return }
+//            if self.isFullscreen {
+//                self.axUiElement.setAttribute(kAXFullscreenAttribute, false)
+//            }
+            if let closeButton = try? self.axElement.closeButton() {
+                closeButton.performAction(action: kAXPressAction)
+            }
         }
     }
     
@@ -110,19 +105,31 @@ final class Window: Element, Switchable {
             }
         }
     }
-    
-    func close() {
-        BackgroundWork.axCallsQueue.async { [weak self] in
-            guard let self = self else { return }
-//            if self.isFullscreen {
-//                self.axUiElement.setAttribute(kAXFullscreenAttribute, false)
-//            }
-            if let closeButton = try? self.axElement.closeButton() {
-                closeButton.performAction(action: kAXPressAction)
+}
+
+class WindowObserver {
+    weak var window: Window? = nil
+    var observer: AXObserver? = nil
+
+    func addObserver() {
+        guard let window = window else { return }
+        let callback: @convention(c) (AXObserver, AXUIElement, CFString, UnsafeMutableRawPointer?) -> Void = { observer, element, notification, ref in
+            let this = Unmanaged<WindowObserver>.fromOpaque(ref!).takeUnretainedValue()
+            retryAxCallUntilTimeout { try this.handleEvent(notificationType: notification as String, element: element) }
+        }
+        
+        AXObserverCreate(window.application.pid, callback, &observer)
+        guard let observer = observer else { return }
+        for notification in Window.notifications {
+            retryAxCallUntilTimeout { [weak self] in
+                guard let self = self else { return }
+                let ref = UnsafeMutableRawPointer(Unmanaged.passUnretained(self).toOpaque())
+                try window.axElement.subscribeToNotification(observer, notification, ref)
             }
         }
+        CFRunLoopAddSource(BackgroundWork.accessibilityEventsThread.runLoop, AXObserverGetRunLoopSource(observer), .defaultMode)
     }
-    
+
     func handleEvent(notificationType: String, element: AXUIElement) throws {
         switch notificationType {
         case kAXUIElementDestroyedNotification: try windowDestroyed(element: element)
@@ -135,23 +142,28 @@ final class Window: Element, Switchable {
     }
     
     func windowDestroyed(element: AXUIElement) throws {
+        guard let window = window else { return }
         BackgroundWork.synchronizationQueue.taskRestricted {
             await MainActor.run {
-                self.destroy()
+                window.destroy()
             }
         }
     }
     
     func windowTitleChanged(element: AXUIElement) throws {
-        title = tryTitle()
+        guard let window = window else { return }
+        window.title = window.tryTitle()
     }
     
+    
     func windowMiniaturized(element: AXUIElement) throws {
-        isMinimized = true
+        guard let window = window else { return }
+        window.isMinimized = true
     }
     
     func windowDeminiaturized(element: AXUIElement) throws {
-        isMinimized = false
+        guard let window = window else { return }
+        window.isMinimized = false
     }
     
     func windowMoved(element: AXUIElement) throws {
