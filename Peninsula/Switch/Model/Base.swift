@@ -40,7 +40,7 @@ extension Collection {
     func add(element: M) {
         if let other = coll.first(where: { $0 == element }) {
             peek(element: other)
-        } else if let order = element.getOrder(collId: self.id) {
+        } else if let _ = element.getOrder(collId: self.id) {
             peek(element: element)
         } else {
             element.colls.append((self, coll.count))
@@ -83,7 +83,7 @@ extension Element {
     func peek() {
         guard let other = self as? M else { return }
         for i in 0..<colls.count {
-            var (coll, _) = colls[i]
+            let (coll, _) = colls[i]
             coll.peek(element: other)
         }
         for cov in covs {
@@ -123,7 +123,7 @@ extension Element {
 
     func destroy() {
         guard let other = self as? M else { return }
-        while var (coll, _) = colls.popLast() {
+        while let (coll, _) = colls.last {
             coll.remove(element: other)
         }
     }
