@@ -9,7 +9,7 @@ import AppKit
 
 class Dock {
     static var shared = Dock()
-    var axList: AXUIElement!
+    var axList: AXUIElement?
     var apps: [String] = []
     
     init() {
@@ -28,11 +28,16 @@ class Dock {
     }
     
     func refresh() {
-        if let children = (try? self.axList.children()?.filter { try $0.subrole() == kAXApplicationDockItemSubrole}) {
-            apps.removeAll()
-            for child in children {
-                if let title = try? child.title() {
-                    apps.append(title)
+        if self.axList == nil {
+            fetchAx()
+        }
+        if let axList = self.axList {
+            if let children = (try? axList.children()?.filter { try $0.subrole() == kAXApplicationDockItemSubrole}) {
+                apps.removeAll()
+                for child in children {
+                    if let title = try? child.title() {
+                        apps.append(title)
+                    }
                 }
             }
         }

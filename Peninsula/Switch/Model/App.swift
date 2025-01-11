@@ -27,7 +27,11 @@ class App: Element, Switchable {
         self.name = nsApp.localizedName ?? ""
         self.bundleId = nsApp.bundleIdentifier ?? ""
         self.axElement = AXUIElementCreateApplication(pid)
-        self.add(coll: Apps.shared)
+        BackgroundWork.synchronizationQueue.taskRestricted {
+            await MainActor.run {
+                self.add(coll: Apps.shared)
+            }
+        }
         self.observer.app = self
         self.observer.addObserver()
         self.observer.updateWindows()

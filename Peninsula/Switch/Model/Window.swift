@@ -44,10 +44,14 @@ class Window: Element, Switchable {
         self.title = tryTitle()
         self.observer.window = self
         self.observer.addObserver()
-        self.add(coll: Windows.shared)
-        self.add(coll: app.windows)
-        for cov in self.covs {
-            cov.peek()
+        BackgroundWork.synchronizationQueue.taskRestricted {
+            await MainActor.run {
+                self.add(coll: Windows.shared)
+                self.add(coll: app.windows)
+                for cov in self.covs {
+                    cov.peek()
+                }
+            }
         }
     }
     

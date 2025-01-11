@@ -86,9 +86,9 @@ class WorkspaceEvents {
     static func observerCallback<A>(_ application: NSWorkspace, _ change: NSKeyValueObservedChange<A>) {
         let workspaceApps = Set(NSWorkspace.shared.runningApplications)
         // TODO: symmetricDifference has bad performance
-        Dock.shared.refresh()
         let diff = Array(workspaceApps.symmetricDifference(previousValueOfRunningApps))
         if change.kind == .insertion {
+            Dock.shared.refresh()
             BackgroundWork.synchronizationQueue.taskRestricted {
                 await MainActor.run {
                     for app in diff {
@@ -97,6 +97,7 @@ class WorkspaceEvents {
                 }
             }
         } else if change.kind == .removal {
+            Dock.shared.refresh()
             BackgroundWork.synchronizationQueue.taskRestricted {
                 await MainActor.run {
                     let apps = Apps.shared

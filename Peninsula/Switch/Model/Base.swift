@@ -24,6 +24,7 @@ extension Collection {
         return coll.first(where: { $0.axElement == axElement })
     }
 
+    @MainActor
     func peek(element: M) {
         if let order = element.getOrder(collId: self.id) {
             element.setOrder(collId: self.id, order: self.coll.count - 1)
@@ -37,6 +38,7 @@ extension Collection {
         }
     }
 
+    @MainActor
     func add(element: M) {
         if let other = coll.first(where: { $0 == element }) {
             peek(element: other)
@@ -49,9 +51,10 @@ extension Collection {
         }
     }
 
+    @MainActor
     func remove(element: M) {
         if let order = element.getOrder(collId: self.id) {
-            coll.remove(at: order)
+            coll.removeAll(where: { $0 == element })
             element.remove(collId: self.id)
             sort()
         }
@@ -75,11 +78,13 @@ protocol Element: AnyObject, Equatable {
     
 
 extension Element {
+    @MainActor
     func add(coll: C) {
         guard let other = self as? M else { return }
         coll.add(element: other)
     }
 
+    @MainActor
     func peek() {
         guard let other = self as? M else { return }
         for i in 0..<colls.count {
@@ -121,6 +126,7 @@ extension Element {
 
     }
 
+    @MainActor
     func destroy() {
         guard let other = self as? M else { return }
         while let (coll, _) = colls.last {
