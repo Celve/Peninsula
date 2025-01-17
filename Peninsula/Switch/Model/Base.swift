@@ -56,7 +56,7 @@ extension Collection {
         if let order = element.getOrder(collId: self.id) {
             coll.removeAll(where: { $0 == element })
             element.remove(collId: self.id)
-            sort()
+            reset()
         }
     }
 
@@ -64,6 +64,14 @@ extension Collection {
         let collId = self.id
         coll.sort {
             return $0.getOrder(collId: collId) ?? 0 > $1.getOrder(collId: collId) ?? 0
+        }
+    }
+    
+    func reset() {
+        let collId = self.id
+        let count = coll.count
+        for (index, element) in coll.enumerated() {
+            element.setOrder(collId: collId, order: count - index - 1)
         }
     }
 }

@@ -36,7 +36,9 @@ final class Apps: Collection, ObservableObject {
         BackgroundWork.synchronizationQueue.taskRestricted {
             await MainActor.run {
                 for runningApp in runningApplications {
-                    _ = App(nsApp: runningApp)
+                    if isActualApplication(runningApp) {
+                        _ = App(nsApp: runningApp)
+                    }
                 }
             }
         }
@@ -67,11 +69,12 @@ final class Apps: Collection, ObservableObject {
         }
     }
     
-    func isActualApplication(_ app: NSRunningApplication) -> Bool {
-        // an app can start with .activationPolicy == .prohibited, then transition to != .prohibited later
-        // an app can be both activationPolicy == .accessory and XPC (e.g. com.apple.dock.etci)
-        return (isNotXpc(app)) && !app.processIdentifier.isZombie()
-    }
+}
+
+func isActualApplication(_ app: NSRunningApplication) -> Bool {
+    // an app can start with .activationPolicy == .prohibited, then transition to != .prohibited later
+    // an app can be both activationPolicy == .accessory and XPC (e.g. com.apple.dock.etci)
+    return (isNotXpc(app)) && !app.processIdentifier.isZombie() && app.localizedName != "Peninsula"
 }
 
 class WorkspaceEvents {
@@ -92,7 +95,9 @@ class WorkspaceEvents {
             BackgroundWork.synchronizationQueue.taskRestricted {
                 await MainActor.run {
                     for app in diff {
-                        _ = App(nsApp: app)
+                        if isActualApplication(app) {
+                            _ = App(nsApp: app)
+                        }
                     }
                 }
             }
