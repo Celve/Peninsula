@@ -7,7 +7,7 @@ class App: Element, Switchable {
     typealias C = Apps
     var axElement: AXUIElement
     var covs: [any Element] = []
-    var colls: [(Apps, Int)] = []
+    var colls: [Apps] = []
 
     var windows = Windows()
     var pid: pid_t

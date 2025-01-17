@@ -7,7 +7,7 @@ import ApplicationServices.HIServices
 class Window: Element, Switchable {
     typealias C = Windows
     var axElement: AXUIElement
-    var colls: [(Windows, Int)] = []
+    var colls: [Windows] = []
     var covs: [any Element]
     
     var application: App

@@ -26,15 +26,9 @@ extension Collection {
 
     @MainActor
     func peek(element: M) {
-        if let order = element.getOrder(collId: self.id) {
-            element.setOrder(collId: self.id, order: self.coll.count - 1)
-            for i in 0..<coll.count {
-                let other = coll[i]
-                if let otherOrder = other.getOrder(collId: self.id), otherOrder > order {
-                    other.setOrder(collId: self.id, order: otherOrder - 1)
-                }
-            }
-            sort()
+        if let index = coll.firstIndex(where: { $0 == element }) {
+            coll.remove(at: index)
+            coll.insert(element, at: 0)
         }
     }
 
@@ -42,37 +36,16 @@ extension Collection {
     func add(element: M) {
         if let other = coll.first(where: { $0 == element }) {
             peek(element: other)
-        } else if let _ = element.getOrder(collId: self.id) {
-            peek(element: element)
         } else {
-            element.colls.append((self, coll.count))
-            coll.append(element)
-            sort()
+            element.colls.append(self)
+            coll.insert(element, at: 0)
         }
     }
 
     @MainActor
     func remove(element: M) {
-        if let order = element.getOrder(collId: self.id) {
-            coll.removeAll(where: { $0 == element })
-            element.remove(collId: self.id)
-            reset()
-        }
-    }
-
-    func sort() {
-        let collId = self.id
-        coll.sort {
-            return $0.getOrder(collId: collId) ?? 0 > $1.getOrder(collId: collId) ?? 0
-        }
-    }
-    
-    func reset() {
-        let collId = self.id
-        let count = coll.count
-        for (index, element) in coll.enumerated() {
-            element.setOrder(collId: collId, order: count - index - 1)
-        }
+        coll.removeAll(where: { $0 == element })
+        element.remove(collId: self.id)
     }
 }
 
@@ -80,7 +53,7 @@ protocol Element: AnyObject, Equatable {
     associatedtype M: Element where M.C == C
     associatedtype C: Collection where C.M == M
     var axElement: AXUIElement { get set }
-    var colls: [(C, Int)] { get set }
+    var colls: [C] { get set }
     var covs: [any Element] { get set }
 }
     
@@ -96,7 +69,7 @@ extension Element {
     func peek() {
         guard let other = self as? M else { return }
         for i in 0..<colls.count {
-            let (coll, _) = colls[i]
+            let coll = colls[i]
             coll.peek(element: other)
         }
         for cov in covs {
@@ -104,28 +77,9 @@ extension Element {
         }
     }
 
-    func getOrder(collId: UUID) -> Int? {
-        for (coll, order) in colls {
-            if collId == coll.id {
-                return order
-            }
-        }
-        return nil
-    }
-
-    func setOrder(collId: UUID, order: Int) {
-        for i in 0..<colls.count {
-            let (coll, _) = colls[i]
-            if collId == coll.id {
-                colls[i].1 = order
-                break
-            }
-        }
-    }
-
     func remove(collId: UUID) {
         for i in 0..<colls.count {
-            let (coll, _) = colls[i]
+            let coll = colls[i]
             if collId == coll.id {
                 colls.remove(at: i)
                 break
@@ -137,7 +91,7 @@ extension Element {
     @MainActor
     func destroy() {
         guard let other = self as? M else { return }
-        while let (coll, _) = colls.last {
+        while let coll = colls.last {
             coll.remove(element: other)
         }
     }
