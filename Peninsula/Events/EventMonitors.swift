@@ -22,18 +22,18 @@ class EventMonitors {
     let optionKeyPress: CurrentValueSubject<Bool, Never> = .init(false)
 
     private init() {
-        mouseMoveEvent = EventMonitor(mask: .mouseMoved) { [weak self] _ in
-            guard let self else { return }
-            let mouseLocation = NSEvent.mouseLocation
-            self.mouseLocation.send(mouseLocation)
-        }
-        mouseMoveEvent.start()
+//        mouseMoveEvent = EventMonitor(mask: .mouseMoved) { [weak self] _ in
+//            guard let self else { return }
+//            let mouseLocation = NSEvent.mouseLocation
+//            self.mouseLocation.send(mouseLocation)
+//        }
+//        mouseMoveEvent.start()
 
-        mouseDownEvent = EventMonitor(mask: .leftMouseDown) { [weak self] _ in
-            guard let self else { return }
-            mouseDown.send()
-        }
-        mouseDownEvent.start()
+//        mouseDownEvent = EventMonitor(mask: .leftMouseDown) { [weak self] _ in
+//            guard let self else { return }
+//            mouseDown.send()
+//        }
+//        mouseDownEvent.start()
 
         mouseDraggingFileEvent = EventMonitor(mask: .leftMouseDragged) { [weak self] _ in
             guard let self else { return }

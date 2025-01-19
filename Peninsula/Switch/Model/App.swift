@@ -106,7 +106,6 @@ class AppObserver {
     }
     
     func handleEvent(notificationType: String, element: AXUIElement) throws {
-        print(app?.getTitle(), notificationType)
         switch notificationType {
         case kAXApplicationActivatedNotification: try applicationActivated(element: element)
         case kAXMainWindowChangedNotification, kAXFocusedWindowChangedNotification: try focusedWindowChanged(element: element)

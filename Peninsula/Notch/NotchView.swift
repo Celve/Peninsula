@@ -7,24 +7,21 @@
 
 import SwiftUI
 
-struct NotchView: View {
-    @StateObject var vm: NotchViewModel
+struct NotchHoverView: View {
+    @StateObject var notchViewModel: NotchViewModel
     @ObservedObject var notchModel = NotchModel.shared
-
-    @State var dropTargeting: Bool = false
-
+    
     var body: some View {
         ZStack(alignment: .top) {
-            NotchDynamicView(vm: vm)
+            NotchDynamicView(notchViewModel: notchViewModel)
                 .zIndex(0)
-                .disabled(true)
             Group {
-                if vm.status == .opened {
-                    NotchContainerView(vm: vm)
-                        .padding(.top, vm.deviceNotchRect.height - vm.spacing + 1)
-                        .padding(vm.spacing)
+                if notchViewModel.status == .opened {
+                    NotchContainerView(vm: notchViewModel)
+                        .padding(.top, notchViewModel.deviceNotchRect.height - notchViewModel.spacing + 1)
+                        .padding(notchViewModel.spacing)
                         .frame(
-                            maxWidth: vm.notchOpenedSize.width, maxHeight: vm.notchOpenedSize.height
+                            maxWidth: notchViewModel.notchOpenedSize.width, maxHeight: notchViewModel.notchOpenedSize.height
                         )
                         .zIndex(1)
                 }
@@ -33,6 +30,27 @@ struct NotchView: View {
                 .blurReplace
             )
         }
+        .onHover { isHover in
+            if isHover && (notchViewModel.status == .notched || notchViewModel.status == .sliced) {
+                notchViewModel.notchPop()
+            } else if !isHover {
+                notchViewModel.notchClose()
+            }
+        }
+        .onTapGesture {
+            notchViewModel.notchOpen(contentType: .apps)
+        }
+    }
+}
+
+struct NotchView: View {
+    @StateObject var vm: NotchViewModel
+    @ObservedObject var notchModel = NotchModel.shared
+
+    @State var dropTargeting: Bool = false
+
+    var body: some View {
+        NotchHoverView(notchViewModel: vm, notchModel: notchModel)
         .animation(
             vm.status == .opened ? vm.innerOnAnimation : vm.innerOffAnimation, value: vm.status
         )

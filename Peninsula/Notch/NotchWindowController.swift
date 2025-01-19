@@ -16,11 +16,12 @@ class NotchWindowController: NSWindowController {
 
     var openAfterCreate: Bool = false
 
-    init(window: NSWindow, screen: NSScreen) {
+    init(window: NSPanel, screen: NSScreen) {
         var notchSize = screen.notchSize
         let vm = NotchViewModel(inset: -4, window: window, isBuiltin: notchSize != .zero)
         self.vm = vm
         self.screen = screen
+        window.orderFrontRegardless()
         super.init(window: window)
 
         contentViewController = NotchViewController(vm)
@@ -34,13 +35,12 @@ class NotchWindowController: NSWindowController {
             width: notchSize.width,
             height: notchSize.height
         )
-        window.makeKeyAndOrderFront(nil)
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak vm] in
             vm?.screenRect = screen.frame
             vm?.cgScreenRect = screen.frame
             vm?.cgScreenRect.origin.y = NSMaxY(NSScreen.screens[0].frame) - NSMaxY(screen.frame)
-            if self.openAfterCreate { vm?.notchOpen(contentType: .tray) }
+//            if self.openAfterCreate { vm?.notchOpen(contentType: .tray) }
         }
     }
 
@@ -50,7 +50,7 @@ class NotchWindowController: NSWindowController {
     convenience init(screen: NSScreen, app: NSRunningApplication) {
         let window = NotchWindow(
             contentRect: screen.frame,
-            styleMask: [.borderless, .fullSizeContentView],
+            styleMask: [.borderless, .nonactivatingPanel],
             backing: .buffered,
             defer: false,
             screen: screen

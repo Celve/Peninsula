@@ -135,7 +135,6 @@ class WindowObserver {
     }
 
     func handleEvent(notificationType: String, element: AXUIElement) throws {
-        print(window?.title, notificationType)
         switch notificationType {
         case kAXUIElementDestroyedNotification: try windowDestroyed(element: element)
         case kAXTitleChangedNotification: try windowTitleChanged(element: element)

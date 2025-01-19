@@ -11,7 +11,7 @@ import SwiftUI
 import UniformTypeIdentifiers
 
 struct NotchDynamicView: View {
-    @StateObject var vm: NotchViewModel
+    @StateObject var notchViewModel: NotchViewModel
     @StateObject var notchModel = NotchModel.shared
     @StateObject var nm = NotificationModel.shared
     @ObservedObject var windows = Windows.shared
@@ -21,85 +21,102 @@ struct NotchDynamicView: View {
             .foregroundStyle(.black)
             .mask(notchBackgroundMaskGroup)
             .frame(
-                width: vm.notchSize.width + vm.notchCornerRadius * 2,
-                height: vm.notchSize.height
+                width: notchViewModel.notchSize.width + notchViewModel.notchCornerRadius * 2,
+                height: notchViewModel.notchSize.height
             )
             .overlay(
                 Group {
-                    if vm.status != .opened {
-                        AbstractView(vm: vm)
+                    if notchViewModel.status != .opened {
+                        AbstractView(vm: notchViewModel)
                             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .trailing)
-                            .offset(x: -vm.spacing)
+                            .offset(x: -notchViewModel.spacing)
                             .transition(
                                 .blurReplace
                             )
                     }
                 }
             )
+            .overlay(
+                Group {
+                    if notchViewModel.status == .opened {
+                        Rectangle()
+                            .fill(Color.clear)
+                            .contentShape(Rectangle())
+                            .frame(
+                                width: notchViewModel.notchOpenedRect.width,
+                                height: notchViewModel.deviceNotchRect.height
+                            )
+                            .onTapGesture {
+                                notchViewModel.contentType = notchViewModel.contentType.next(invisibles: notchModel.invisibleContentTypes)
+                            }
+                    }
+                },
+                alignment: .top
+            )
             .shadow(
-                color: .black.opacity(([.opened, .popping].contains(vm.status)) ? 1 : 0),
+                color: .black.opacity(([.opened, .popping].contains(notchViewModel.status)) ? 1 : 0),
                 radius: 16
             )
-            .offset(x: vm.abstractSize / 2, y: 0)
+            .offset(x: notchViewModel.abstractSize / 2, y: 0)
             .animation(
-                vm.status == .opened
-                    ? vm.outerOnAnimation
-                    : vm.status == .notched ? vm.outerOffAnimation : vm.normalAnimation,
-                value: vm.status
+                notchViewModel.status == .opened
+                    ? notchViewModel.outerOnAnimation
+                    : notchViewModel.status == .notched ? notchViewModel.outerOffAnimation : notchViewModel.normalAnimation,
+                value: notchViewModel.status
             )
-            .animation(vm.outerOnAnimation, value: vm.contentType)
-            .animation(vm.normalAnimation, value: vm.abstractSize)
-            .animation(vm.outerOnAnimation, value: vm.notchOpenedSize)
+            .animation(notchViewModel.outerOnAnimation, value: notchViewModel.contentType)
+            .animation(notchViewModel.normalAnimation, value: notchViewModel.abstractSize)
+            .animation(notchViewModel.outerOnAnimation, value: notchViewModel.notchOpenedSize)
     }
 
     var notchBackgroundMaskGroup: some View {
         Rectangle()
             .foregroundStyle(.black)
             .frame(
-                width: vm.notchSize.width,
-                height: vm.notchSize.height
+                width: notchViewModel.notchSize.width,
+                height: notchViewModel.notchSize.height
             )
             .clipShape(
                 .rect(
-                    bottomLeadingRadius: vm.notchCornerRadius,
-                    bottomTrailingRadius: vm.notchCornerRadius
+                    bottomLeadingRadius: notchViewModel.notchCornerRadius,
+                    bottomTrailingRadius: notchViewModel.notchCornerRadius
                 )
             )
             .overlay {
                 ZStack(alignment: .topTrailing) {
                     Rectangle()
-                        .frame(width: vm.notchCornerRadius, height: vm.notchCornerRadius)
+                        .frame(width: notchViewModel.notchCornerRadius, height: notchViewModel.notchCornerRadius)
                         .foregroundStyle(.black)
                     Rectangle()
-                        .clipShape(.rect(topTrailingRadius: vm.notchCornerRadius))
+                        .clipShape(.rect(topTrailingRadius: notchViewModel.notchCornerRadius))
                         .foregroundStyle(.white)
                         .frame(
-                            width: vm.notchCornerRadius + vm.spacing,
-                            height: vm.notchCornerRadius + vm.spacing
+                            width: notchViewModel.notchCornerRadius + notchViewModel.spacing,
+                            height: notchViewModel.notchCornerRadius + notchViewModel.spacing
                         )
                         .blendMode(.destinationOut)
                 }
                 .compositingGroup()
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-                .offset(x: -vm.notchCornerRadius - vm.spacing + 0.5, y: -0.5)
+                .offset(x: -notchViewModel.notchCornerRadius - notchViewModel.spacing + 0.5, y: -0.5)
             }
             .overlay {
                 ZStack(alignment: .topLeading) {
                     Rectangle()
-                        .frame(width: vm.notchCornerRadius, height: vm.notchCornerRadius)
+                        .frame(width: notchViewModel.notchCornerRadius, height: notchViewModel.notchCornerRadius)
                         .foregroundStyle(.black)
                     Rectangle()
-                        .clipShape(.rect(topLeadingRadius: vm.notchCornerRadius))
+                        .clipShape(.rect(topLeadingRadius: notchViewModel.notchCornerRadius))
                         .foregroundStyle(.white)
                         .frame(
-                            width: vm.notchCornerRadius + vm.spacing,
-                            height: vm.notchCornerRadius + vm.spacing
+                            width: notchViewModel.notchCornerRadius + notchViewModel.spacing,
+                            height: notchViewModel.notchCornerRadius + notchViewModel.spacing
                         )
                         .blendMode(.destinationOut)
                 }
                 .compositingGroup()
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topTrailing)
-                .offset(x: vm.notchCornerRadius + vm.spacing - 0.5, y: -0.5)
+                .offset(x: notchViewModel.notchCornerRadius + notchViewModel.spacing - 0.5, y: -0.5)
             }
     }
 }

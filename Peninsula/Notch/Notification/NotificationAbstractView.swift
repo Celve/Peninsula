@@ -10,7 +10,9 @@ import SwiftUI
 
 struct QuiverView<Inner: View>: View {
     let inner: Inner
+    let tapGesture: () -> Void
     @State var quiver = false
+    @State var hover = false
 
     var body: some View {
         inner.scaleEffect(quiver ? 1.15 : 1)  // Apply a rotation effect for quivering
@@ -20,12 +22,18 @@ struct QuiverView<Inner: View>: View {
                     : .default,
                 value: quiver
             )
+            .scaleEffect(hover ? 1.15 : 1.0)
+            .animation(.easeInOut(duration: 0.2), value: hover)
             .onAppear {
                 quiver = true
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                     quiver = false
                 }
             }
+            .onHover { hover in
+                self.hover = hover
+            }
+            .onTapGesture(perform: tapGesture)
     }
 }
 
@@ -41,11 +49,19 @@ struct AbstractView: View {
                 case .num, .time:
                     QuiverView(inner: RoundedRectangle(cornerRadius: 4)
                         .fill(Color.white)
-                        .frame(width: vm.abstractSize - 4 * vm.deviceNotchRect.height / 8, height: 2))
+                        .frame(width: vm.abstractSize - 4 * vm.deviceNotchRect.height / 8, height: 2), tapGesture: {
+                            vm.notchOpen(contentType: .notification)
+                        })
                 case .icon(_, let color):
                     QuiverView(inner: RoundedRectangle(cornerRadius: 4)
                         .fill(Color(color))
-                        .frame(width: vm.abstractSize - 4 * vm.deviceNotchRect.height / 8, height: 2))
+                        .frame(width: vm.abstractSize - 4 * vm.deviceNotchRect.height / 8, height: 2), tapGesture: {
+                            if model.displayedName != "" {
+                                model.open(bundleId: model.displayedName)
+                            } else {
+                                vm.notchOpen(contentType: .notification)
+                            }
+                        })
                 case .none:
                     EmptyView()
                 }
@@ -58,12 +74,21 @@ struct AbstractView: View {
                                 contentMode: .fit
                             ),
                             percentage: 0.1
-                        ).padding(vm.deviceNotchRect.height / 8)
+                        ).padding(vm.deviceNotchRect.height / 8),
+                        tapGesture: {
+                            vm.notchOpen(contentType: .notification)
+                        }
                     )
                 case .icon(let icon, _):
                     QuiverView(
                         inner: Image(nsImage: icon).resizable().aspectRatio(contentMode: .fit).padding(
-                            vm.deviceNotchRect.height / 8))
+                            vm.deviceNotchRect.height / 8), tapGesture: {
+                                if model.displayedName != "" {
+                                    model.open(bundleId: model.displayedName)
+                                } else {
+                                    vm.notchOpen(contentType: .notification)
+                                }
+                            })
                 case .time(let hour, let min):
                     HStack(spacing: vm.deviceNotchRect.height / 8) {
                         ScaledPaddingView(

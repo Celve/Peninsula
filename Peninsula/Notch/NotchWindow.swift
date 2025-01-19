@@ -7,7 +7,7 @@
 
 import Cocoa
 
-class NotchWindow: NSWindow {
+class NotchWindow: NSPanel {
     override init(
         contentRect: NSRect,
         styleMask: NSWindow.StyleMask,
@@ -20,31 +20,31 @@ class NotchWindow: NSWindow {
             backing: backing,
             defer: flag
         )
-
-        title = "Peninsula"
+        
+        isFloatingPanel = true
         isOpaque = false
-        alphaValue = 1
         titleVisibility = .hidden
         titlebarAppearsTransparent = true
-        backgroundColor = NSColor.clear
+        backgroundColor = .clear
         isMovable = false
+        
         collectionBehavior = [
             .fullScreenAuxiliary,
             .stationary,
             .canJoinAllSpaces,
             .ignoresCycle,
         ]
-        level = .statusBar  // kills ibar lol
+        
+        isReleasedWhenClosed = false
+        level = .mainMenu + 3
         hasShadow = false
-        makeKey()
-        makeKeyAndOrderFront(nil)
     }
-
+    
     override var canBecomeKey: Bool {
-        true
+        false
     }
-
+    
     override var canBecomeMain: Bool {
-        true
+        false
     }
 }
