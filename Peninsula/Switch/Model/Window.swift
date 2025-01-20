@@ -77,6 +77,30 @@ class Window: Element, Switchable {
         }
     }
     
+    func quit() {
+        self.application.quit()
+    }
+    
+    func minimize() {
+        BackgroundWork.axCallsQueue.async { [weak self] in
+            guard let self else { return }
+//            if self.isFullscreen {
+//                self.axUiElement.setAttribute(kAXFullscreenAttribute, false)
+//                // minimizing is ignored if sent immediatly; we wait for the de-fullscreen animation to be over
+//                BackgroundWork.accessibilityCommandsQueue.asyncAfter(deadline: .now() + .seconds(1)) { [weak self] in
+//                    guard let self else { return }
+//                    self.axUiElement.setAttribute(kAXMinimizedAttribute, true)
+//                }
+//            } else {
+            self.axElement.setAttribute(kAXMinimizedAttribute, !self.isMinimized)
+//            }
+        }
+    }
+    
+    func hide() {
+        application.hide()
+    }
+
     func close() {
         BackgroundWork.axCallsQueue.async { [weak self] in
             guard let self = self else { return }

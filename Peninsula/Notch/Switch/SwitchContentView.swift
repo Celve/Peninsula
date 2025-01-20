@@ -18,7 +18,7 @@ struct SwitchContentView: View {
     
     var body: some View {
         VStack(spacing: 0) {
-            ForEach(Array(notchModel.state.expand().enumerated())[notchModel.globalWindowsBegin..<notchModel.globalWindowsEnd], id: \.offset) { index, window in
+            ForEach(Array(notchModel.stateExpansion.enumerated())[notchModel.globalWindowsBegin..<notchModel.globalWindowsEnd], id: \.offset) { index, window in
                 HStack {
                     AppIcon(name: window.getTitle() ?? "", image: (window.getIcon() ?? NSImage(systemSymbolName: "app.fill", accessibilityDescription: nil)!))
                     Text(window.getTitle() ?? "").foregroundStyle(index == notchModel.globalWindowsPointer ? .black : .white).lineLimit(1)

@@ -19,6 +19,7 @@ class App: Element, Switchable {
     var name: String
     var bundleId: String
     
+    var quitRequested: Bool = false
     
     init(nsApp: NSRunningApplication) {
         self.pid = nsApp.processIdentifier
@@ -49,6 +50,39 @@ class App: Element, Switchable {
         if windows.coll.count > 0 {
             windows.coll[0].focus()
         }
+    }
+    
+    func hide() {
+        if nsApp.isHidden {
+            nsApp.unhide()
+        } else {
+            nsApp.hide()
+        }
+    }
+    
+    func minimize() {
+        hide()
+    }
+    
+    func canBeQuit() -> Bool {
+        return bundleIdentifier != "com.apple.finder"
+    }
+
+    func quit() {
+        if !canBeQuit() {
+            NSSound.beep()
+            return
+        }
+        if quitRequested {
+            nsApp.forceTerminate()
+        } else {
+            nsApp.terminate()
+            quitRequested = true
+        }
+    }
+    
+    func close() {
+        quit()
     }
 }
 

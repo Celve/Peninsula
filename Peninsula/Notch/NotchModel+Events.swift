@@ -26,8 +26,8 @@ extension NotchModel {
     
     func closeAndFocus() {
         notchClose()
-        if globalWindowsPointer < state.expand().count {
-            state.expand()[globalWindowsPointer].focus()
+        if globalWindowsPointer < stateExpansion.count {
+            stateExpansion[globalWindowsPointer].focus()
         }
         initPointer(pointer: 0)
     }
@@ -76,16 +76,21 @@ extension NotchModel {
                     }
                     self.state = .none
                 case .hide:
-                    print("hide")
+                    if globalWindowsPointer < stateExpansion.count {
+                        stateExpansion[globalWindowsPointer].hide()
+                    }
                 case .minimize:
-                    print("mini")
+                    if globalWindowsPointer < stateExpansion.count {
+                        stateExpansion[globalWindowsPointer].minimize()
+                    }
                 case .close:
-                    print("close")
-                    if globalWindowsPointer < state.expand().count {
-                        state.expand()[globalWindowsPointer].close()
+                    if globalWindowsPointer < stateExpansion.count {
+                        stateExpansion[globalWindowsPointer].close()
                     }
                 case .quit:
-                    print("quit")
+                    if globalWindowsPointer < stateExpansion.count {
+                        stateExpansion[globalWindowsPointer].quit()
+                    }
                 case .drop:
                     notchClose()
                     initPointer(pointer: 1)

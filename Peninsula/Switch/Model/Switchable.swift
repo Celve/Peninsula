@@ -11,5 +11,8 @@ protocol Switchable {
     func getIcon() -> NSImage?
     func getTitle() -> String?
     func focus()
+    func hide()
+    func minimize()
+    func quit()
     func close()
 }

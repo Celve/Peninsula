@@ -14,25 +14,6 @@ enum SwitchState {
     case interWindows
     case interApps
     case intraApp
-    
-    func expand() -> [Switchable] {
-        switch self {
-        case .interWindows:
-            return Windows.shared.coll
-        case .interApps:
-            return Apps.shared.useableInner
-        case .intraApp:
-            if Windows.shared.coll.count > 0 {
-                let window = Windows.shared.coll[0]
-                let application = window.application
-                return application.windows.coll
-            } else {
-                return []
-            }
-        case .none:
-            return []
-        }
-    }
 }
 
 enum NotchContentType: Int, Codable, Hashable, Equatable {
@@ -88,6 +69,25 @@ class NotchModel: NSObject, ObservableObject {
     var externalWindowsCounter: Int? = nil
     @Published var invisibleContentTypes: Dictionary<NotchContentType, NotchContentType> = Dictionary()
     
+    var stateExpansion: [any Switchable] {
+        switch self.state {
+        case .interWindows:
+            return Windows.shared.coll
+        case .interApps:
+            return Apps.shared.useableInner
+        case .intraApp:
+            if Windows.shared.coll.count > 0 {
+                let window = Windows.shared.coll[0]
+                let application = window.application
+                return application.windows.coll
+            } else {
+                return []
+            }
+        case .none:
+            return []
+        }
+    }
+    
     @PublishedPersist(key: "fasterSwitch", defaultValue: false)
     var fasterSwitch: Bool
     
@@ -106,7 +106,7 @@ class NotchModel: NSObject, ObservableObject {
     }
     
     var globalWindowsPointer: Int {
-        let count = state.expand().count
+        let count = stateExpansion.count
         if count == 0 {
             return 0
         } else {
@@ -119,7 +119,7 @@ class NotchModel: NSObject, ObservableObject {
     }
     
     var globalWindowsEnd: Int {
-        min(globalWindowsBegin + SwitchContentView.COUNT, state.expand().count)
+        min(globalWindowsBegin + SwitchContentView.COUNT, stateExpansion.count)
     }
     
     func updateExternalPointer(pointer: Int?) {
