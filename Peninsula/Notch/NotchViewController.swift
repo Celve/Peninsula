@@ -11,7 +11,7 @@ import SwiftUI
 
 class NotchViewController: NSHostingController<NotchView> {
     init(_ vm: NotchViewModel) {
-        super.init(rootView: .init(vm: vm))
+        super.init(rootView: .init(notchViewModel: vm))
     }
 
     @available(*, unavailable)

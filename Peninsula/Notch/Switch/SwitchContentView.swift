@@ -26,10 +26,11 @@ struct SwitchContentView: View {
                 .frame(width: notchViewModel.notchOpenedSize.width - notchViewModel.spacing * 2, height: SwitchContentView.HEIGHT, alignment: .leading)
                 .background(RoundedRectangle(cornerRadius: 16).fill(index == notchModel.globalWindowsPointer ? Color.white : Color.clear).frame(maxWidth: .infinity))
                 .id(index)
-                .onHover { hover in
-                    if hover {
+                .onContinuousHover { phase in
+                    switch phase {
+                    case .active:
                         notchModel.updateExternalPointer(pointer: index)
-                    } else {
+                    case .ended:
                         notchModel.updateExternalPointer(pointer: nil)
                     }
                 }

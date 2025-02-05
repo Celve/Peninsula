@@ -8,6 +8,7 @@
 import Foundation
 import SwiftUICore
 import Combine
+import AppKit
 
 enum SwitchState {
     case none
@@ -62,7 +63,7 @@ class NotchModel: NSObject, ObservableObject {
     static let shared = NotchModel()
     let notchViewModels = NotchViewModels.shared
     @Published var isFirstOpen: Bool = true // for first open the app
-    @Published var isFirstTouch: Bool = true // for first touch in the switch window
+    @Published var lastMouseLocation: NSPoint = NSEvent.mouseLocation // for first touch in the switch window
     @Published var state: SwitchState = .none
     var cancellables: Set<AnyCancellable> = []
     @Published var windowsCounter: Int = 1
@@ -124,23 +125,17 @@ class NotchModel: NSObject, ObservableObject {
     
     func updateExternalPointer(pointer: Int?) {
         externalWindowsCounter = pointer
-        if let pointer = pointer, !isFirstTouch {
+        let mouseLocation = NSEvent.mouseLocation
+        if let pointer = pointer, lastMouseLocation != mouseLocation {
             windowsCounter = pointer
         }
-    }
-    
-    func touch() {
-        isFirstTouch = false
-        if let counter = externalWindowsCounter {
-            windowsCounter = counter
-        }
+        lastMouseLocation = mouseLocation
     }
     
     func incrementPointer() {
         if globalWindowsPointer != 0 && globalWindowsPointer % SwitchContentView.COUNT == SwitchContentView.COUNT - 1 {
             externalWindowsCounter = nil
         }
-        isFirstTouch = true
         windowsCounter += 1
     }
     
@@ -148,12 +143,11 @@ class NotchModel: NSObject, ObservableObject {
         if globalWindowsPointer != 0 && globalWindowsPointer % SwitchContentView.COUNT == 0 {
             externalWindowsCounter = nil
         }
-        isFirstTouch = true
         windowsCounter -= 1
     }
     
     func initPointer(pointer: Int) {
-        isFirstTouch = true
+        lastMouseLocation = NSEvent.mouseLocation
         externalWindowsCounter = nil
         windowsCounter = pointer
     }

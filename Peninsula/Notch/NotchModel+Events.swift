@@ -105,12 +105,5 @@ extension NotchModel {
         setupEachCancellable(toggleType: .optTab, triggeredState: .interApps)
         setupEachCancellable(toggleType: .cmdBtick, triggeredState: .intraApp)
         let events = EventMonitors.shared
-        events.mouseLocation
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] mouseLocation in
-                guard let self else { return }
-                self.touch()
-            }
-            .store(in: &cancellables)
     }
 }
