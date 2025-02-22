@@ -150,11 +150,16 @@ class HotKeyObserver {
             callback: { (proxy, type, event, refcon) -> Unmanaged<CGEvent>? in
                 // Retrieve the CurrentValueSubject instance from the unmanaged pointer
                 let this = Unmanaged<HotKeyObserver>.fromOpaque(refcon!).takeUnretainedValue()
-                let keyCode = event.getIntegerValueField(.keyboardEventKeycode)
-                let flags = event.flags
-                for toggle in this.toggles {
-                    if toggle.process(globalState: &this.state, type: type, keyCode: Int(keyCode), flags: flags) {
-                        return nil
+                
+                if (type == .tapDisabledByUserInput || type == .tapDisabledByTimeout) {
+                    CGEvent.tapEnable(tap: this.eventTap!, enable: true)
+                } else {
+                    let keyCode = event.getIntegerValueField(.keyboardEventKeycode)
+                    let flags = event.flags
+                    for toggle in this.toggles {
+                        if toggle.process(globalState: &this.state, type: type, keyCode: Int(keyCode), flags: flags) {
+                            return nil
+                        }
                     }
                 }
 
@@ -165,6 +170,7 @@ class HotKeyObserver {
             let runLoopSource = CFMachPortCreateRunLoopSource(kCFAllocatorDefault, eventTap, 0)
             CFRunLoopAddSource(CFRunLoopGetCurrent(), runLoopSource, .commonModes)
             CGEvent.tapEnable(tap: eventTap, enable: true)
+            print("Succeeded to create event tap")
         } else {
             print("Failed to create event tap")
         }
