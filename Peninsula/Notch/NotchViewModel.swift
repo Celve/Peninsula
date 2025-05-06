@@ -5,7 +5,7 @@ import LaunchAtLogin
 import SwiftUI
 
 class NotchViewModel: NSObject, ObservableObject {
-    @ObservedObject var notifModel = NotificationModel.shared
+    @ObservedObject var notifModel = NewNotificationModel.shared
     @ObservedObject var windows = Windows.shared
     @ObservedObject var notchModel = NotchModel.shared
     var cancellables: Set<AnyCancellable> = []
@@ -87,17 +87,15 @@ class NotchViewModel: NSObject, ObservableObject {
 
     var abstractSize: CGFloat {
         if status == .opened {
-            0
+            return 0
         } else {
-            switch notifModel.displayedBadge {
-            case .icon(_):
-                deviceNotchRect.height + deviceNotchRect.height / 4
-            case .num(_):
-                deviceNotchRect.height + deviceNotchRect.height / 4
-            case .time(_, _):
-                deviceNotchRect.height * 4 + deviceNotchRect.height / 4
-            case .none:
-                0
+            let count = notifModel.names.count
+            if count == 0 {
+                return 0
+            } else {
+                let spacing = deviceNotchRect.height / 8
+                let itemHeight = deviceNotchRect.height
+                return spacing + (itemHeight + spacing) * CGFloat(count)
             }
         }
     }

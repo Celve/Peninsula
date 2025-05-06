@@ -13,7 +13,8 @@ import UniformTypeIdentifiers
 struct NotchDynamicView: View {
     @StateObject var notchViewModel: NotchViewModel
     @StateObject var notchModel = NotchModel.shared
-    @StateObject var nm = NotificationModel.shared
+    @StateObject var sysNotifModel = SystemNotificationModel.shared
+    @StateObject var notifModel = NewNotificationModel.shared
     @ObservedObject var windows = Windows.shared
 
     var body: some View {
@@ -27,7 +28,7 @@ struct NotchDynamicView: View {
             .overlay(
                 Group {
                     if notchViewModel.status != .opened {
-                        AbstractView(vm: notchViewModel)
+                        NewNotificationAbstractView(notchViewModel: notchViewModel)
                             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .trailing)
                             .offset(x: -notchViewModel.spacing)
                             .transition(

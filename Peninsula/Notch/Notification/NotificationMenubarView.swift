@@ -9,7 +9,7 @@ import SwiftUI
 
 struct NotificationMenubarView: View {
     @StateObject var vm: NotchViewModel
-    @StateObject var nm = NotificationModel.shared
+    @StateObject var sysNotifModel = SystemNotificationModel.shared
 
     var body: some View {
         HStack {
@@ -31,7 +31,7 @@ struct NotificationMenubarView: View {
                         else {
                             return
                         }
-                        nm.observe(bundleId: appBundle.bundleIdentifier ?? "")
+                        sysNotifModel.observe(bundleId: appBundle.bundleIdentifier ?? "")
                     } else {
                         vm.isExternal = false
                     }

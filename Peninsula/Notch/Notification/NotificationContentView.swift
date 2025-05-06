@@ -10,13 +10,13 @@ import SwiftUI
 
 struct NotificationContentView: View {
     @StateObject var nvm: NotchViewModel
-    @StateObject var nm = NotificationModel.shared
+    @StateObject var nm = SystemNotificationModel.shared
     @State var isAnimating = false
 
     var body: some View {
         HStack(alignment: .top, spacing: nvm.spacing) {
             ForEach(Array(nm.items.keys), id: \.self) { key in
-                AppIcon(bundleId: key, image: nm.items[key]!.icon, vm: nvm)
+                AppIcon(bundleId: key, image: AnyView(nm.items[key]!.icon), vm: nvm)
             }
         }.animation(nvm.normalAnimation, value: nm.items)
     }
@@ -24,8 +24,8 @@ struct NotificationContentView: View {
 
 private struct AppIcon: View {
     let bundleId: String
-    let image: NSImage
-    @ObservedObject var nm = NotificationModel.shared
+    let image: AnyView
+    @ObservedObject var nm = SystemNotificationModel.shared
     @StateObject var vm: NotchViewModel
 
     @State var hover: Bool = false
@@ -35,10 +35,8 @@ private struct AppIcon: View {
 
     var body: some View {
         ZStack {
-            Image(nsImage: image)
-                .resizable()
+            image
                 .contentShape(Rectangle())
-                .aspectRatio(contentMode: .fit)
                 .scaleEffect(hover ? 1.15 : 1)
                 .animation(.spring(), value: hover)
                 .rotationEffect(.degrees(quiver ? 5 : 0))  // Apply a rotation effect for quivering

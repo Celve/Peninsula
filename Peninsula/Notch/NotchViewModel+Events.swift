@@ -35,18 +35,10 @@ extension NotchViewModel {
                         }
                     case .sliced, .notched, .popping:
                         // touch inside, open
-                        if true {
-                            if abstractRect.insetBy(dx: inset, dy: inset).contains(mouseLocation) {
-                                if notifModel.displayedName != "" {
-                                    notifModel.open(bundleId: notifModel.displayedName)
-                                } else {
-                                    notchOpen(contentType: .notification)
-                                }
-                            } else if notchRect.insetBy(dx: inset, dy: inset).contains(
-                                mouseLocation)
-                            {
-                                notchOpen(contentType: NotchContentType(rawValue: 0)!)
-                            }
+                        if notchRect.insetBy(dx: inset, dy: inset).contains(
+                            mouseLocation)
+                        {
+                            notchOpen(contentType: NotchContentType(rawValue: 0)!)
                         }
                     }
                 }
