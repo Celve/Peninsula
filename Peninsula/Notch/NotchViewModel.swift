@@ -5,7 +5,7 @@ import LaunchAtLogin
 import SwiftUI
 
 class NotchViewModel: NSObject, ObservableObject {
-    @ObservedObject var notifModel = NewNotificationModel.shared
+    @ObservedObject var notifModel = NotificationModel.shared
     @ObservedObject var windows = Windows.shared
     @ObservedObject var notchModel = NotchModel.shared
     var cancellables: Set<AnyCancellable> = []

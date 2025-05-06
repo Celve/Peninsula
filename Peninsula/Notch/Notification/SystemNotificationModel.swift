@@ -63,14 +63,14 @@ class SystemNotificationItem: Equatable {
     }
 }
 
-class SystemNotificationInstance: NewNotificationInstance, Equatable {
+class SystemNotificationInstance: NotificationInstance, Equatable {
     var id: UUID
     var category: String
-    var ty: NewNotificationType
+    var ty: NotificationType
     var icon: any View
     var action: (NotchViewModel) -> Void
     
-    init(category: String, ty: NewNotificationType, icon: any View, action: @escaping (NotchViewModel) -> Void) {
+    init(category: String, ty: NotificationType, icon: any View, action: @escaping (NotchViewModel) -> Void) {
         self.id = UUID()
         self.category = category
         self.ty = ty
@@ -86,7 +86,7 @@ class SystemNotificationInstance: NewNotificationInstance, Equatable {
 class SystemNotificationModel: ObservableObject {
     static let shared = SystemNotificationModel()
     @ObservedObject var notchModel = NotchModel.shared
-    @ObservedObject var notifModel = NewNotificationModel.shared
+    @ObservedObject var notifModel = NotificationModel.shared
     @ObservedObject var apps = Apps.shared
     let monitor = BadgeMonitor.shared
 
