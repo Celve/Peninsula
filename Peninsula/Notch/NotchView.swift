@@ -33,6 +33,7 @@ struct NotchHoverView: View {
         .onHover { isHover in
             if isHover && (notchViewModel.status == .notched || notchViewModel.status == .sliced) {
                 notchViewModel.notchPop()
+                self.notchViewModel.hapticSender.send()
             } else if !isHover {
                 notchViewModel.notchClose()
             }
