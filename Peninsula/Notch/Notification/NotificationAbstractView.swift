@@ -11,6 +11,7 @@ import SwiftUI
 struct QuiverView<Inner: View>: View {
     let inner: Inner
     let tapGesture: () -> Void
+    var notchViewModel: NotchViewModel
     @State var quiver = false
     @State var hover = false
 
@@ -32,6 +33,9 @@ struct QuiverView<Inner: View>: View {
             }
             .onHover { hover in
                 self.hover = hover
+                if let window = NSApp.windows.first(where: { $0.windowNumber == notchViewModel.windowId }) {
+                    window.makeKey()
+                }
             }
             .onTapGesture(perform: tapGesture)
     }
@@ -47,21 +51,23 @@ struct NotificationAbstractView: View {
             case .sliced:
                 EmptyView()
             case .notched, .popping:
-                HStack {
+                HStack(spacing: 0) {
                     ForEach(Array(notifModel.names), id: \.self) { name in
                         if let item = notifModel.temporaryItems[name] {
                             QuiverView(
-                                inner: AnyView(item.icon),
+                                inner: AnyView(item.icon(notchViewModel)),
                                 tapGesture: {
                                     item.action(notchViewModel)
-                                }
+                                },
+                                notchViewModel: notchViewModel
                             ).padding(notchViewModel.deviceNotchRect.height / 12)
                         } else if let item = notifModel.alwaysItems[name] {
                             QuiverView(
-                                inner: AnyView(item.icon),
+                                inner: AnyView(item.icon(notchViewModel)),
                                 tapGesture: {
                                     item.action(notchViewModel)
-                                }
+                                },
+                                notchViewModel: notchViewModel
                             ).padding(notchViewModel.deviceNotchRect.height / 12)
                         }
                     }

@@ -59,7 +59,7 @@ class SystemNotificationItem: Equatable {
     }
 
     func instance() -> SystemNotificationInstance {
-        return SystemNotificationInstance(category: "system_notification", ty: .temporary(6), icon: self.icon, action: { (notchViewModel: NotchViewModel) in SystemNotificationModel.shared.open(bundleId: self.bundleId) })
+        return SystemNotificationInstance(category: "system_notification", ty: .temporary(6), icon: { (notchViewModel: NotchViewModel) in self.icon }, action: { (notchViewModel: NotchViewModel) in SystemNotificationModel.shared.open(bundleId: self.bundleId) })
     }
 }
 
@@ -67,10 +67,10 @@ class SystemNotificationInstance: NotificationInstance, Equatable {
     var id: UUID
     var category: String
     var ty: NotificationType
-    var icon: any View
+    var icon: (NotchViewModel) -> any View
     var action: (NotchViewModel) -> Void
     
-    init(category: String, ty: NotificationType, icon: any View, action: @escaping (NotchViewModel) -> Void) {
+    init(category: String, ty: NotificationType, icon: @escaping (NotchViewModel) -> any View, action: @escaping (NotchViewModel) -> Void) {
         self.id = UUID()
         self.category = category
         self.ty = ty
@@ -162,12 +162,14 @@ class SystemNotificationModel: ObservableObject {
                 self.notifModel.add(item: SystemNotificationInstance(
                     category: "system_notification",
                     ty: .always,
-                    icon: AnyView(ScaledPaddingView(
-                        inner: Image(systemName: "\(self.total).square.fill")
-                            .resizable()
-                            .aspectRatio(contentMode: .fit),
-                        percentage: 0.1
-                    )),
+                    icon: { (notchViewModel: NotchViewModel) in
+                        AnyView(ScaledPaddingView(
+                            inner: Image(systemName: "\(self.total).square.fill")
+                                .resizable()
+                                .aspectRatio(contentMode: .fit),
+                            percentage: 0.1
+                        ))
+                    },
                     action: { (notchViewModel: NotchViewModel) in
                         notchViewModel.notchOpen(contentType: .notification)
                     }

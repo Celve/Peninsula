@@ -35,6 +35,8 @@ struct NotchContainerView: View {
                 .animation(vm.normalAnimation, value: vm.contentType)
                 .animation(vm.status == .opened ? vm.innerOnAnimation : vm.innerOffAnimation, value: vm.status)
             switch vm.contentType {
+            case .timer:
+                TimerMenuView(notchViewModel: vm)
             case .tray:
                 HStack(spacing: vm.spacing) {
                     TrayView(vm: vm)

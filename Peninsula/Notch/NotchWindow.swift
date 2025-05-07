@@ -45,6 +45,6 @@ class NotchWindow: NSPanel {
     }
     
     override var canBecomeMain: Bool {
-        false
+        true
     }
 }

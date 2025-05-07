@@ -19,16 +19,23 @@ enum SwitchState {
 
 enum NotchContentType: Int, Codable, Hashable, Equatable {
     case apps
+    case timer
     case notification
     case tray
     case traySettings
     case settings
     case switching
     
-    func toTitle() -> String {
+    func count() -> Int {
+        return 7
+    }
+    
+    func toTitle() -> String { // when modify this, don't forgfet to modify the count of cases
         switch self {
         case .apps:
             return "Apps"
+        case .timer:
+            return "Timer"
         case .tray:
             return "Tray"
         case .traySettings:
@@ -57,6 +64,22 @@ enum NotchContentType: Int, Codable, Hashable, Equatable {
         }
         return contentType
     }
+
+    func previous(invisibles: Dictionary<Self, Self>) -> Self {
+        var contentType = self
+        if let previousContentType = invisibles[contentType]{
+            return previousContentType
+        } else {
+            repeat {
+                if let previousValue = NotchContentType(rawValue: contentType.rawValue - 1) {
+                    contentType = previousValue
+                } else {
+                    contentType = NotchContentType(rawValue: count() - 1)!
+                }
+            } while invisibles.keys.contains(where: { $0 == contentType })
+        }
+        return contentType
+    }
 }
 
 class NotchModel: NSObject, ObservableObject {
@@ -69,6 +92,8 @@ class NotchModel: NSObject, ObservableObject {
     @Published var windowsCounter: Int = 1
     var externalWindowsCounter: Int? = nil
     @Published var invisibleContentTypes: Dictionary<NotchContentType, NotchContentType> = Dictionary()
+    @Published var buffer: String = ""
+    @Published var cursor: Int = 0
     
     var stateExpansion: [any Switchable] {
         switch self.state {
