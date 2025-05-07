@@ -119,8 +119,8 @@ struct TimerView: View {
 
 struct TimerAbstractView: View {
     @StateObject var timerViewModel: TimerViewModel
-    let timerColor: Color = .white.opacity(0.8)
-    @State private var isHovering: Bool = false
+    let timerColor: Color = .white
+    @State private var animating: Bool = false
 
     var lineWidth: CGFloat { 
         circleWidth / 10
@@ -129,35 +129,50 @@ struct TimerAbstractView: View {
     let circleWidth: CGFloat
 
     var body: some View {
-        VStack {
-            ZStack {
-                Circle()
-                    .stroke(lineWidth: lineWidth)
-                    .foregroundStyle(timerColor.opacity(0.4))
-                    .padding(lineWidth)
-                    .frame(width: circleWidth, height: circleWidth)
-                Circle()
-                    .trim(from: 0.0, to: min(1-timerViewModel.progress, 1.0))
-                    .stroke(timerColor.gradient, style: StrokeStyle(
-                        lineWidth: lineWidth,
-                        lineCap: .round,
-                        lineJoin: .miter))
-                    .rotationEffect(.degrees(-90))
-                    .shadow(radius: 2)
-                    .padding(lineWidth)
-                    .frame(width: circleWidth, height: circleWidth)
-                Rectangle()
-                    .cornerRadius(lineWidth)
-                    .frame(width: lineWidth, height: (circleWidth - lineWidth) / 4)
-                    .foregroundStyle(timerColor)
-                    .offset(y: -(circleWidth - lineWidth) / 6)
-                    .rotationEffect(.degrees(CGFloat(360) * (1 - timerViewModel.progress)))
-                    .shadow(radius: 1)
-            }
-            .animation(.linear, value: timerViewModel.remainingTime)
-            .aspectRatio(contentMode: .fit)
-            
+        ZStack {
+            Circle()
+                .stroke(lineWidth: lineWidth)
+                .foregroundStyle(animating ? timerColor : timerColor.opacity(0.2))
+                .padding(lineWidth)
+                .frame(width: circleWidth, height: circleWidth)
+            Circle()
+                .trim(from: 0.0, to: min(1-timerViewModel.progress, 1.0))
+                .stroke(timerColor, style: StrokeStyle(
+                    lineWidth: lineWidth,
+                    lineCap: .round,
+                    lineJoin: .miter))
+                .rotationEffect(.degrees(-90))
+                .shadow(radius: 2)
+                .padding(lineWidth)
+                .frame(width: circleWidth, height: circleWidth)
+            Rectangle()
+                .cornerRadius(lineWidth)
+                .frame(width: lineWidth, height: (circleWidth - lineWidth) / 4)
+                .foregroundStyle(timerColor)
+                .offset(y: -(circleWidth - lineWidth) / 6)
+                .rotationEffect(.degrees(CGFloat(360) * (1 - timerViewModel.progress)))
+                .shadow(radius: 1)
         }
+        .scaleEffect(animating ? 1.15 : 1)
+        .rotationEffect(.degrees(animating ? 45 : 0))
+        .animation(
+            animating
+                ? Animation.easeInOut(duration: 0.1).repeatForever(autoreverses: true)
+                : .linear,
+            value: animating
+        )
+        .animation(.linear, value: timerViewModel.remainingTime)
+        .onAppear {
+            if timerViewModel.remainingTime <= 0 {
+                animating = true
+            }
+        }
+        .onChange(of: timerViewModel.remainingTime) { newValue in
+            if newValue <= 0 {
+                animating = true
+            }
+        }
+        .aspectRatio(contentMode: .fit)
     }
 }
 

@@ -14,9 +14,11 @@ class TimerViewModel: Hashable, ObservableObject {
     @Published var totalTime: Int
     @Published var elapsedTime: Int = 0
     @Published var isRunning: Bool = false
+    var callback: () -> Void
     
-    init(time: Int) {
+    init(time: Int, callback: @escaping () -> Void) {
         self.totalTime = time
+        self.callback = callback
     }
     
     var remainingTime: Int {
@@ -34,6 +36,7 @@ class TimerViewModel: Hashable, ObservableObject {
                 self.elapsedTime += 1
             } else {
                 self.stop()
+                self.callback()
             }
         }
     }
@@ -78,7 +81,7 @@ class TimerModel: ObservableObject {
 
     init(times: [Int]) {
         for time in times {
-            self.viewModels.append(TimerViewModel(time: time))
+            self.add(time: time)
         }
     }
 
@@ -88,8 +91,20 @@ class TimerModel: ObservableObject {
         NotificationModel.shared.remove(ty: .always, category: "timer_\(id)")
     }
 
+    func clearExpiredTimers() {
+        // Get all expired timer IDs
+        let expiredTimerIDs = viewModels
+            .filter { $0.remainingTime <= 0 }
+            .map { $0.id }
+        
+        // Remove each expired timer
+        for id in expiredTimerIDs {
+            remove(id: id)
+        }
+    }
+
     func add(time: Int) {
-        let timer = TimerViewModel(time: time)
+        let timer = TimerViewModel(time: time, callback: {})
         viewModels.append(timer)
         timer.start()
         

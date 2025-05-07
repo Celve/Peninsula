@@ -27,6 +27,9 @@ struct TimerMenuView: View {
             }
         }
         .padding(0)
+        .onAppear { 
+            timerModel.clearExpiredTimers()
+        }
     }
 }
 
