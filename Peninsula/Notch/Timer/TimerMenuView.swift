@@ -25,7 +25,9 @@ struct TimerMenuView: View {
                         }
                         .animation(.easeInOut(duration: 0.2), value: timerModel.viewModels)
                     }
-                }.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+                .animation(.easeInOut(duration: 0.2), value: timerModel.viewModels)
                 Spacer()
                 Text(timerModel.description)
                     .lineLimit(1)
