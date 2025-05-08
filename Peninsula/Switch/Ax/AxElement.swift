@@ -84,6 +84,27 @@ extension AXUIElement {
         return result
     }
     
+    func parent() throws -> AXUIElement? {
+        return try attribute(kAXParentAttribute, AXUIElement.self)
+    }
+    
+    func rootParent() throws -> AXUIElement? {
+        var current = self
+        while let parent = try current.parent() {
+            current = parent
+        }
+        return current
+    }
+
+    func secondRootParent() throws -> AXUIElement? {
+        var current = self, last = self
+        while let parent = try current.parent() {
+            last = current
+            current = parent
+        }
+        return last
+    }
+    
     func closeButton() throws -> AXUIElement? {
         return try attribute(kAXCloseButtonAttribute, AXUIElement.self)
     }

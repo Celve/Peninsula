@@ -80,7 +80,18 @@ class App: Element, Switchable {
             quitRequested = true
         }
     }
-    
+
+    @MainActor
+    func destroy() {
+        // First destroy all windows
+        for window in windows.coll {
+            window.destroy()
+        }
+        
+        // Then destroy self
+        (self as any Element).destroy()
+    }
+
     func close() {
         quit()
     }

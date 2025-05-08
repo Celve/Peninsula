@@ -26,6 +26,7 @@ final class Apps: Collection, ObservableObject {
     
     init() {
         WorkspaceEvents.observeRunningApplications()
+        WorkspaceEvents.observeFocusedElement()
         addInitials()
         refreshBadges()
         autoRefresh()
@@ -80,6 +81,29 @@ func isActualApplication(_ app: NSRunningApplication) -> Bool {
 class WorkspaceEvents {
     private static var appsObserver: NSKeyValueObservation!
     private static var previousValueOfRunningApps: Set<NSRunningApplication>!
+    private static var focusTimer: DispatchSourceTimer?
+
+    static func observeFocusedElement() {
+        focusTimer = DispatchSource.makeTimerSource(queue: BackgroundWork.axCallsQueue)
+        focusTimer?.schedule(deadline: .now(), repeating: .seconds(1))
+        focusTimer?.setEventHandler {
+            BackgroundWork.axCallsQueue.taskRestricted {
+                await MainActor.run {
+                    let systemWide = AXUIElementCreateSystemWide()
+                    if let focusedElement = try? systemWide.attribute(kAXFocusedUIElementAttribute, AXUIElement.self) {
+                        let windowElement = try? focusedElement.secondRootParent()
+                        if let windowId = Windows.shared.coll.firstIndex(where: { $0.axElement == windowElement }) {
+                            if windowId != 0 {
+                                let window = Windows.shared.coll[windowId]
+                                window.peek()
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        focusTimer?.resume()
+    }
     
     static func observeRunningApplications() {
         previousValueOfRunningApps = Set(NSWorkspace.shared.runningApplications)
