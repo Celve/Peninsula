@@ -14,10 +14,12 @@ class TimerViewModel: Hashable, ObservableObject {
     @Published var totalTime: Int
     @Published var elapsedTime: Int = 0
     @Published var isRunning: Bool = false
+    @Published var description: String 
     var callback: () -> Void
     
-    init(time: Int, callback: @escaping () -> Void) {
+    init(time: Int, description: String, callback: @escaping () -> Void) {
         self.totalTime = time
+        self.description = description
         self.callback = callback
     }
     
@@ -78,10 +80,11 @@ class TimerModel: ObservableObject {
     static let shared = TimerModel(times: [])
     @Published var viewModels: [TimerViewModel] = []
     var absInsts: [TimerAbstractInstance] = []
+    @Published var description: String = "None" // placeholder is needed, otherwise the view will not show
 
     init(times: [Int]) {
         for time in times {
-            self.add(time: time)
+            self.add(time: time, description: "")
         }
     }
 
@@ -103,13 +106,17 @@ class TimerModel: ObservableObject {
         }
     }
 
-    func add(time: Int) {
-        let timer = TimerViewModel(time: time, callback: {})
+    func add(time: Int, description: String) {
+        let timer = TimerViewModel(time: time, description: description, callback: {})
         viewModels.append(timer)
         timer.start()
         
         let absInst = TimerAbstractInstance(timerViewModel: timer)
         absInsts.append(absInst)
         NotificationModel.shared.add(item: absInst)
+    }
+
+    func setDescription(description: String) {
+        self.description = description
     }
 }

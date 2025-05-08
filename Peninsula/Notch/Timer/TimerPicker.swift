@@ -115,7 +115,7 @@ struct TimerPickerView: View {
                     if match(text: text, pattern: #"(\d+)s"#) == nil { 
                         timerPickerViewModel.secondsViewModel.setPosition(position: 0)
                     }
-                    timerModel.add(time: timerPickerViewModel.hoursViewModel.trueValue * 3600 + timerPickerViewModel.minutesViewModel.trueValue * 60 + timerPickerViewModel.secondsViewModel.trueValue)
+                    timerModel.add(time: timerPickerViewModel.hoursViewModel.trueValue * 3600 + timerPickerViewModel.minutesViewModel.trueValue * 60 + timerPickerViewModel.secondsViewModel.trueValue, description: text)
                     text = "" // Clear the text field after submission
                 }
                 .onChange(of: text) { newValue in

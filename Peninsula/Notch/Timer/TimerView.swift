@@ -19,11 +19,12 @@ struct PressDownAnimationStyle: ButtonStyle {
 struct TimerView: View {
     @StateObject var timerViewModel: TimerViewModel
     let timerColor: Color = .white.opacity(0.8)
-    @State private var isHovering: Bool = false
+    @State private var isHoveringOnNumber: Bool = false
+    @State private var isHoveringOnAll: Bool = false
 
     let lineWidth: CGFloat = 5
     let fontSize: CGFloat = 18
-    let circleWidth: CGFloat = 100
+    let circleWidth: CGFloat = 90
     var body: some View {
         VStack {
             ZStack {
@@ -59,10 +60,10 @@ struct TimerView: View {
                             .contentTransition(.numericText())
                     }
                     .onHover { hovering in
-                        isHovering = hovering
+                        isHoveringOnNumber = hovering
                     }
-                    .scaleEffect(isHovering ? 1.1 : 1)
-                    .animation(.easeInOut(duration: 0.2), value: isHovering)
+                    .scaleEffect(isHoveringOnNumber ? 1.1 : 1)
+                    .animation(.easeInOut(duration: 0.2), value: isHoveringOnNumber)
                     .buttonStyle(PressDownAnimationStyle())
                     .buttonStyle(.plain)
 
@@ -101,6 +102,15 @@ struct TimerView: View {
                 .frame(width: circleWidth, height: circleWidth)
             }
             .animation(.linear, value: timerViewModel.remainingTime)
+            .onHover { hovering in
+                isHoveringOnAll = hovering
+                if isHoveringOnAll {
+                    TimerModel.shared.setDescription(description: timerViewModel.description)
+                } else {
+                    TimerModel.shared.setDescription(description: "None")
+                }
+            }
+            .aspectRatio(contentMode: .fit)
         }
     }
     
