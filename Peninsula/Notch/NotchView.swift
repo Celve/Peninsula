@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct NotchHoverView: View {
-    @StateObject var notchViewModel: NotchViewModel
+    @ObservedObject var notchViewModel: NotchViewModel
     @ObservedObject var notchModel = NotchModel.shared
     
     var body: some View {
@@ -24,11 +24,10 @@ struct NotchHoverView: View {
                             maxWidth: notchViewModel.notchOpenedSize.width, maxHeight: notchViewModel.notchOpenedSize.height
                         )
                         .zIndex(1)
+                } else if notchViewModel.status == .popping {
+
                 }
             }
-            .transition(
-                .blurReplace
-            )
         }
         .onHover { isHover in
             if isHover && (notchViewModel.status == .notched || notchViewModel.status == .sliced) {

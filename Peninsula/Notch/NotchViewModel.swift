@@ -128,8 +128,8 @@ class NotchViewModel: NSObject, ObservableObject {
             return notchOpenedSize
         case .popping:
             return .init(
-                width: deviceNotchRect.width + abstractSize + 6,
-                height: deviceNotchRect.height + 6
+                width: deviceNotchRect.width + abstractSize + spacing,
+                height: deviceNotchRect.height * 2 + spacing
             )
         }
     }

@@ -36,13 +36,28 @@ struct NotchDynamicView: View {
                 Group {
                     if notchViewModel.status != .opened {
                         NotificationAbstractView(notchViewModel: notchViewModel)
-                            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .trailing)
+                            .frame(maxWidth: .infinity, maxHeight: notchViewModel.deviceNotchRect.height, alignment: Alignment(horizontal: .trailing, vertical: .center))
                             .offset(x: -notchViewModel.spacing)
                             .transition(
                                 .blurReplace
                             )
                     }
                 }
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topTrailing)
+            )
+            .overlay(
+                Group {
+                    if notchViewModel.status == .popping {
+                        NotchNavView(notchViewModel: notchViewModel)
+                        .padding(.top, notchViewModel.deviceNotchRect.height - notchViewModel.spacing + 1)
+                        .padding(notchViewModel.spacing)
+                        .frame(
+                            maxWidth: notchViewModel.deviceNotchRect.width + notchViewModel.abstractSize + 6, maxHeight: notchViewModel.deviceNotchRect.height + 36
+                        )
+                        .zIndex(1)
+                    }
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
             )
             .overlay(
                 Group {

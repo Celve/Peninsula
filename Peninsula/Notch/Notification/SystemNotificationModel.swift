@@ -63,6 +63,30 @@ class SystemNotificationItem: Equatable {
     }
 }
 
+struct NumberSquare: View {
+    @State var notchViewModel: NotchViewModel
+    let number: Int
+    @State var isHover: Bool = false
+
+    var body: some View {
+        ZStack {
+            RoundedRectangle(cornerRadius: 4).fill(isHover ? .white : .black)
+            Text("\(number)")
+                .font(.system(size: notchViewModel.deviceNotchRect.height * 0.5, weight: .medium))
+                .foregroundColor(isHover ? .black : .white)
+            Circle()
+                .fill(Color.red)
+                .frame(width: notchViewModel.deviceNotchRect.height * 0.2, height: notchViewModel.deviceNotchRect.height * 0.2)
+                .offset(x: notchViewModel.deviceNotchRect.height * 0.25 + 2, y: -notchViewModel.deviceNotchRect.height * 0.25 - 2)
+        }
+        .frame(width: notchViewModel.deviceNotchRect.height * 0.7, height: notchViewModel.deviceNotchRect.height * 0.7)
+        .animation(.easeInOut(duration: 0.2), value: isHover)
+        .onHover { hover in
+            self.isHover = hover
+        }
+    }
+}
+
 class SystemNotificationInstance: NotificationInstance, Equatable {
     var id: UUID
     var category: String
@@ -163,12 +187,8 @@ class SystemNotificationModel: ObservableObject {
                     category: "system_notification",
                     ty: .always,
                     icon: { (notchViewModel: NotchViewModel) in
-                        AnyView(ScaledPaddingView(
-                            inner: Image(systemName: "\(self.total).square.fill")
-                                .resizable()
-                                .aspectRatio(contentMode: .fit),
-                            percentage: 0.1
-                        ))
+                        AnyView(NumberSquare(notchViewModel: notchViewModel, number: Int(self.total))
+                        ).aspectRatio(contentMode: .fit)
                     },
                     action: { (notchViewModel: NotchViewModel) in
                         notchViewModel.notchOpen(contentType: .notification)
