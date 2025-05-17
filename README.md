@@ -56,6 +56,12 @@ This part of code mainly comes from [Doll](https://github.com/xiaogdgenuine/Doll
 
 <https://github.com/user-attachments/assets/37d7d89c-57ad-49b9-a8cf-8bedd3971458>
 
+### Timer
+
+Setup timer inside Peninsula by scrolling up and down the wheels or directly type the time you want to count down.
+For example, typing "2h15m" for counting down 2 hours and 15 minutes.
+It will automatically detect patterns like "?h?m?s".
+
 ## Support Me
 
 <a href="https://www.buymeacoffee.com/linyu" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" ></a>
