@@ -9,77 +9,15 @@ import Foundation
 import SwiftUICore
 import Combine
 import AppKit
+import SwiftUI
 
-enum SwitchState {
+enum SwitchState: String, CaseIterable, Codable, Identifiable {
+    var id: String { rawValue }
+    
     case none
     case interWindows
     case interApps
     case intraApp
-}
-
-enum NotchContentType: Int, Codable, Hashable, Equatable {
-    case apps
-    case timer
-    case notification
-    case tray
-    case traySettings
-    case settings
-    case switching
-    
-    func count() -> Int {
-        return 7
-    }
-    
-    func toTitle() -> String { // when modify this, don't forgfet to modify the count of cases
-        switch self {
-        case .apps:
-            return "Apps"
-        case .timer:
-            return "Timer"
-        case .tray:
-            return "Tray"
-        case .traySettings:
-            return "TraySettings"
-        case .notification:
-            return "Notification"
-        case .settings:
-            return "Settings"
-        case .switching:
-            return "Switch"
-        }
-    }
-    
-    func next(invisibles: Dictionary<Self, Self>) -> Self {
-        var contentType = self
-        if let nextContentType = invisibles[contentType]{
-            return nextContentType
-        } else {
-            repeat {
-                if let nextValue = NotchContentType(rawValue: contentType.rawValue + 1) {
-                    contentType = nextValue
-                } else {
-                    contentType = NotchContentType(rawValue: 0)!
-                }
-            } while invisibles.keys.contains(where: { $0 == contentType })
-        }
-        return contentType
-    }
-
-    func previous(invisibles: Dictionary<Self, Self>) -> Self {
-        var contentType = self
-        if let previousContentType = invisibles[contentType]{
-            return previousContentType
-        } else {
-            repeat {
-                if let previousValue = NotchContentType(rawValue: contentType.rawValue - 1) {
-                    contentType = previousValue
-                } else {
-                    contentType = NotchContentType(rawValue: count() - 1)!
-                }
-            } while invisibles.keys.contains(where: { $0 == contentType })
-        }
-        return contentType
-    }
 }
 
 class NotchModel: NSObject, ObservableObject {
@@ -94,23 +32,38 @@ class NotchModel: NSObject, ObservableObject {
     @Published var invisibleContentTypes: Dictionary<NotchContentType, NotchContentType> = Dictionary()
     @Published var buffer: String = ""
     @Published var cursor: Int = 0
+    @PublishedPersist(key: "cmdTabTrigger", defaultValue: .interWindows)
+    var cmdTabTrigger: SwitchState
+    @PublishedPersist(key: "optTabTrigger", defaultValue: .interApps)
+    var optTabTrigger: SwitchState
+    @PublishedPersist(key: "cmdBtickTrigger", defaultValue: .intraApp)
+    var cmdBtickTrigger: SwitchState
+    @PublishedPersist(key: "optBtickTrigger", defaultValue: .none)
+    var optBtickTrigger: SwitchState
+    @Published var filterString: String = ""
+    @Published var isKeyboardTriggered: Bool = false
     
-    var stateExpansion: [any Switchable] {
-        switch self.state {
+    var stateExpansion: [(any Switchable, NSImage, [MatchableString.MatchResult])] {
+        let rawExpansion: [any Switchable] = switch self.state {
         case .interWindows:
-            return Windows.shared.coll
+            Windows.shared.coll
         case .interApps:
-            return Apps.shared.useableInner
+            Apps.shared.useableInner
         case .intraApp:
             if Windows.shared.coll.count > 0 {
-                let window = Windows.shared.coll[0]
-                let application = window.application
-                return application.windows.coll
+                Windows.shared.coll[0].application.windows.coll
             } else {
-                return []
+                []
             }
         case .none:
-            return []
+            []
+        }
+        let filterString = filterString.lowercased()
+        return rawExpansion.compactMap { (item) -> (any Switchable, NSImage, [MatchableString.MatchResult])? in
+            if let matchableString = item.getMatchableString().matches(string: filterString) {
+                return (item, item.getIcon() ?? NSImage(systemSymbolName: "app.fill", accessibilityDescription: nil)!, matchableString)
+            }
+            return nil
         }
     }
     
@@ -123,6 +76,7 @@ class NotchModel: NSObject, ObservableObject {
     override init() {
         super.init()
         setupCancellables()
+        setupKeyboardShortcuts()
         setupInvisibleViews()
     }
     

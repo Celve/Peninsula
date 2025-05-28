@@ -15,7 +15,7 @@ Accessibility is required for Peninsula to get the app list and show the notific
 
 ### Cmd-Tab
 
-Replace the default Cmd-Tab with a more useful app switcher. Use `cmd + tab` to show the app switcher:
+Replace the default Cmd-Tab with a more useful window switcher. Use `cmd + tab` to show the window switcher:
 
 - Hold `cmd` and press `tab` to move to the next app
 - Hold `cmd` and press `shift` to move to the previous app
@@ -25,6 +25,15 @@ Replace the default Cmd-Tab with a more useful app switcher. Use `cmd + tab` to 
 This part of code mainly comes from [alt-tab-macos](https://github.com/lwouis/alt-tab-macos).
 
 <https://github.com/user-attachments/assets/d58ce0d5-c685-44df-9a50-4afe99a710db>
+
+### Cmd-Tab with Search
+
+You can define a keyboard shortcut to show the window switcher with search.
+In the search view, you can type the name of the window you want to switch to.
+Only target windows that match the search will be shown.
+Then press `enter` to switch to the window.
+
+This can be configured in the settings in the apps view, which can be entered by clicking the gear icon on the top right corner of the apps view.
 
 ### Switch inside Peninsula
 

@@ -49,7 +49,13 @@ class NotchViewModel: NSObject, ObservableObject {
                 width: 600,
                 height: CGFloat((notchModel.globalWindowsEnd - notchModel.globalWindowsBegin))
                     * SwitchContentView.HEIGHT
-                    + deviceNotchRect.height + spacing * CGFloat(3))
+                    + deviceNotchRect.height + spacing * CGFloat(3) + 1)
+        case .searching:
+            .init(
+                width: 600,
+                height: CGFloat((notchModel.globalWindowsEnd - notchModel.globalWindowsBegin))
+                    * SwitchContentView.HEIGHT
+                + deviceNotchRect.height + SwitchSearchView.LINEHEIGHT + spacing * CGFloat(4) + 1)
         default:
             .init(width: 600, height: 200 + 1)
         }
@@ -189,17 +195,26 @@ class NotchViewModel: NSObject, ObservableObject {
     let hapticSender = PassthroughSubject<Void, Never>()
 
     func notchOpen(contentType: NotchContentType) {
+        if let window = NSApp.windows.first(where: { $0.windowNumber == windowId }) {
+            window.makeKey()
+        }
         openReason = .unknown
         status = .opened
         self.contentType = contentType
     }
     
     func notchClose() {
+        if let window = NSApp.windows.first(where: { $0.windowNumber == windowId }) {
+            window.resignKey()
+        }
         openReason = .unknown
         status = baseStatus
     }
 
     func notchPop() {
+        if let window = NSApp.windows.first(where: { $0.windowNumber == windowId }) {
+            window.makeKey()
+        }
         openReason = .unknown
         status = .popping
     }

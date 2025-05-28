@@ -18,6 +18,8 @@ class Window: Element, Switchable {
     var isMinimized: Bool = false
     var log: String? = nil
     var observer: WindowObserver = WindowObserver()
+
+    var matchableString: MatchableString!
     
     static let notifications = [
         kAXUIElementDestroyedNotification,
@@ -35,6 +37,10 @@ class Window: Element, Switchable {
     func getTitle() -> String? {
         return self.title
     }
+
+    func getMatchableString() -> MatchableString {
+        return matchableString
+    }
     
     init(app: App, axWindow: AXUIElement) {
         self.axElement = axWindow
@@ -42,6 +48,7 @@ class Window: Element, Switchable {
         self.covs = [app]
         self.id = try! axWindow.cgWindowId() ?? 0
         self.title = tryTitle()
+        self.matchableString = MatchableString(string: title.lowercased())
         self.observer.window = self
         self.observer.addObserver()
         BackgroundWork.synchronizationQueue.taskRestricted {

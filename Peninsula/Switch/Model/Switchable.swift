@@ -10,6 +10,7 @@ import AppKit
 protocol Switchable {
     func getIcon() -> NSImage?
     func getTitle() -> String?
+    func getMatchableString() -> MatchableString
     func focus()
     func hide()
     func minimize()

@@ -23,6 +23,8 @@ struct NotchContainerView: View {
                 NotificationMenubarView(vm: vm)
             case .tray:
                 TrayDropMenubarView(notchViewModel: vm)
+            case .apps:
+                SwitchMenubarView(notchViewModel: vm)
             default:
                 EmptyView()
             }
@@ -55,6 +57,10 @@ struct NotchContainerView: View {
                 SettingsView(vm: vm).transition(.blurReplace)
             case .switching:
                 SwitchContentView(notchViewModel: vm).transition(.blurReplace)
+            case .switchSettings:
+                SwitchSettingView(notchViewModel: vm).transition(.blurReplace)
+            case .searching:
+                SwitchSearchView(notchViewModel: vm).transition(.blurReplace)
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)

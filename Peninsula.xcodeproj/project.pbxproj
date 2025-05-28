@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		644622922DE601F500B95752 /* KeyboardShortcuts in Frameworks */ = {isa = PBXBuildFile; productRef = 644622912DE601F500B95752 /* KeyboardShortcuts */; };
 		64B1484C2D222CC7006A93C3 /* DominantColors in Frameworks */ = {isa = PBXBuildFile; productRef = 64B1484B2D222CC7006A93C3 /* DominantColors */; };
 		64EBAF832CFECECE000429A4 /* Atomics in Frameworks */ = {isa = PBXBuildFile; productRef = 64EBAF822CFECECE000429A4 /* Atomics */; };
 		64EBAF862CFECEE4000429A4 /* ColorfulX in Frameworks */ = {isa = PBXBuildFile; productRef = 64EBAF852CFECEE4000429A4 /* ColorfulX */; };
@@ -56,6 +57,7 @@
 				64EBAF862CFECEE4000429A4 /* ColorfulX in Frameworks */,
 				64EBAF8C2CFECEFE000429A4 /* LaunchAtLogin in Frameworks */,
 				64EBAF952CFECF7E000429A4 /* SkyLight.framework in Frameworks */,
+				644622922DE601F500B95752 /* KeyboardShortcuts in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -114,6 +116,7 @@
 				64EBAF922CFECF26000429A4 /* OrderedCollections */,
 				64B1484B2D222CC7006A93C3 /* DominantColors */,
 				64ED675A2DCB1864006476B4 /* OpenAI */,
+				644622912DE601F500B95752 /* KeyboardShortcuts */,
 			);
 			productName = Peninsula;
 			productReference = 64EBAE7F2CFECD56000429A4 /* Peninsula.app */;
@@ -151,6 +154,7 @@
 				64EBAF902CFECF19000429A4 /* XCRemoteSwiftPackageReference "swift-collections" */,
 				64B1484A2D222CC7006A93C3 /* XCRemoteSwiftPackageReference "DominantColors" */,
 				64ED67592DCB1864006476B4 /* XCRemoteSwiftPackageReference "OpenAI" */,
+				644622902DE601F500B95752 /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 64EBAE802CFECD56000429A4 /* Products */;
@@ -311,7 +315,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 10;
+				CURRENT_PROJECT_VERSION = 10.post0;
 				DEVELOPMENT_ASSET_PATHS = "\"Peninsula/Preview Content\"";
 				DEVELOPMENT_TEAM = 8TDYAWS6VC;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -348,7 +352,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 10;
+				CURRENT_PROJECT_VERSION = 10.post0;
 				DEVELOPMENT_ASSET_PATHS = "\"Peninsula/Preview Content\"";
 				DEVELOPMENT_TEAM = 8TDYAWS6VC;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -399,6 +403,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		644622902DE601F500B95752 /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/sindresorhus/KeyboardShortcuts";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.3.0;
+			};
+		};
 		64B1484A2D222CC7006A93C3 /* XCRemoteSwiftPackageReference "DominantColors" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/DenDmitriev/DominantColors.git";
@@ -458,6 +470,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		644622912DE601F500B95752 /* KeyboardShortcuts */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 644622902DE601F500B95752 /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */;
+			productName = KeyboardShortcuts;
+		};
 		64B1484B2D222CC7006A93C3 /* DominantColors */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 64B1484A2D222CC7006A93C3 /* XCRemoteSwiftPackageReference "DominantColors" */;

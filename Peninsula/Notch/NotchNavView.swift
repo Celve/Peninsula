@@ -10,7 +10,7 @@ struct NotchNavButton: View {
             notchViewModel.notchOpen(contentType: contentType)
         }) {
             ZStack {
-                RoundedRectangle(cornerRadius: 4).fill(isHovered ? .white : .black)
+                RoundedRectangle(cornerRadius: 4).fill(isHovered ? .white : .clear)
                 if contentType == .notification {
                     Image(systemName: "app.badge")
                         .resizable()

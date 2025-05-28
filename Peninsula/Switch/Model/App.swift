@@ -20,12 +20,15 @@ class App: Element, Switchable {
     var bundleId: String
     
     var quitRequested: Bool = false
+
+    var matchableString: MatchableString
     
     init(nsApp: NSRunningApplication) {
         self.pid = nsApp.processIdentifier
         self.nsApp = nsApp
         self.icon = nsApp.icon ?? NSImage(systemSymbolName: "app.fill", accessibilityDescription: nil)!
         self.name = nsApp.localizedName ?? ""
+        self.matchableString = MatchableString(string: name.lowercased())
         self.bundleId = nsApp.bundleIdentifier ?? ""
         self.axElement = AXUIElementCreateApplication(pid)
         BackgroundWork.synchronizationQueue.taskRestricted {
@@ -44,6 +47,10 @@ class App: Element, Switchable {
     
     func getTitle() -> String? {
         return name
+    }
+
+    func getMatchableString() -> MatchableString {
+        return matchableString
     }
     
     func focus() {

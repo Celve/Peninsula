@@ -30,19 +30,15 @@ struct NotchHoverView: View {
             }
         }
         .onHover { isHover in
-            if isHover && (notchViewModel.status == .notched || notchViewModel.status == .sliced) {
-                // Make the window key when hovering over the notch
-                if let window = NSApp.windows.first(where: { $0.windowNumber == notchViewModel.windowId }) {
-                    window.makeKey()
+            if !notchModel.isKeyboardTriggered {
+                if isHover && (notchViewModel.status == .notched || notchViewModel.status == .sliced) {
+                    // Make the window key when hovering over the notch
+                    notchViewModel.notchPop()
+                    self.notchViewModel.hapticSender.send()
+                } else if !isHover {
+                    // Make the window not key when mouse leaves the notch
+                    notchViewModel.notchClose()
                 }
-                notchViewModel.notchPop()
-                self.notchViewModel.hapticSender.send()
-            } else if !isHover {
-                // Make the window not key when mouse leaves the notch
-                if let window = NSApp.windows.first(where: { $0.windowNumber == notchViewModel.windowId }) {
-                    window.resignKey()
-                }
-                notchViewModel.notchClose()
             }
         }
         .onTapGesture {

@@ -9,16 +9,31 @@ import Cocoa
 import Combine
 import Foundation
 import SwiftUI
+import KeyboardShortcuts
 
+extension KeyboardShortcuts.Name {
+    static let toggleSearchInterWindows = Self("toggleSearchWindows")
+    static let toggleSearchApps = Self("toggleSwitching")
+    static let toggleSearchIntraWindows = Self("toggleSearchIntraWindows")
+}
 
 extension NotchModel {
-    func notchOpen() {
+    func notchOpenForSwitching() {
+        isKeyboardTriggered = true
         for viewModel in notchViewModels.inner {
             viewModel.notchOpen(contentType: .switching)
         }
     }
+
+    func notchOpenForSearching() {
+        isKeyboardTriggered = true
+        for viewModel in notchViewModels.inner {
+            viewModel.notchOpen(contentType: .searching)
+        }
+    }
     
     func notchClose() {
+        isKeyboardTriggered = false
         for viewModel in notchViewModels.inner {
             viewModel.notchClose()
         }
@@ -27,9 +42,21 @@ extension NotchModel {
     func closeAndFocus() {
         notchClose()
         if globalWindowsPointer < stateExpansion.count {
-            stateExpansion[globalWindowsPointer].focus()
+            stateExpansion[globalWindowsPointer].0.focus()
         }
         initPointer(pointer: 0)
+    }
+    
+    func setupKeyboardShortcuts() {
+        KeyboardShortcuts.onKeyDown(for: .toggleSearchInterWindows) {
+            if !self.isKeyboardTriggered {
+                self.state = .interWindows
+                self.initPointer(pointer: 1)
+                self.notchOpenForSearching()
+            } else {
+                self.notchClose()
+            }
+        }
     }
     
     func setupEachCancellable(toggleType: HotKeyState, triggeredState: SwitchState) {
@@ -58,11 +85,11 @@ extension NotchModel {
                     if fasterSwitch {
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) { [weak self] in
                             if self?.state == triggeredState {
-                                self?.notchOpen()
+                                self?.notchOpenForSwitching()
                             }
                         }
                     } else {
-                        notchOpen()
+                        notchOpenForSwitching()
                     }
                 case .forward:
                     incrementPointer()
@@ -77,19 +104,19 @@ extension NotchModel {
                     self.state = .none
                 case .hide:
                     if globalWindowsPointer < stateExpansion.count {
-                        stateExpansion[globalWindowsPointer].hide()
+                        stateExpansion[globalWindowsPointer].0.hide()
                     }
                 case .minimize:
                     if globalWindowsPointer < stateExpansion.count {
-                        stateExpansion[globalWindowsPointer].minimize()
+                        stateExpansion[globalWindowsPointer].0.minimize()
                     }
                 case .close:
                     if globalWindowsPointer < stateExpansion.count {
-                        stateExpansion[globalWindowsPointer].close()
+                        stateExpansion[globalWindowsPointer].0.close()
                     }
                 case .quit:
                     if globalWindowsPointer < stateExpansion.count {
-                        stateExpansion[globalWindowsPointer].quit()
+                        stateExpansion[globalWindowsPointer].0.quit()
                     }
                 case .drop:
                     notchClose()
@@ -101,9 +128,11 @@ extension NotchModel {
     }
     
     func setupCancellables() {
-        setupEachCancellable(toggleType: .cmdTab, triggeredState: .interWindows)
-        setupEachCancellable(toggleType: .optTab, triggeredState: .interApps)
-        setupEachCancellable(toggleType: .cmdBtick, triggeredState: .intraApp)
+        self.cancellables.removeAll()
+        setupEachCancellable(toggleType: .cmdTab, triggeredState: cmdTabTrigger)
+        setupEachCancellable(toggleType: .optTab, triggeredState: optTabTrigger)
+        setupEachCancellable(toggleType: .cmdBtick, triggeredState: cmdBtickTrigger)
+        setupEachCancellable(toggleType: .optBtick, triggeredState: optBtickTrigger)
         let events = EventMonitors.shared
     }
 }
