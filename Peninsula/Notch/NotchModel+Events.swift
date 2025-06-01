@@ -18,20 +18,14 @@ extension KeyboardShortcuts.Name {
 }
 
 extension NotchModel {
-    func notchOpenForSwitching() {
+    func notchOpen(contentType: NotchContentType) {
+        filterString = ""
         isKeyboardTriggered = true
         for viewModel in notchViewModels.inner {
-            viewModel.notchOpen(contentType: .switching)
+            viewModel.notchOpen(contentType: contentType)
         }
     }
 
-    func notchOpenForSearching() {
-        isKeyboardTriggered = true
-        for viewModel in notchViewModels.inner {
-            viewModel.notchOpen(contentType: .searching)
-        }
-    }
-    
     func notchClose() {
         isKeyboardTriggered = false
         for viewModel in notchViewModels.inner {
@@ -52,7 +46,7 @@ extension NotchModel {
             if !self.isKeyboardTriggered {
                 self.state = .interWindows
                 self.initPointer(pointer: 1)
-                self.notchOpenForSearching()
+                self.notchOpen(contentType: .searching)
             } else {
                 self.notchClose()
             }
@@ -85,11 +79,11 @@ extension NotchModel {
                     if fasterSwitch {
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) { [weak self] in
                             if self?.state == triggeredState {
-                                self?.notchOpenForSwitching()
+                                self?.notchOpen(contentType: .switching)
                             }
                         }
                     } else {
-                        notchOpenForSwitching()
+                        notchOpen(contentType: .switching)
                     }
                 case .forward:
                     incrementPointer()

@@ -12,7 +12,11 @@ class Window: Element, Switchable {
     
     var application: App
     var id: CGWindowID
-    var title: String!
+    var title: String! {
+        didSet {
+            matchableString = MatchableString(string: title.lowercased())
+        }
+    }
     var isHidden: Bool { get { application.isHidden } }
     var label: String? { get { application.label } }
     var isMinimized: Bool = false
