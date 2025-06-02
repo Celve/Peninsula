@@ -18,7 +18,7 @@ class App: Element, Switchable {
     var label: String? = nil
     var name: String! {
         didSet {
-            matchableString = MatchableString(string: name.lowercased())
+            matchableString = MatchableString(string: name)
         }
     }
     var bundleId: String
@@ -32,7 +32,7 @@ class App: Element, Switchable {
         self.nsApp = nsApp
         self.icon = nsApp.icon ?? NSImage(systemSymbolName: "app.fill", accessibilityDescription: nil)!
         self.name = nsApp.localizedName ?? ""
-        self.matchableString = MatchableString(string: name.lowercased())
+        self.matchableString = MatchableString(string: name)
         self.bundleId = nsApp.bundleIdentifier ?? ""
         self.axElement = AXUIElementCreateApplication(pid)
         BackgroundWork.synchronizationQueue.taskRestricted {

@@ -22,7 +22,7 @@ class MatchableString {
     init(string: String) {
         self.string = string
         self.pos = [:]
-        for (index, char) in string.enumerated() {
+        for (index, char) in string.lowercased().enumerated() {
             if self.pos[char] == nil {
                 self.pos[char] = []
             }

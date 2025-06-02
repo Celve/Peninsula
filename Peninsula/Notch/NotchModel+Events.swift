@@ -21,6 +21,7 @@ extension NotchModel {
     func notchOpen(contentType: NotchContentType) {
         filterString = ""
         isKeyboardTriggered = true
+        self.contentType = contentType
         for viewModel in notchViewModels.inner {
             viewModel.notchOpen(contentType: contentType)
         }

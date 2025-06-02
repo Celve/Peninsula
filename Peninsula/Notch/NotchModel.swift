@@ -42,6 +42,7 @@ class NotchModel: NSObject, ObservableObject {
     var optBtickTrigger: SwitchState
     @Published var filterString: String = ""
     @Published var isKeyboardTriggered: Bool = false
+    @Published var contentType: NotchContentType = .switching
     
     var stateExpansion: [(any Switchable, NSImage, [MatchableString.MatchResult])] {
         let rawExpansion: [any Switchable] = switch self.state {
@@ -58,12 +59,18 @@ class NotchModel: NSObject, ObservableObject {
         case .none:
             []
         }
-        let filterString = filterString.lowercased()
-        return rawExpansion.compactMap { (item) -> (any Switchable, NSImage, [MatchableString.MatchResult])? in
-            if let matchableString = item.getMatchableString().matches(string: filterString) {
-                return (item, item.getIcon() ?? NSImage(systemSymbolName: "app.fill", accessibilityDescription: nil)!, matchableString)
+        if contentType == .searching {
+            let filterString = filterString.lowercased()
+            return rawExpansion.compactMap { (item) -> (any Switchable, NSImage, [MatchableString.MatchResult])? in
+                if let matchableString = item.getMatchableString().matches(string: filterString) {
+                    return (item, item.getIcon() ?? NSImage(systemSymbolName: "app.fill", accessibilityDescription: nil)!, matchableString)
+                }
+                return nil
             }
-            return nil
+        } else {
+            return rawExpansion.compactMap { (item) -> (any Switchable, NSImage, [MatchableString.MatchResult])? in
+                return (item, item.getIcon() ?? NSImage(systemSymbolName: "app.fill", accessibilityDescription: nil)!, [.unmatched(item.getTitle() ?? "")])
+            }
         }
     }
     

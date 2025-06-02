@@ -14,7 +14,7 @@ class Window: Element, Switchable {
     var id: CGWindowID
     var title: String! {
         didSet {
-            matchableString = MatchableString(string: title.lowercased())
+            matchableString = MatchableString(string: application.name + " - " + title)
         }
     }
     var isHidden: Bool { get { application.isHidden } }
@@ -23,7 +23,7 @@ class Window: Element, Switchable {
     var log: String? = nil
     var observer: WindowObserver = WindowObserver()
 
-    var matchableString: MatchableString!
+    var matchableString: MatchableString?
     
     static let notifications = [
         kAXUIElementDestroyedNotification,
@@ -43,7 +43,7 @@ class Window: Element, Switchable {
     }
 
     func getMatchableString() -> MatchableString {
-        return matchableString
+        return matchableString ?? MatchableString(string: "")
     }
     
     init(app: App, axWindow: AXUIElement) {
@@ -52,7 +52,7 @@ class Window: Element, Switchable {
         self.covs = [app]
         self.id = try! axWindow.cgWindowId() ?? 0
         self.title = tryTitle()
-        self.matchableString = MatchableString(string: title.lowercased())
+        self.matchableString = MatchableString(string: application.name + " - " + title)
         self.observer.window = self
         self.observer.addObserver()
         BackgroundWork.synchronizationQueue.taskRestricted {
