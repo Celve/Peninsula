@@ -17,7 +17,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     var counter = 0
 
     var timer: Timer?
-
     func applicationDidFinishLaunching(_: Notification) {
         NotificationCenter.default.addObserver(
             self,

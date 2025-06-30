@@ -22,15 +22,11 @@ struct SettingsView: View {
     var body: some View {
         VStack(spacing: vm.spacing) {
             HStack {
-                Picker("Language: ", selection: $vm.selectedLanguage) {
-                    ForEach(Language.allCases) { language in
-                        Text(language.localized).tag(language)
-                    }
+                Button(action: {
+                    notchModel.updaterController.updater.checkForUpdates()
+                }) {
+                    Text("Check for updates")
                 }
-                .pickerStyle(MenuPickerStyle())
-                .frame(
-                    width: vm.selectedLanguage == .simplifiedChinese
-                        || vm.selectedLanguage == .traditionalChinese ? 220 : 160)
                 Text("Accessibility: ")
                 Button(action: {
                     if !accessibilityGranted() {

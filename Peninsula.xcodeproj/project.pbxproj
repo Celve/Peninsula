@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		64248EE92E1298860025F759 /* Sparkle in Frameworks */ = {isa = PBXBuildFile; productRef = 64248EE82E1298860025F759 /* Sparkle */; };
 		644622922DE601F500B95752 /* KeyboardShortcuts in Frameworks */ = {isa = PBXBuildFile; productRef = 644622912DE601F500B95752 /* KeyboardShortcuts */; };
 		64B1484C2D222CC7006A93C3 /* DominantColors in Frameworks */ = {isa = PBXBuildFile; productRef = 64B1484B2D222CC7006A93C3 /* DominantColors */; };
 		64EBAF832CFECECE000429A4 /* Atomics in Frameworks */ = {isa = PBXBuildFile; productRef = 64EBAF822CFECECE000429A4 /* Atomics */; };
@@ -54,6 +55,7 @@
 				64ED675B2DCB1864006476B4 /* OpenAI in Frameworks */,
 				64B1484C2D222CC7006A93C3 /* DominantColors in Frameworks */,
 				64EBAF932CFECF26000429A4 /* OrderedCollections in Frameworks */,
+				64248EE92E1298860025F759 /* Sparkle in Frameworks */,
 				64EBAF862CFECEE4000429A4 /* ColorfulX in Frameworks */,
 				64EBAF8C2CFECEFE000429A4 /* LaunchAtLogin in Frameworks */,
 				64EBAF952CFECF7E000429A4 /* SkyLight.framework in Frameworks */,
@@ -117,6 +119,7 @@
 				64B1484B2D222CC7006A93C3 /* DominantColors */,
 				64ED675A2DCB1864006476B4 /* OpenAI */,
 				644622912DE601F500B95752 /* KeyboardShortcuts */,
+				64248EE82E1298860025F759 /* Sparkle */,
 			);
 			productName = Peninsula;
 			productReference = 64EBAE7F2CFECD56000429A4 /* Peninsula.app */;
@@ -155,6 +158,7 @@
 				64B1484A2D222CC7006A93C3 /* XCRemoteSwiftPackageReference "DominantColors" */,
 				64ED67592DCB1864006476B4 /* XCRemoteSwiftPackageReference "OpenAI" */,
 				644622902DE601F500B95752 /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */,
+				64248EE72E1298860025F759 /* XCRemoteSwiftPackageReference "Sparkle" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 64EBAE802CFECD56000429A4 /* Products */;
@@ -403,6 +407,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		64248EE72E1298860025F759 /* XCRemoteSwiftPackageReference "Sparkle" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/sparkle-project/Sparkle";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.7.1;
+			};
+		};
 		644622902DE601F500B95752 /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/sindresorhus/KeyboardShortcuts";
@@ -470,6 +482,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		64248EE82E1298860025F759 /* Sparkle */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 64248EE72E1298860025F759 /* XCRemoteSwiftPackageReference "Sparkle" */;
+			productName = Sparkle;
+		};
 		644622912DE601F500B95752 /* KeyboardShortcuts */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 644622902DE601F500B95752 /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */;

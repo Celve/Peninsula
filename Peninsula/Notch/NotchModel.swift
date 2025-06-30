@@ -5,6 +5,7 @@
 //  Created by Celve on 12/10/24.
 //
 
+import Sparkle
 import Foundation
 import SwiftUICore
 import Combine
@@ -43,6 +44,8 @@ class NotchModel: NSObject, ObservableObject {
     @Published var filterString: String = ""
     @Published var isKeyboardTriggered: Bool = false
     @Published var contentType: NotchContentType = .switching
+    
+    var updaterController: SPUStandardUpdaterController = SPUStandardUpdaterController(startingUpdater: true, updaterDelegate: nil, userDriverDelegate: nil)
     
     var stateExpansion: [(any Switchable, NSImage, [MatchableString.MatchResult])] {
         let rawExpansion: [any Switchable] = switch self.state {
