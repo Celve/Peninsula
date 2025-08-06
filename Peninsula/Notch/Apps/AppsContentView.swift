@@ -20,7 +20,7 @@ struct AppsContentView: View {
         VStack {
             HStack {
                 ForEach(Array(windows.coll.filter({ if let frame = try? $0.axElement.frame() { vm.cgScreenRect.intersects(frame) } else { false } }).enumerated()), id: \.offset) { index, window in
-                    AppIcon(name: window.title, image: (window.application.icon ?? NSImage(systemSymbolName: "app.fill", accessibilityDescription: nil)!), vm: vm, svm: svm)
+                    AppIcon(name: window.title, image: (window.application.icon ?? NSImage(systemSymbolName: "app.fill", accessibilityDescription: nil) ?? NSImage()), vm: vm, svm: svm)
                         .onTapGesture {
                             window.focus()
                             vm.notchClose()

@@ -50,7 +50,7 @@ class Window: Element, Switchable {
         self.axElement = axWindow
         self.application = app
         self.covs = [app]
-        self.id = try! axWindow.cgWindowId() ?? 0
+        self.id = (try? axWindow.cgWindowId()) ?? 0
         self.title = tryTitle()
         self.matchableString = MatchableString(string: application.name + " - " + title)
         self.observer.window = self
@@ -140,7 +140,8 @@ class Window: Element, Switchable {
         memset(&bytes2[0x20], 0xFF, 0x10)
         [bytes1, bytes2].forEach { bytes in
             _ = bytes.withUnsafeBufferPointer() { pointer in
-                SLPSPostEventRecordTo(&psn_, &UnsafeMutablePointer(mutating: pointer.baseAddress)!.pointee)
+                guard let baseAddress = pointer.baseAddress else { return }
+                SLPSPostEventRecordTo(&psn_, &UnsafeMutablePointer(mutating: baseAddress).pointee)
             }
         }
     }
@@ -153,7 +154,8 @@ class WindowObserver {
     func addObserver() {
         guard let window = window else { return }
         let callback: @convention(c) (AXObserver, AXUIElement, CFString, UnsafeMutableRawPointer?) -> Void = { observer, element, notification, ref in
-            let this = Unmanaged<WindowObserver>.fromOpaque(ref!).takeUnretainedValue()
+            guard let ref = ref else { return }
+            let this = Unmanaged<WindowObserver>.fromOpaque(ref).takeUnretainedValue()
             retryAxCallUntilTimeout { try this.handleEvent(notificationType: notification as String, element: element) }
         }
         

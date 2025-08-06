@@ -174,7 +174,7 @@ extension AXUIElement {
     private static func firefox(_ runningApp: NSRunningApplication, _ role: String?, _ size: CGSize?) -> Bool {
         // Firefox fullscreen video have subrole == AXUnknown if fullscreen'ed when the base window is not fullscreen
         // Firefox tooltips are implemented as windows with subrole == AXUnknown
-        return (runningApp.bundleIdentifier?.hasPrefix("org.mozilla.firefox") ?? false) && role == kAXWindowRole && size?.height != nil && size!.height > 400
+        return (runningApp.bundleIdentifier?.hasPrefix("org.mozilla.firefox") ?? false) && role == kAXWindowRole && (size?.height ?? 0) > 400
     }
     
     private static func vlcFullscreenVideo(_ runningApp: NSRunningApplication, _ role: String?) -> Bool {

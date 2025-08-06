@@ -144,7 +144,8 @@ class AppObserver {
         guard let app = self.app else { return }
         if app.nsApp.activationPolicy != .prohibited {
             let callback: @convention(c) (AXObserver, AXUIElement, CFString, UnsafeMutableRawPointer?) -> Void = { observer, element, notification, ref in
-                let this = Unmanaged<AppObserver>.fromOpaque(ref!).takeUnretainedValue()
+                guard let ref = ref else { return }
+                let this = Unmanaged<AppObserver>.fromOpaque(ref).takeUnretainedValue()
                 retryAxCallUntilTimeout { try this.handleEvent(notificationType: notification as String, element: element) }
             }
             

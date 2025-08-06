@@ -16,7 +16,9 @@ struct NotificationContentView: View {
     var body: some View {
         HStack(alignment: .top, spacing: nvm.spacing) {
             ForEach(Array(nm.items.keys), id: \.self) { key in
-                AppIcon(bundleId: key, image: AnyView(nm.items[key]!.icon), vm: nvm)
+                if let item = nm.items[key] {
+                    AppIcon(bundleId: key, image: AnyView(item.icon), vm: nvm)
+                }
             }
         }.animation(nvm.normalAnimation, value: nm.items)
     }

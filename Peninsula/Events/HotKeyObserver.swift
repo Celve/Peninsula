@@ -149,10 +149,13 @@ class HotKeyObserver {
             eventsOfInterest: CGEventMask(eventMask),
             callback: { (proxy, type, event, refcon) -> Unmanaged<CGEvent>? in
                 // Retrieve the CurrentValueSubject instance from the unmanaged pointer
-                let this = Unmanaged<HotKeyObserver>.fromOpaque(refcon!).takeUnretainedValue()
+                guard let refcon = refcon else { return Unmanaged.passUnretained(event) }
+                let this = Unmanaged<HotKeyObserver>.fromOpaque(refcon).takeUnretainedValue()
                 
                 if (type == .tapDisabledByUserInput || type == .tapDisabledByTimeout) {
-                    CGEvent.tapEnable(tap: this.eventTap!, enable: true)
+                    if let eventTap = this.eventTap {
+                        CGEvent.tapEnable(tap: eventTap, enable: true)
+                    }
                 } else {
                     let keyCode = event.getIntegerValueField(.keyboardEventKeycode)
                     let flags = event.flags

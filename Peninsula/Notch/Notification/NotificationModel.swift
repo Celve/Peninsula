@@ -40,7 +40,9 @@ class NotificationModel: ObservableObject {
                     if self.temporaryItems[item.category]?.id == item.id {
                         self.temporaryItems.removeValue(forKey: item.category)
                         if self.alwaysItems[item.category] == nil {
-                            self.names.remove(at: self.names.firstIndex(of: item.category)!)
+                            if let index = self.names.firstIndex(of: item.category) {
+                                self.names.remove(at: index)
+                            }
                             self.namesSet.remove(item.category)
                         }
                     }
@@ -56,13 +58,17 @@ class NotificationModel: ObservableObject {
             case .always:
                 alwaysItems.removeValue(forKey: category)
                 if temporaryItems[category] == nil {
-                    names.remove(at: names.firstIndex(of: category)!)
+                    if let index = names.firstIndex(of: category) {
+                        names.remove(at: index)
+                    }
                     namesSet.remove(category)
                 }
             case .temporary:
                 temporaryItems.removeValue(forKey: category)
                 if alwaysItems[category] == nil {
-                    names.remove(at: names.firstIndex(of: category)!)
+                    if let index = names.firstIndex(of: category) {
+                        names.remove(at: index)
+                    }
                     namesSet.remove(category)
                 }
             }
