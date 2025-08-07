@@ -45,19 +45,32 @@ class NotchViewModel: NSObject, ObservableObject {
     var notchOpenedSize: CGSize {
         switch contentType {
         case .switching:
-            .init(
+            return .init(
                 width: 600,
                 height: CGFloat((notchModel.globalWindowsEnd - notchModel.globalWindowsBegin))
                     * SwitchContentView.HEIGHT
                     + deviceNotchRect.height + spacing * CGFloat(3) + 1)
         case .searching:
-            .init(
+            return .init(
                 width: 600,
                 height: CGFloat((notchModel.globalWindowsEnd - notchModel.globalWindowsBegin))
                     * SwitchContentView.HEIGHT
                 + deviceNotchRect.height + SwitchSearchView.LINEHEIGHT + spacing * CGFloat(4) + 1)
+        case .apps:
+            let appCount = windows.coll.filter { window in
+                if let frame = try? window.axElement.frame() {
+                    return cgScreenRect.intersects(frame)
+                }
+                return false
+            }.count
+            let maxAppsPerRow = 9
+            let rows = max(1, (appCount + maxAppsPerRow - 1) / maxAppsPerRow)
+            let rowHeight: CGFloat = 62
+            let minHeight: CGFloat = 200
+            let calculatedHeight = CGFloat(rows) * rowHeight + spacing * 2 + 40
+            return .init(width: 600, height: max(minHeight, calculatedHeight) + 1)
         default:
-            .init(width: 600, height: 200 + 1)
+            return .init(width: 600, height: 200 + 1)
         }
     }
     let dropDetectorRange: CGFloat = 32
