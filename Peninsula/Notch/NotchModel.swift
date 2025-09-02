@@ -47,34 +47,49 @@ class NotchModel: NSObject, ObservableObject {
     
     var updaterController: SPUStandardUpdaterController = SPUStandardUpdaterController(startingUpdater: true, updaterDelegate: nil, userDriverDelegate: nil)
     
+    private var cachedStateExpansion: [(any Switchable, NSImage, [MatchableString.MatchResult])] = []
+    private var lastState: SwitchState = .none
+    private var lastContentType: NotchContentType = .apps
+    private var lastFilterString: String = ""
+    
     var stateExpansion: [(any Switchable, NSImage, [MatchableString.MatchResult])] {
-        let rawExpansion: [any Switchable] = switch self.state {
-        case .interWindows:
-            Windows.shared.coll
-        case .interApps:
-            Apps.shared.useableInner
-        case .intraApp:
-            if Windows.shared.coll.count > 0 {
-                Windows.shared.coll[0].application.windows.coll
-            } else {
+        // Check if we need to recalculate
+        if state != lastState || contentType != lastContentType || 
+           (contentType == .searching && filterString != lastFilterString) {
+            lastState = state
+            lastContentType = contentType
+            lastFilterString = filterString
+            
+            let rawExpansion: [any Switchable] = switch self.state {
+            case .interWindows:
+                Windows.shared.coll
+            case .interApps:
+                Apps.shared.useableInner
+            case .intraApp:
+                if Windows.shared.coll.count > 0 {
+                    Windows.shared.coll[0].application.windows.coll
+                } else {
+                    []
+                }
+            case .none:
                 []
             }
-        case .none:
-            []
-        }
-        if contentType == .searching {
-            let filterString = filterString.lowercased()
-            return rawExpansion.compactMap { (item) -> (any Switchable, NSImage, [MatchableString.MatchResult])? in
-                if let matchableString = item.getMatchableString().matches(string: filterString) {
-                    return (item, item.getIcon() ?? NSImage(systemSymbolName: "app.fill", accessibilityDescription: nil)!, matchableString)
+            
+            if contentType == .searching {
+                let filterString = filterString.lowercased()
+                cachedStateExpansion = rawExpansion.compactMap { (item) -> (any Switchable, NSImage, [MatchableString.MatchResult])? in
+                    if let matchableString = item.getMatchableString().matches(string: filterString) {
+                        return (item, item.getIcon() ?? NSImage(systemSymbolName: "app.fill", accessibilityDescription: nil)!, matchableString)
+                    }
+                    return nil
                 }
-                return nil
-            }
-        } else {
-            return rawExpansion.compactMap { (item) -> (any Switchable, NSImage, [MatchableString.MatchResult])? in
-                return (item, item.getIcon() ?? NSImage(systemSymbolName: "app.fill", accessibilityDescription: nil)!, [.unmatched(item.getTitle() ?? "")])
+            } else {
+                cachedStateExpansion = rawExpansion.compactMap { (item) -> (any Switchable, NSImage, [MatchableString.MatchResult])? in
+                    return (item, item.getIcon() ?? NSImage(systemSymbolName: "app.fill", accessibilityDescription: nil)!, [.unmatched(item.getTitle() ?? "")])
+                }
             }
         }
+        return cachedStateExpansion
     }
     
     @PublishedPersist(key: "fasterSwitch", defaultValue: false)

@@ -25,18 +25,24 @@ struct AppsContentView: View {
     @State private var scrollOffset: CGFloat = 0
     @State private var contentWidth: CGFloat = 0
     @State private var scrollViewWidth: CGFloat = 0
+    @State private var cachedFilteredWindows: [Window] = []
+    @State private var lastScreenRect: CGRect = .zero
     
     let rows = [
         GridItem(.adaptive(minimum: 50, maximum: 60), spacing: 12)
     ]
     
     var filteredWindows: [Window] {
-        windows.coll.filter {
-            if let frame = try? $0.axElement.frame() {
-                return vm.cgScreenRect.intersects(frame)
+        // Only recalculate if screen rect changed or windows changed
+        if lastScreenRect != vm.cgScreenRect || cachedFilteredWindows.isEmpty {
+            return windows.coll.filter {
+                if let frame = try? $0.axElement.frame() {
+                    return vm.cgScreenRect.intersects(frame)
+                }
+                return false
             }
-            return false
         }
+        return cachedFilteredWindows
     }
     
     var showRightIndicator: Bool {
@@ -56,6 +62,14 @@ struct AppsContentView: View {
                                     vm.notchClose()
                                 }
                         }
+                    }
+                    .onAppear {
+                        cachedFilteredWindows = filteredWindows
+                        lastScreenRect = vm.cgScreenRect
+                    }
+                    .onChange(of: vm.cgScreenRect) { newValue in
+                        lastScreenRect = newValue
+                        cachedFilteredWindows = filteredWindows
                     }
                     .padding(.vertical, 8)
                     .padding(.leading, 16)
@@ -122,15 +136,14 @@ struct AppsContentView: View {
 private struct AppIcon: View {
     let name: String
     let image: NSImage
-    @StateObject var vm: NotchViewModel
+    let vm: NotchViewModel
     @State var hover: Bool = false
-    @StateObject var svm: AppsViewModel
+    @ObservedObject var svm: AppsViewModel
 
     var body: some View {
         ZStack {
             RoundedRectangle(cornerRadius: 10)
                 .fill(Color.white.opacity(hover ? 0.15 : 0.05))
-                .animation(.spring(), value: hover)
             
             Image(nsImage: image)
                 .resizable()
@@ -138,13 +151,15 @@ private struct AppIcon: View {
                 .aspectRatio(contentMode: .fit)
                 .padding(8)
                 .scaleEffect(hover ? 1.1 : 1)
-                .animation(.spring(), value: hover)
-                .onHover { hover in
-                    self.hover = hover
-                    svm.title = hover ? name : "None"
-                }
         }
         .frame(width: 50, height: 50)
+        .animation(.spring(response: 0.3, dampingFraction: 0.7), value: hover)
+        .onHover { hovering in
+            if self.hover != hovering {
+                self.hover = hovering
+                svm.title = hovering ? name : "None"
+            }
+        }
     }
 }
 

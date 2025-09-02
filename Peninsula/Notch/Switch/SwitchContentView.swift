@@ -48,12 +48,11 @@ struct SwitchContentView: View {
                     notchModel.closeAndFocus()
                 }
             }
-            .animation(notchViewModel.normalAnimation, value: notchModel.windowsCounter)
-            .animation(notchViewModel.normalAnimation, value: notchModel.state)
-            .animation(notchViewModel.normalAnimation, value: notchModel.filterString)
             .transition(.blurReplace)
         }
         .animation(notchViewModel.normalAnimation, value: notchModel.windowsCounter)
+        .animation(notchViewModel.normalAnimation, value: notchModel.state)
+        .animation(notchViewModel.normalAnimation, value: notchModel.filterString)
         .transition(.blurReplace)
         .aspectRatio(contentMode: .fit)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)

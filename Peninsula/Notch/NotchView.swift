@@ -58,7 +58,6 @@ struct NotchView: View {
         .animation(
             notchViewModel.status == .opened ? notchViewModel.innerOnAnimation : notchViewModel.innerOffAnimation, value: notchViewModel.status
         )
-        .animation(notchViewModel.normalAnimation, value: notchViewModel.contentType)
         .background(dragDetector)
         .preferredColorScheme(.dark)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)

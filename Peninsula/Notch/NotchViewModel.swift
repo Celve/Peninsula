@@ -42,36 +42,44 @@ class NotchViewModel: NSObject, ObservableObject {
     let outerOffAnimation: Animation = .spring(duration: 0.236).delay(0.118)
     let innerOffAnimation: Animation = .interactiveSpring(duration: 0.236)
 
+    @Published private var cachedNotchOpenedSize: CGSize = .init(width: 600, height: 201)
+    private var lastContentType: NotchContentType = .apps
+    
     var notchOpenedSize: CGSize {
-        switch contentType {
-        case .switching:
-            return .init(
-                width: 600,
-                height: CGFloat((notchModel.globalWindowsEnd - notchModel.globalWindowsBegin))
-                    * SwitchContentView.HEIGHT
-                    + deviceNotchRect.height + spacing * CGFloat(3) + 1)
-        case .searching:
-            return .init(
-                width: 600,
-                height: CGFloat((notchModel.globalWindowsEnd - notchModel.globalWindowsBegin))
-                    * SwitchContentView.HEIGHT
-                + deviceNotchRect.height + SwitchSearchView.LINEHEIGHT + spacing * CGFloat(4) + 1)
-        case .apps:
-            let appCount = windows.coll.filter { window in
-                if let frame = try? window.axElement.frame() {
-                    return cgScreenRect.intersects(frame)
-                }
-                return false
-            }.count
-            let maxAppsPerRow = 9
-            let rows = max(1, (appCount + maxAppsPerRow - 1) / maxAppsPerRow)
-            let rowHeight: CGFloat = 62
-            let minHeight: CGFloat = 200
-            let calculatedHeight = CGFloat(rows) * rowHeight + spacing * 2 + 40
-            return .init(width: 600, height: max(minHeight, calculatedHeight) + 1)
-        default:
-            return .init(width: 600, height: 200 + 1)
+        // Only recalculate if content type changed
+        if contentType != lastContentType {
+            lastContentType = contentType
+            switch contentType {
+            case .switching:
+                cachedNotchOpenedSize = .init(
+                    width: 600,
+                    height: CGFloat((notchModel.globalWindowsEnd - notchModel.globalWindowsBegin))
+                        * SwitchContentView.HEIGHT
+                        + deviceNotchRect.height + spacing * CGFloat(3) + 1)
+            case .searching:
+                cachedNotchOpenedSize = .init(
+                    width: 600,
+                    height: CGFloat((notchModel.globalWindowsEnd - notchModel.globalWindowsBegin))
+                        * SwitchContentView.HEIGHT
+                    + deviceNotchRect.height + SwitchSearchView.LINEHEIGHT + spacing * CGFloat(4) + 1)
+            case .apps:
+                let appCount = windows.coll.filter { window in
+                    if let frame = try? window.axElement.frame() {
+                        return cgScreenRect.intersects(frame)
+                    }
+                    return false
+                }.count
+                let maxAppsPerRow = 9
+                let rows = max(1, (appCount + maxAppsPerRow - 1) / maxAppsPerRow)
+                let rowHeight: CGFloat = 62
+                let minHeight: CGFloat = 200
+                let calculatedHeight = CGFloat(rows) * rowHeight + spacing * 2 + 40
+                cachedNotchOpenedSize = .init(width: 600, height: max(minHeight, calculatedHeight) + 1)
+            default:
+                cachedNotchOpenedSize = .init(width: 600, height: 200 + 1)
+            }
         }
+        return cachedNotchOpenedSize
     }
     let dropDetectorRange: CGFloat = 32
 
