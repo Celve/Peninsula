@@ -15,6 +15,16 @@ struct NotchHoverView: View {
         ZStack(alignment: .top) {
             NotchDynamicView(notchViewModel: notchViewModel)
                 .zIndex(0)
+                .onHover { isHover in
+                    if !notchModel.isKeyboardTriggered {
+                        if isHover && (notchViewModel.status == .notched || notchViewModel.status == .sliced) {
+                            notchViewModel.notchPop()
+                            self.notchViewModel.hapticSender.send()
+                        } else if !isHover {
+                            notchViewModel.notchClose()
+                        }
+                    }
+                }
             Group {
                 if notchViewModel.status == .opened {
                     NotchContainerView(vm: notchViewModel)
@@ -26,18 +36,6 @@ struct NotchHoverView: View {
                         .zIndex(1)
                 } else if notchViewModel.status == .popping {
 
-                }
-            }
-        }
-        .onHover { isHover in
-            if !notchModel.isKeyboardTriggered {
-                if isHover && (notchViewModel.status == .notched || notchViewModel.status == .sliced) {
-                    // Make the window key when hovering over the notch
-                    notchViewModel.notchPop()
-                    self.notchViewModel.hapticSender.send()
-                } else if !isHover {
-                    // Make the window not key when mouse leaves the notch
-                    notchViewModel.notchClose()
                 }
             }
         }
