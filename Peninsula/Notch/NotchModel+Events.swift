@@ -36,8 +36,8 @@ extension NotchModel {
     
     func closeAndFocus() {
         notchClose()
-        if globalWindowsPointer < stateExpansion.count {
-            stateExpansion[globalWindowsPointer].0.focus()
+        if activeIndex < switchItems.count {
+            switchItems[activeIndex].0.focus()
         }
         initPointer(pointer: 0)
     }
@@ -98,20 +98,20 @@ extension NotchModel {
                     }
                     self.state = .none
                 case .hide:
-                    if globalWindowsPointer < stateExpansion.count {
-                        stateExpansion[globalWindowsPointer].0.hide()
+                    if activeIndex < switchItems.count {
+                        switchItems[activeIndex].0.hide()
                     }
                 case .minimize:
-                    if globalWindowsPointer < stateExpansion.count {
-                        stateExpansion[globalWindowsPointer].0.minimize()
+                    if activeIndex < switchItems.count {
+                        switchItems[activeIndex].0.minimize()
                     }
                 case .close:
-                    if globalWindowsPointer < stateExpansion.count {
-                        stateExpansion[globalWindowsPointer].0.close()
+                    if activeIndex < switchItems.count {
+                        switchItems[activeIndex].0.close()
                     }
                 case .quit:
-                    if globalWindowsPointer < stateExpansion.count {
-                        stateExpansion[globalWindowsPointer].0.quit()
+                    if activeIndex < switchItems.count {
+                        switchItems[activeIndex].0.quit()
                     }
                 case .drop:
                     notchClose()

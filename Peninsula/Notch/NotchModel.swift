@@ -7,7 +7,6 @@
 
 import Sparkle
 import Foundation
-import SwiftUICore
 import Combine
 import AppKit
 import SwiftUI
@@ -28,8 +27,8 @@ class NotchModel: NSObject, ObservableObject {
     @Published var lastMouseLocation: NSPoint = NSEvent.mouseLocation // for first touch in the switch window
     @Published var state: SwitchState = .none
     var cancellables: Set<AnyCancellable> = []
-    @Published var windowsCounter: Int = 1
-    var externalWindowsCounter: Int? = nil
+    @Published var selectionCounter: Int = 1
+    var externalSelectionCounter: Int? = nil
     @Published var invisibleContentTypes: Dictionary<NotchContentType, NotchContentType> = Dictionary()
     @Published var buffer: String = ""
     @Published var cursor: Int = 0
@@ -47,49 +46,12 @@ class NotchModel: NSObject, ObservableObject {
     
     var updaterController: SPUStandardUpdaterController = SPUStandardUpdaterController(startingUpdater: true, updaterDelegate: nil, userDriverDelegate: nil)
     
-    private var cachedStateExpansion: [(any Switchable, NSImage, [MatchableString.MatchResult])] = []
-    private var lastState: SwitchState = .none
-    private var lastContentType: NotchContentType = .apps
-    private var lastFilterString: String = ""
-    
-    var stateExpansion: [(any Switchable, NSImage, [MatchableString.MatchResult])] {
-        // Check if we need to recalculate
-        if state != lastState || contentType != lastContentType || 
-           (contentType == .searching && filterString != lastFilterString) {
-            lastState = state
-            lastContentType = contentType
-            lastFilterString = filterString
-            
-            let rawExpansion: [any Switchable] = switch self.state {
-            case .interWindows:
-                Windows.shared.coll
-            case .interApps:
-                Apps.shared.useableInner
-            case .intraApp:
-                if Windows.shared.coll.count > 0 {
-                    Windows.shared.coll[0].application.windows.coll
-                } else {
-                    []
-                }
-            case .none:
-                []
-            }
-            
-            if contentType == .searching {
-                let filterString = filterString.lowercased()
-                cachedStateExpansion = rawExpansion.compactMap { (item) -> (any Switchable, NSImage, [MatchableString.MatchResult])? in
-                    if let matchableString = item.getMatchableString().matches(string: filterString) {
-                        return (item, item.getIcon() ?? NSImage(systemSymbolName: "app.fill", accessibilityDescription: nil)!, matchableString)
-                    }
-                    return nil
-                }
-            } else {
-                cachedStateExpansion = rawExpansion.compactMap { (item) -> (any Switchable, NSImage, [MatchableString.MatchResult])? in
-                    return (item, item.getIcon() ?? NSImage(systemSymbolName: "app.fill", accessibilityDescription: nil)!, [.unmatched(item.getTitle() ?? "")])
-                }
-            }
-        }
-        return cachedStateExpansion
+    var switchItems: [(any Switchable, NSImage, [MatchableString.MatchResult])] {
+        SwitchManager.shared.items(
+            state: state,
+            contentType: contentType,
+            filterString: filterString
+        )
     }
     
     @PublishedPersist(key: "fasterSwitch", defaultValue: false)
@@ -110,49 +72,58 @@ class NotchModel: NSObject, ObservableObject {
         invisibleContentTypes[.switching] = .tray
     }
     
-    var globalWindowsPointer: Int {
-        let count = stateExpansion.count
+    var activeIndex: Int {
+        let count = SwitchManager.shared.itemsCount(
+            state: state,
+            contentType: contentType,
+            filterString: filterString
+        )
         if count == 0 {
             return 0
         } else {
-            return (windowsCounter % count + count) % count
+            return (selectionCounter % count + count) % count
         }
     }
     
-    var globalWindowsBegin: Int {
-        (globalWindowsPointer / SwitchContentView.COUNT) * SwitchContentView.COUNT
+    var pageStart: Int {
+        (activeIndex / SwitchContentView.COUNT) * SwitchContentView.COUNT
     }
     
-    var globalWindowsEnd: Int {
-        min(globalWindowsBegin + SwitchContentView.COUNT, stateExpansion.count)
+    var pageEnd: Int {
+        let count = SwitchManager.shared.itemsCount(
+            state: state,
+            contentType: contentType,
+            filterString: filterString
+        )
+        return min(pageStart + SwitchContentView.COUNT, count)
     }
     
     func updateExternalPointer(pointer: Int?) {
-        externalWindowsCounter = pointer
+        externalSelectionCounter = pointer
         let mouseLocation = NSEvent.mouseLocation
         if let pointer = pointer, lastMouseLocation != mouseLocation {
-            windowsCounter = pointer
+            selectionCounter = pointer
         }
         lastMouseLocation = mouseLocation
     }
     
     func incrementPointer() {
-        if globalWindowsPointer != 0 && globalWindowsPointer % SwitchContentView.COUNT == SwitchContentView.COUNT - 1 {
-            externalWindowsCounter = nil
+        if activeIndex != 0 && activeIndex % SwitchContentView.COUNT == SwitchContentView.COUNT - 1 {
+            externalSelectionCounter = nil
         }
-        windowsCounter += 1
+        selectionCounter += 1
     }
     
     func decrementPointer() {
-        if globalWindowsPointer != 0 && globalWindowsPointer % SwitchContentView.COUNT == 0 {
-            externalWindowsCounter = nil
+        if activeIndex != 0 && activeIndex % SwitchContentView.COUNT == 0 {
+            externalSelectionCounter = nil
         }
-        windowsCounter -= 1
+        selectionCounter -= 1
     }
     
     func initPointer(pointer: Int) {
         lastMouseLocation = NSEvent.mouseLocation
-        externalWindowsCounter = nil
-        windowsCounter = pointer
+        externalSelectionCounter = nil
+        selectionCounter = pointer
     }
 }
