@@ -6,25 +6,17 @@
 //
 
 import SwiftUI
+import AppKit
 
 struct NotchHoverView: View {
     @ObservedObject var notchViewModel: NotchViewModel
     @ObservedObject var notchModel = NotchModel.shared
+    @State private var isHovering: Bool = false
     
     var body: some View {
         ZStack(alignment: .top) {
             NotchDynamicView(notchViewModel: notchViewModel)
                 .zIndex(0)
-                .onHover { isHover in
-                    if !notchModel.isKeyboardTriggered {
-                        if isHover && (notchViewModel.status == .notched || notchViewModel.status == .sliced) {
-                            notchViewModel.notchPop()
-                            self.notchViewModel.hapticSender.send()
-                        } else if !isHover {
-                            notchViewModel.notchClose()
-                        }
-                    }
-                }
             Group {
                 if notchViewModel.status == .opened {
                     NotchContainerView(vm: notchViewModel)
@@ -35,12 +27,88 @@ struct NotchHoverView: View {
                         )
                         .zIndex(1)
                 } else if notchViewModel.status == .popping {
-
+                    // Position nav just below the physical device notch area
+                    Color.clear
+                        .frame(
+                            width: notchViewModel.notchSize.width,
+                            height: notchViewModel.notchSize.height
+                        )
+                        .overlay(
+                            NotchNavView(notchViewModel: notchViewModel)
+                                .frame(
+                                    maxWidth: notchViewModel.deviceNotchRect.width + notchViewModel.abstractSize + 6,
+                                    maxHeight: notchViewModel.deviceNotchRect.height + 36
+                                )
+                                .padding(.horizontal, notchViewModel.spacing)
+                                // Equivalent to previous placement in DynamicView:
+                                // top padding ≈ deviceNotchRect.height + 1 so it sits just under the notch
+                                .padding(.top, notchViewModel.deviceNotchRect.height + 1),
+                            alignment: .top
+                        )
+                        // Match DynamicView's horizontal offset so edges align
+                        .offset(x: notchViewModel.abstractSize / 2, y: 0)
+                        .zIndex(1)
                 }
             }
         }
+        .onHover { isHover in
+            isHovering = isHover
+            if !notchModel.isKeyboardTriggered {
+                if isHover && (notchViewModel.status == .notched || notchViewModel.status == .sliced) {
+                    notchViewModel.notchPop()
+                    notchViewModel.hapticSender.send()
+                } else if !isHover {
+                    notchViewModel.notchClose()
+                }
+            }
+        }
+        // Force re-evaluation when the notch frame changes, even if the mouse hasn't moved
+        .onChange(of: notchViewModel.notchSize) { _ in reevaluateHover() }
+        .onChange(of: notchViewModel.notchOpenedSize) { _ in reevaluateHover() }
+        .onChange(of: notchViewModel.abstractSize) { _ in reevaluateHover() }
+        .onChange(of: notchViewModel.status) { _ in reevaluateHover() }
+        // .overlay(
+        //     HoverActivationArea { isHover in
+        //         if !notchModel.isKeyboardTriggered {
+        //             if isHover && (notchViewModel.status == .notched || notchViewModel.status == .sliced) {
+        //                 notchViewModel.notchPop()
+        //                 notchViewModel.hapticSender.send()
+        //             } else if !isHover {
+        //                 notchViewModel.notchClose()
+        //             }
+        //         }
+        //     }
+        //     .frame(width: notchViewModel.notchSize.width, height: notchViewModel.notchSize.height)
+        //     .offset(x: notchViewModel.abstractSize / 2, y: 0)
+        //     .allowsHitTesting(false),
+        //     alignment: .top
+        // )
         .onTapGesture {
             notchViewModel.notchOpen(contentType: .apps)
+        }
+    }
+
+    private func reevaluateHover() {
+        if notchModel.isKeyboardTriggered { return }
+        let mouseLocation: NSPoint = NSEvent.mouseLocation
+        let targetRect: CGRect
+        switch notchViewModel.status {
+        case .opened:
+            targetRect = notchViewModel.notchOpenedRect.insetBy(dx: notchViewModel.inset, dy: notchViewModel.inset)
+        case .notched, .sliced, .popping:
+            targetRect = notchViewModel.notchRect
+        }
+        let currentlyInside = targetRect.contains(mouseLocation)
+        if currentlyInside != isHovering {
+            isHovering = currentlyInside
+            if currentlyInside {
+                if notchViewModel.status == .notched || notchViewModel.status == .sliced {
+                    notchViewModel.notchPop()
+                    notchViewModel.hapticSender.send()
+                }
+            } else {
+                notchViewModel.notchClose()
+            }
         }
     }
 }
@@ -79,9 +147,9 @@ struct NotchView: View {
                 } else if !isTargeted {
                     // Close the notch when the dragged item leaves the area
                     let mouseLocation: NSPoint = NSEvent.mouseLocation
-                    if !notchViewModel.notchOpenedRect.insetBy(dx: notchViewModel.inset, dy: notchViewModel.inset).contains(
-                        mouseLocation)
-                    {
+                    if !notchViewModel.notchOpenedRect
+                        .insetBy(dx: notchViewModel.inset, dy: notchViewModel.inset)
+                        .contains(mouseLocation) {
                         notchViewModel.notchClose()
                     }
                 }

@@ -47,20 +47,6 @@ struct NotchDynamicView: View {
             )
             .overlay(
                 Group {
-                    if notchViewModel.status == .popping {
-                        NotchNavView(notchViewModel: notchViewModel)
-                        .padding(.top, notchViewModel.deviceNotchRect.height - notchViewModel.spacing + 1)
-                        .padding(notchViewModel.spacing)
-                        .frame(
-                            maxWidth: notchViewModel.deviceNotchRect.width + notchViewModel.abstractSize + 6, maxHeight: notchViewModel.deviceNotchRect.height + 36
-                        )
-                        .zIndex(1)
-                    }
-                }
-                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
-            )
-            .overlay(
-                Group {
                     if notchViewModel.status == .opened {
                         Rectangle()
                             .fill(Color.clear)

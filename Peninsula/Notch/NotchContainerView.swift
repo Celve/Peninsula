@@ -67,4 +67,3 @@ struct NotchContainerView: View {
         .transition(.blurReplace)
     }
 }
-

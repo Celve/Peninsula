@@ -10,7 +10,6 @@ struct NotchNavButton: View {
             notchViewModel.notchOpen(contentType: contentType)
         }) {
             ZStack {
-                RoundedRectangle(cornerRadius: 4).fill(isHovered ? .white : .clear)
                 if contentType == .notification {
                     Image(systemName: "app.badge")
                         .resizable()
@@ -44,15 +43,38 @@ struct NotchNavButton: View {
                 }
             }
             .frame(width: notchViewModel.deviceNotchRect.height, height: notchViewModel.deviceNotchRect.height)
+            // Liquid glass hover treatment for nav buttons
+            .background(
+                Group {
+                    if isHovered {
+                        RoundedRectangle(cornerRadius: 10, style: .continuous)
+                            .fill(.regularMaterial)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 10, style: .continuous)
+                                    .fill(
+                                        LinearGradient(
+                                            colors: [Color.white.opacity(0.98), Color.white.opacity(0.92)],
+                                            startPoint: .topLeading,
+                                            endPoint: .bottomTrailing
+                                        )
+                                    )
+                            )
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 10, style: .continuous)
+                                    .strokeBorder(Color.white.opacity(0.95), lineWidth: 1)
+                            )
+                            .shadow(color: .black.opacity(0.18), radius: 8, x: 0, y: 2)
+                    } else {
+                        Color.clear
+                    }
+                }
+            )
+            .contentShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
         }
         .buttonStyle(PlainButtonStyle())
         .onHover { isHovered in
             self.isHovered = isHovered
         }
-        .background(
-            RoundedRectangle(cornerRadius: 6)
-                .fill(isHovered ? Color.white : Color.clear)
-        )
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .animation(.easeInOut(duration: 0.1), value: isHovered)
     }
@@ -67,7 +89,16 @@ struct NotchNavView: View {
         HStack {
             ForEach(contentTypes, id: \.self) { contentType in
                 NotchNavButton(notchViewModel: notchViewModel, contentType: contentType)
+                    .id(contentType)
+                    .transition(
+                        .asymmetric(
+                            insertion: .scale(scale: 0.9).combined(with: .opacity),
+                            removal: .opacity.combined(with: .scale(scale: 0.9))
+                        )
+                    )
             }
         }
+        // Animate button insert/remove when the nav appears/disappears
+        .animation(notchViewModel.normalAnimation, value: notchViewModel.status)
     }
 }

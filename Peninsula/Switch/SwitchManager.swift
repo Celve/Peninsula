@@ -59,7 +59,7 @@ final class SwitchManager {
         return rawExpansion.map { item in
             (
                 item,
-                item.getIcon() ?? NSImage(systemSymbolName: "app.fill", accessibilityDescription: nil)!,
+                item.getIcon() ?? NSImage(systemSymbolName: "app.fill", accessibilityDescription: nil) ?? NSImage(),
                 [.unmatched(item.getTitle() ?? "")]
             )
         }
@@ -93,7 +93,7 @@ final class SwitchManager {
                 idx,
                 (
                     item,
-                    item.getIcon() ?? NSImage(systemSymbolName: "app.fill", accessibilityDescription: nil)!,
+                    item.getIcon() ?? NSImage(systemSymbolName: "app.fill", accessibilityDescription: nil) ?? NSImage(),
                     [.unmatched(item.getTitle() ?? "")]
                 )
             )

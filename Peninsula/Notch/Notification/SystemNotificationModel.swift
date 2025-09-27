@@ -151,7 +151,7 @@ class SystemNotificationModel: ObservableObject {
                 icon = smallIcon
             }
         } else {
-            icon = NSImage(systemSymbolName: "app.badge", accessibilityDescription: nil)!
+            icon = NSImage(systemSymbolName: "app.badge", accessibilityDescription: nil) ?? NSImage()
         }
         self.items[bundleId] = SystemNotificationItem(bundleId: bundleId, badge: SystemNotificationBadge.null, icon: Image(nsImage: icon).resizable().aspectRatio(contentMode: .fit), color: NSColor(red: 1.0, green: 1.0, blue: 1.0, alpha: 1.0))
         monitor.observe(
