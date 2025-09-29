@@ -190,7 +190,7 @@ class NotchViewModel: NSObject, ObservableObject {
     @Published private(set) var status: Status = .notched
     @Published var isExternal: Bool = false
     @Published var openReason: OpenReason = .unknown
-    @Published var contentType: NotchContentType = NotchContentType(rawValue: 0)!
+    @Published var contentType: NotchContentType = .apps
     @Published var spacing: CGFloat = 16
     @Published var cornerRadius: CGFloat = 16
     @Published var deviceNotchRect: CGRect = .zero

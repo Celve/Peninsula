@@ -20,14 +20,33 @@ extension CGWindowID {
     }
 
     func spaces() -> [CGSSpaceID] {
-        return CGSCopySpacesForWindows(cgsMainConnectionId, CGSSpaceMask.all.rawValue, [self] as CFArray) as! [CGSSpaceID]
+        let cfArray = CGSCopySpacesForWindows(
+            cgsMainConnectionId,
+            CGSSpaceMask.all.rawValue,
+            [self] as CFArray
+        )
+        if let array = cfArray as? [CGSSpaceID] {
+            return array
+        }
+        if let anyArray = cfArray as? [Any] {
+            return anyArray.compactMap { $0 as? CGSSpaceID }
+        }
+        return []
     }
 
     func screenshot(_ bestResolution: Bool = false) -> CGImage? {
         // CGSHWCaptureWindowList
         var windowId_ = self
-        let list = CGSHWCaptureWindowList(cgsMainConnectionId, &windowId_, 1, [.ignoreGlobalClipShape, bestResolution ? .bestResolution : .nominalResolution]).takeRetainedValue() as! [CGImage]
-        return list.first
+        let cfArray = CGSHWCaptureWindowList(
+            cgsMainConnectionId,
+            &windowId_,
+            1,
+            [.ignoreGlobalClipShape, bestResolution ? .bestResolution : .nominalResolution]
+        ).takeRetainedValue()
+        if let list = cfArray as? [CGImage] {
+            return list.first
+        }
+        return nil
     }
 
     private func cgProperty<T>(_ key: String, _ type: T.Type) -> T? {

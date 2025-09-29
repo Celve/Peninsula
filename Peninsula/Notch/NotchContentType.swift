@@ -45,7 +45,7 @@ enum NotchContentType: Int, Codable, Hashable, Equatable {
                 if let nextValue = NotchContentType(rawValue: contentType.rawValue + 1) {
                     contentType = nextValue
                 } else {
-                    contentType = NotchContentType(rawValue: 0)!
+                    contentType = NotchContentType(rawValue: 0) ?? .apps
                 }
             } while invisibles.keys.contains(where: { $0 == contentType })
         }
@@ -61,7 +61,7 @@ enum NotchContentType: Int, Codable, Hashable, Equatable {
                 if let previousValue = NotchContentType(rawValue: contentType.rawValue - 1) {
                     contentType = previousValue
                 } else {
-                    contentType = NotchContentType(rawValue: count() - 1)!
+                    contentType = NotchContentType(rawValue: count() - 1) ?? contentType
                 }
             } while invisibles.keys.contains(where: { $0 == contentType })
         }

@@ -30,7 +30,9 @@ struct SettingsView: View {
                 Text("Accessibility: ")
                 Button(action: {
                     if !accessibilityGranted() {
-                        NSWorkspace.shared.open(URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility")!)
+                        if let url = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility") {
+                            NSWorkspace.shared.open(url)
+                        }
                     }
                 }) {
                     Text("Grant")

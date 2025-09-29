@@ -93,7 +93,7 @@ class WorkspaceEvents {
                     if let focusedElement = try? systemWide.attribute(kAXFocusedUIElementAttribute, AXUIElement.self) {
                         let windowElement = try? focusedElement.secondRootParent()
                         if let windowId = Windows.shared.coll.firstIndex(where: { $0.axElement == windowElement }) {
-                            if windowId != 0 {
+                            if windowId != 0 && windowId < Windows.shared.coll.count {
                                 let window = Windows.shared.coll[windowId]
                                 window.peek()
                             }

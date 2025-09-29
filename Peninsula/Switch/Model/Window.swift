@@ -12,7 +12,7 @@ class Window: Element, Switchable {
     
     var application: App
     var id: CGWindowID
-    var title: String! {
+    var title: String = "" {
         didSet {
             matchableString = MatchableString(string: application.name + " - " + title)
         }
@@ -210,4 +210,3 @@ class WindowObserver {
     func windowMoved(element: AXUIElement) throws {
     }
 }
-

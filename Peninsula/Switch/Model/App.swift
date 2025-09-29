@@ -16,7 +16,7 @@ class App: Element, Switchable {
     var observer = AppObserver()
     var isHidden: Bool = false
     var label: String? = nil
-    var name: String! {
+    var name: String = "" {
         didSet {
             matchableString = MatchableString(string: name)
         }

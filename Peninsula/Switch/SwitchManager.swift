@@ -41,11 +41,12 @@ final class SwitchManager {
             if state != lastSearchState || lowered != lastSearchFilter {
                 lastSearchState = state
                 lastSearchFilter = lowered
+                let fallbackIcon = NSImage(systemSymbolName: "app.fill", accessibilityDescription: nil)!
                 cachedSearchExpansion = rawExpansion.compactMap { item in
                     if let match = item.getMatchableString().matches(string: lowered) {
                         return (
                             item,
-                            item.getIcon() ?? NSImage(systemSymbolName: "app.fill", accessibilityDescription: nil)!,
+                            item.getIcon() ?? fallbackIcon,
                             match
                         )
                     }
@@ -56,10 +57,11 @@ final class SwitchManager {
         }
 
         // Non-searching modes: compute on demand (no caching)
+        let fallbackIcon = NSImage(systemSymbolName: "app.fill", accessibilityDescription: nil)!
         return rawExpansion.map { item in
             (
                 item,
-                item.getIcon() ?? NSImage(systemSymbolName: "app.fill", accessibilityDescription: nil) ?? NSImage(),
+                item.getIcon() ?? fallbackIcon,
                 [.unmatched(item.getTitle() ?? "")]
             )
         }
@@ -84,6 +86,7 @@ final class SwitchManager {
         }
         // Non-searching: map only the requested slice
         let base = rawExpansion(state: state)
+        let fallbackIcon = NSImage(systemSymbolName: "app.fill", accessibilityDescription: nil)!
         let upper = min(range.upperBound, base.count)
         let lower = min(range.lowerBound, upper)
         if lower >= upper { return [] }
@@ -93,7 +96,7 @@ final class SwitchManager {
                 idx,
                 (
                     item,
-                    item.getIcon() ?? NSImage(systemSymbolName: "app.fill", accessibilityDescription: nil) ?? NSImage(),
+                    item.getIcon() ?? fallbackIcon,
                     [.unmatched(item.getTitle() ?? "")]
                 )
             )

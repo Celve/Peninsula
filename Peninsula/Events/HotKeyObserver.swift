@@ -116,7 +116,7 @@ class HotKeyObserver {
     var hotKeyPressedEventHandler: EventHandlerRef?
     var hotKeyReleasedEventHandler: EventHandlerRef?
     var shortcutsReference: EventHotKeyRef?
-    var localMonitor: Any!
+    var localMonitor: Any?
     var eventTap: CFMachPort?
     let cmdBtickTogggle = HotKeyToggle(state: .cmdBtick)
     let cmdTabToggle = HotKeyToggle(state: .cmdTab)

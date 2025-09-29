@@ -7,17 +7,18 @@
 
 import AppKit
 
-let productPage = URL(string: "https://github.com/Celve/Peninsula")!
-let sponsorPage = URL(string: "https://github.com/sponsors/Celve")!
+let productPage = URL(string: "https://github.com/Celve/Peninsula")
+let sponsorPage = URL(string: "https://github.com/sponsors/Celve")
 
-let bundleIdentifier = Bundle.main.bundleIdentifier!
+let bundleIdentifier = Bundle.main.bundleIdentifier ?? "Peninsula"
 let appVersion =
     "\(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "") (\(Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? ""))"
 
 private let availableDirectories = FileManager
     .default
     .urls(for: .documentDirectory, in: .userDomainMask)
-let documentsDirectory = availableDirectories[0]
+let documentsDirectory = (availableDirectories.first
+    ?? FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent("Documents"))
     .deletingLastPathComponent()
     .appendingPathComponent(".config")
     .appendingPathComponent("peninsula")
