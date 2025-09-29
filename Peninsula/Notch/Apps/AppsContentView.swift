@@ -7,13 +7,6 @@
 
 import SwiftUI
 
-struct ScrollOffsetPreferenceKey: PreferenceKey {
-    static var defaultValue: CGFloat = 0
-    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
-        value = nextValue()
-    }
-}
-
 class AppsViewModel: ObservableObject {
     @Published var title: String = "None"
 }
@@ -22,15 +15,22 @@ struct AppsContentView: View {
     let vm: NotchViewModel
     @StateObject var windows = Windows.shared
     @StateObject var svm = AppsViewModel()
-    @State private var scrollOffset: CGFloat = 0
-    @State private var contentWidth: CGFloat = 0
-    @State private var scrollViewWidth: CGFloat = 0
+    @State private var currentPage: Int = 0
     @State private var cachedFilteredWindows: [Window] = []
     @State private var lastScreenRect: CGRect = .zero
     
-    let rows = [
-        GridItem(.adaptive(minimum: 50, maximum: 60), spacing: 12)
-    ]
+    // Paging configuration
+    private let itemsPerRow: Int = 9
+    private let rowsPerPage: Int = 2
+    private var pageCapacity: Int { itemsPerRow * rowsPerPage }
+    private var columns: [GridItem] {
+        Array(repeating: GridItem(.fixed(50), spacing: 12), count: itemsPerRow)
+    }
+    private var gridHeight: CGFloat {
+        // rows * cellHeight + (rows-1) * rowSpacing + top/bottom padding (8 + 8)
+        let rows = CGFloat(rowsPerPage)
+        return rows * 45 + (rows - 1) * 12 + 16
+    }
     
     var filteredWindows: [Window] {
         // Only recalculate if screen rect changed or windows changed
@@ -45,81 +45,81 @@ struct AppsContentView: View {
         return cachedFilteredWindows
     }
     
-    var showRightIndicator: Bool {
-        scrollOffset + scrollViewWidth < contentWidth - 5
+    private var pageCount: Int {
+        let count = filteredWindows.count
+        return max(1, Int(ceil(Double(count) / Double(pageCapacity))))
+    }
+    
+    private var currentPageClamped: Int {
+        min(max(0, currentPage), max(0, pageCount - 1))
+    }
+    
+    private var windowsForCurrentPage: ArraySlice<Window> {
+        let p = currentPageClamped
+        let start = p * pageCapacity
+        let end = min(start + pageCapacity, filteredWindows.count)
+        guard start < end else { return [] }
+        return filteredWindows[start..<end]
     }
     
     var body: some View {
         VStack(spacing: 12) {
-            HStack(spacing: 0) {
-                ScrollView(.horizontal, showsIndicators: false) {
-                    LazyHGrid(rows: rows, spacing: 12) {
-                        ForEach(Array(filteredWindows.enumerated()), id: \.offset) { index, window in
-                            AppIcon(name: window.title, image: (window.application.icon ?? NSImage(systemSymbolName: "app.fill", accessibilityDescription: nil) ?? NSImage()), vm: vm, svm: svm)
-                                .frame(width: 50, height: 50)
-                                .onTapGesture {
-                                    window.focus()
-                                    vm.notchClose()
-                                }
-                        }
-                    }
-                    .onAppear {
-                        cachedFilteredWindows = filteredWindows
-                        lastScreenRect = vm.cgScreenRect
-                    }
-                    .onChange(of: vm.cgScreenRect) { newValue in
-                        lastScreenRect = newValue
-                        cachedFilteredWindows = filteredWindows
-                    }
-                    .padding(.vertical, 8)
-                    .padding(.leading, 16)
-                    .padding(.trailing, showRightIndicator ? 8 : 16)
-                    .background(
-                        GeometryReader { geo in
-                            Color.clear
-                                .onAppear {
-                                    contentWidth = geo.size.width
-                                }
-                                .onChange(of: geo.size.width) { newValue in
-                                    contentWidth = newValue
-                                }
-                        }
-                    )
-                }
-                .background(
-                    GeometryReader { geo in
-                        Color.clear
-                            .onAppear {
-                                scrollViewWidth = geo.size.width
+            ZStack(alignment: .topLeading) {
+                LazyVGrid(columns: columns, alignment: .leading, spacing: 12) {
+                    ForEach(Array(windowsForCurrentPage), id: \.id) { window in
+                        AppIcon(name: window.title, image: (window.application.icon ?? NSImage(systemSymbolName: "app.fill", accessibilityDescription: nil) ?? NSImage()), vm: vm, svm: svm)
+                            .frame(width: 45, height: 45)
+                            .onTapGesture {
+                                window.focus()
+                                vm.notchClose()
                             }
-                            .onChange(of: geo.size.width) { newValue in
-                                scrollViewWidth = newValue
-                            }
-                            .preference(key: ScrollOffsetPreferenceKey.self, value: geo.frame(in: .named("scroll")).origin.x)
                     }
-                )
-                .coordinateSpace(name: "scroll")
-                .onPreferenceChange(ScrollOffsetPreferenceKey.self) { value in
-                    scrollOffset = -value
                 }
-                
-                if showRightIndicator {
-                    VStack {
-                        Image(systemName: "chevron.right.circle.fill")
-                            .font(.system(size: 16))
-                            .foregroundColor(.white.opacity(0.6))
-                            .background(
-                                Circle()
-                                    .fill(Color.black.opacity(0.3))
-                                    .frame(width: 20, height: 20)
-                            )
+                .padding(.vertical, 8)
+                .padding(.horizontal, 16)
+            }
+            .frame(maxWidth: .infinity)
+            .frame(height: gridHeight, alignment: .top)
+            .overlay(alignment: .leading) {
+                if currentPageClamped > 0 {
+                    Button {
+                        withAnimation(vm.normalAnimation) { currentPage = max(0, currentPageClamped - 1) }
+                    } label: {
+                        Image(systemName: "chevron.left")
+                            .font(.system(size: 12, weight: .medium))
+                            .foregroundColor(.white.opacity(0.8))
+                            .frame(width: 24, height: 24)
+                            .background(Circle().fill(Color.black.opacity(0.25)))
                     }
-                    .padding(.trailing, 12)
-                    .transition(.opacity.combined(with: .scale))
-                    .animation(vm.normalAnimation, value: showRightIndicator)
+                    .buttonStyle(.plain)
+                    .padding(.leading, 8)
                 }
             }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .overlay(alignment: .trailing) {
+                if currentPageClamped < pageCount - 1 {
+                    Button {
+                        withAnimation(vm.normalAnimation) { currentPage = min(pageCount - 1, currentPageClamped + 1) }
+                    } label: {
+                        Image(systemName: "chevron.right")
+                            .font(.system(size: 12, weight: .medium))
+                            .foregroundColor(.white.opacity(0.8))
+                            .frame(width: 24, height: 24)
+                            .background(Circle().fill(Color.black.opacity(0.25)))
+                    }
+                    .buttonStyle(.plain)
+                    .padding(.trailing, 8)
+                }
+            }
+            .onAppear {
+                cachedFilteredWindows = filteredWindows
+                lastScreenRect = vm.cgScreenRect
+                if currentPageClamped != currentPage { currentPage = currentPageClamped }
+            }
+            .onChange(of: vm.cgScreenRect) { newValue in
+                lastScreenRect = newValue
+                cachedFilteredWindows = filteredWindows
+                if currentPageClamped != currentPage { currentPage = currentPageClamped }
+            }
             
             Text(svm.title)
                 .lineLimit(1)
@@ -162,4 +162,3 @@ private struct AppIcon: View {
         }
     }
 }
-

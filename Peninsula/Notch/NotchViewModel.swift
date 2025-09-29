@@ -59,18 +59,13 @@ class NotchViewModel: NSObject, ObservableObject {
                     + deviceNotchRect.height + SwitchSearchView.LINEHEIGHT + spacing * CGFloat(4) + 1
             )
         case .apps:
-            let appCount = windows.coll.filter { window in
-                if let frame = try? window.axElement.frame() {
-                    return cgScreenRect.intersects(frame)
-                }
-                return false
-            }.count
-            let maxAppsPerRow = 9
-            let rows = max(1, (appCount + maxAppsPerRow - 1) / maxAppsPerRow)
-            let rowHeight: CGFloat = 62
+            // Paged apps grid: exact 2-row height (icons 50, inter-row spacing 12, vertical padding 8+8)
+            let gridHeight: CGFloat = 2 * 50 + 12 + 16 // = 128
+            let labelHeight: CGFloat = 22 // single-line label under grid
+            // Total: notch area + grid + header/content spacing (≈ 3*spacing) + label + 1px fudge
+            let baseHeight = deviceNotchRect.height + gridHeight + spacing * 3 + labelHeight
             let minHeight: CGFloat = 200
-            let calculatedHeight = CGFloat(rows) * rowHeight + spacing * 2 + 40
-            return .init(width: 600, height: max(minHeight, calculatedHeight) + 1)
+            return .init(width: 600, height: max(minHeight, baseHeight) + 1)
         default:
             return .init(width: 600, height: 200 + 1)
         }
