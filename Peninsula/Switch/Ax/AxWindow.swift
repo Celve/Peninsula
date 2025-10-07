@@ -34,6 +34,22 @@ extension AXUIElement {
         let result = CGRect(origin: position, size: size)
         return result
     }
+
+    // Returns true if the AX window has been destroyed/closed.
+    func isClosed() -> Bool {
+        var value: CFTypeRef?
+        let err = AXUIElementCopyAttributeValue(self, kAXRoleAttribute as CFString, &value)
+        switch err {
+        case .success:
+            return false
+        case .invalidUIElement:
+            return true
+        case .cannotComplete:
+            return false
+        default:
+            return false
+        }
+    }
     
     func isActual(runningApp: NSRunningApplication) -> Bool {
         guard let cgWid = try? cgWindowId() else { return false }
