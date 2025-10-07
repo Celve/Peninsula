@@ -25,6 +25,9 @@ class Dock {
 
         let dock = AXUIElementCreateApplication(dockProcessId)
         self.axList = try? dock.children()?.first { try $0.role() == kAXListRole }
+        if self.axList == nil {
+            PeninsulaLog.accessibility.error("Failed to fetch dock accessibility list")
+        }
     }
     
     func refresh() {

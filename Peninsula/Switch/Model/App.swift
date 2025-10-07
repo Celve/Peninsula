@@ -1,6 +1,6 @@
-import Foundation
 import ApplicationServices.HIServices.AXNotificationConstants
 import AppKit
+import Foundation
 
 class App: Element, Switchable {
     typealias M = App

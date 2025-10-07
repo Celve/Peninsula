@@ -1,7 +1,7 @@
-import Foundation
 import Cocoa
 import AppKit
 import ApplicationServices.HIServices
+import Foundation
 
 
 class Window: Element, Switchable {

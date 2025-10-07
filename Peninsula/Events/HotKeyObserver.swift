@@ -173,9 +173,8 @@ class HotKeyObserver {
             let runLoopSource = CFMachPortCreateRunLoopSource(kCFAllocatorDefault, eventTap, 0)
             CFRunLoopAddSource(CFRunLoopGetCurrent(), runLoopSource, .commonModes)
             CGEvent.tapEnable(tap: eventTap, enable: true)
-            print("Succeeded to create event tap")
         } else {
-            print("Failed to create event tap")
+            PeninsulaLog.hotKey.error("Failed to create event tap")
         }
     }
 }

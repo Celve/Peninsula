@@ -1,5 +1,5 @@
-import Foundation
 import AppKit
+import Foundation
 
 func isNotXpc(_ app: NSRunningApplication) -> Bool {
     // these private APIs are more reliable than Bundle.init? as it can return nil (e.g. for com.apple.dock.etci)

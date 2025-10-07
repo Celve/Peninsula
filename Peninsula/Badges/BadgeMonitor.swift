@@ -206,7 +206,7 @@ class ObservedApp {
             }
         }
 
-        print("Error \(err.rawValue)")
+        PeninsulaLog.badge.error("AX attribute error code \(err.rawValue)")
         return nil
     }
 }

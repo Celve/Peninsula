@@ -25,7 +25,6 @@ class NotificationModel: ObservableObject {
     private let lock = NSLock()
 
     func add(item: NotificationInstance) {
-        print("add", item.ty, item.category)
         lock.withLock {
             switch item.ty {
                 case .always:
@@ -52,7 +51,6 @@ class NotificationModel: ObservableObject {
     }
 
     func remove(ty: NotificationType, category: String) {
-        print("remove", ty, category)
         lock.withLock {
             switch ty {
             case .always:
