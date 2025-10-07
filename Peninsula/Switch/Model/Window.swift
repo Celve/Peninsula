@@ -193,7 +193,14 @@ class WindowObserver {
     
     func windowTitleChanged(element: AXUIElement) throws {
         guard let window = window else { return }
-        window.title = window.tryTitle()
+        let updatedTitle = window.tryTitle()
+        // Ensure title updates (and related string work) run on the main actor.
+        BackgroundWork.synchronizationQueue.taskRestricted { [weak window] in
+            guard let window = window else { return }
+            await MainActor.run {
+                window.title = updatedTitle
+            }
+        }
     }
     
     
