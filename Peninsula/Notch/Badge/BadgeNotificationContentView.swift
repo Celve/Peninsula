@@ -8,9 +8,9 @@
 import ColorfulX
 import SwiftUI
 
-struct NotificationContentView: View {
+struct BadgeNotificationContentView: View {
     @StateObject var nvm: NotchViewModel
-    @StateObject var nm = SystemNotificationModel.shared
+    @StateObject var nm = BadgeSystemNotificationModel.shared
     @State var isAnimating = false
 
     var body: some View {
@@ -27,7 +27,7 @@ struct NotificationContentView: View {
 private struct AppIcon: View {
     let bundleId: String
     let image: AnyView
-    @ObservedObject var nm = SystemNotificationModel.shared
+    @ObservedObject var nm = BadgeSystemNotificationModel.shared
     @StateObject var vm: NotchViewModel
 
     @State var hover: Bool = false

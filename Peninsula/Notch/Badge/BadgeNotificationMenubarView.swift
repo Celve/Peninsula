@@ -7,9 +7,9 @@
 
 import SwiftUI
 
-struct NotificationMenubarView: View {
+struct BadgeNotificationMenubarView: View {
     @StateObject var vm: NotchViewModel
-    @StateObject var sysNotifModel = SystemNotificationModel.shared
+    @StateObject var sysNotifModel = BadgeSystemNotificationModel.shared
 
     var body: some View {
         HStack {

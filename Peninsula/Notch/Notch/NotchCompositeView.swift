@@ -1,5 +1,5 @@
 //
-//  NotchContainerView.swift
+//  NotchCompositeView.swift
 //  Island
 //
 //  Created by Celve on 9/21/24.
@@ -9,7 +9,7 @@ import ColorfulX
 import SwiftUI
 import UniformTypeIdentifiers
 
-struct NotchContainerView: View {
+struct NotchCompositeView: View {
     @StateObject var vm: NotchViewModel
     @ObservedObject var windows = Windows.shared
     var headline: some View {
@@ -20,7 +20,7 @@ struct NotchContainerView: View {
         ZStack {
             switch vm.contentType {
             case .notification:
-                NotificationMenubarView(vm: vm)
+                BadgeNotificationMenubarView(vm: vm)
             case .tray:
                 TrayDropMenubarView(notchViewModel: vm)
             case .apps:
@@ -48,11 +48,11 @@ struct NotchContainerView: View {
             case .traySettings:
                 TryDropSettingsView(notchViewModel: vm, trayDrop: TrayDrop.shared)
             case .apps:
-                AppsContentView(vm: vm).transition(.blurReplace)
+                AppsView(vm: vm).transition(.blurReplace)
                     .animation(vm.normalAnimation, value: vm.contentType)
                     .animation(vm.status == .opened ? vm.innerOnAnimation : vm.innerOffAnimation, value: vm.status)
             case .notification:
-                NotificationContentView(nvm: vm).transition(.blurReplace)
+                BadgeNotificationContentView(nvm: vm).transition(.blurReplace)
             case .settings:
                 SettingsView(vm: vm).transition(.blurReplace)
             case .switching:

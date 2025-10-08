@@ -17,11 +17,11 @@ enum SwipeDirection {
     case right
 }
 
-struct NotchDynamicView: View {
+struct NotchBackgroundView: View {
     @StateObject var notchViewModel: NotchViewModel
     @StateObject var notchModel = NotchModel.shared
-    @StateObject var sysNotifModel = SystemNotificationModel.shared
-    @StateObject var notifModel = NotificationModel.shared
+    @StateObject var sysNotifModel = BadgeSystemNotificationModel.shared
+    @StateObject var notifModel = BadgeNotificationModel.shared
     @ObservedObject var windows = Windows.shared
 
     var body: some View {
@@ -35,7 +35,7 @@ struct NotchDynamicView: View {
             .overlay(
                 Group {
                     if notchViewModel.status != .opened {
-                        NotificationAbstractView(notchViewModel: notchViewModel)
+                        BadgeNotificationAbstractView(notchViewModel: notchViewModel)
                             .frame(maxWidth: .infinity, maxHeight: notchViewModel.deviceNotchRect.height, alignment: Alignment(horizontal: .trailing, vertical: .center))
                             .offset(x: -notchViewModel.spacing)
                             .transition(

@@ -7,17 +7,12 @@
 
 import SwiftUI
 
-class AppsViewModel: ObservableObject {
-    @Published var title: String = "None"
-}
 
-struct AppsContentView: View {
+struct AppsView: View {
     let vm: NotchViewModel
     @StateObject var windows = Windows.shared
-    @StateObject var svm = AppsViewModel()
-    @State private var currentPage: Int = 0
-    @State private var cachedFilteredWindows: [Window] = []
-    @State private var lastScreenRect: CGRect = .zero
+    @StateObject var appsViewModel: AppsViewModel = AppsViewModel()
+    // moved into AppsViewModel: currentPage, cachedFilteredWindows, lastScreenRect
     
     // Paging configuration
     private let itemsPerRow: Int = 9
@@ -34,7 +29,7 @@ struct AppsContentView: View {
     
     var filteredWindows: [Window] {
         // Only recalculate if screen rect changed or windows changed
-        if lastScreenRect != vm.cgScreenRect || cachedFilteredWindows.isEmpty {
+        if appsViewModel.lastScreenRect != vm.cgScreenRect || appsViewModel.cachedFilteredWindows.isEmpty {
             return windows.coll.filter {
                 if let frame = try? $0.axElement.frame() {
                     return vm.cgScreenRect.intersects(frame)
@@ -42,7 +37,7 @@ struct AppsContentView: View {
                 return false
             }
         }
-        return cachedFilteredWindows
+        return appsViewModel.cachedFilteredWindows
     }
     
     private var pageCount: Int {
@@ -51,7 +46,7 @@ struct AppsContentView: View {
     }
     
     private var currentPageClamped: Int {
-        min(max(0, currentPage), max(0, pageCount - 1))
+        min(max(0, appsViewModel.currentPage), max(0, pageCount - 1))
     }
     
     private var windowsForCurrentPage: ArraySlice<Window> {
@@ -67,7 +62,7 @@ struct AppsContentView: View {
             ZStack(alignment: .topLeading) {
                 LazyVGrid(columns: columns, alignment: .leading, spacing: 12) {
                     ForEach(Array(windowsForCurrentPage), id: \.id) { window in
-                        AppIcon(name: window.title, image: (window.application.icon ?? NSImage(systemSymbolName: "app.fill", accessibilityDescription: nil) ?? NSImage()), vm: vm, svm: svm)
+                        AppIcon(name: window.title, image: (window.application.icon ?? NSImage(systemSymbolName: "app.fill", accessibilityDescription: nil) ?? NSImage()), vm: vm, appsViewModel: appsViewModel)
                             .frame(width: 45, height: 45)
                             .onTapGesture {
                                 window.focus()
@@ -83,7 +78,7 @@ struct AppsContentView: View {
             .overlay(alignment: .leading) {
                 if currentPageClamped > 0 {
                     Button {
-                        withAnimation(vm.normalAnimation) { currentPage = max(0, currentPageClamped - 1) }
+                        withAnimation(vm.normalAnimation) { appsViewModel.currentPage = max(0, currentPageClamped - 1) }
                     } label: {
                         Image(systemName: "chevron.left")
                             .font(.system(size: 12, weight: .medium))
@@ -98,7 +93,7 @@ struct AppsContentView: View {
             .overlay(alignment: .trailing) {
                 if currentPageClamped < pageCount - 1 {
                     Button {
-                        withAnimation(vm.normalAnimation) { currentPage = min(pageCount - 1, currentPageClamped + 1) }
+                        withAnimation(vm.normalAnimation) { appsViewModel.currentPage = min(pageCount - 1, currentPageClamped + 1) }
                     } label: {
                         Image(systemName: "chevron.right")
                             .font(.system(size: 12, weight: .medium))
@@ -111,21 +106,21 @@ struct AppsContentView: View {
                 }
             }
             .onAppear {
-                cachedFilteredWindows = filteredWindows
-                lastScreenRect = vm.cgScreenRect
-                if currentPageClamped != currentPage { currentPage = currentPageClamped }
+                appsViewModel.cachedFilteredWindows = filteredWindows
+                appsViewModel.lastScreenRect = vm.cgScreenRect
+                if currentPageClamped != appsViewModel.currentPage { appsViewModel.currentPage = currentPageClamped }
             }
             .onChange(of: vm.cgScreenRect) { newValue in
-                lastScreenRect = newValue
-                cachedFilteredWindows = filteredWindows
-                if currentPageClamped != currentPage { currentPage = currentPageClamped }
+                appsViewModel.lastScreenRect = newValue
+                appsViewModel.cachedFilteredWindows = filteredWindows
+                if currentPageClamped != appsViewModel.currentPage { appsViewModel.currentPage = currentPageClamped }
             }
             
-            Text(svm.title)
+            Text(appsViewModel.title)
                 .lineLimit(1)
-                .opacity(svm.title == "None" ? 0 : 1)
+                .opacity(appsViewModel.title == "None" ? 0 : 1)
                 .transition(.opacity)
-                .animation(vm.normalAnimation, value: svm.title)
+                .animation(vm.normalAnimation, value: appsViewModel.title)
                 .contentTransition(.numericText())
                 .padding(.bottom, 8)
         }
@@ -138,7 +133,7 @@ private struct AppIcon: View {
     let image: NSImage
     let vm: NotchViewModel
     @State var hover: Bool = false
-    @ObservedObject var svm: AppsViewModel
+    @ObservedObject var appsViewModel: AppsViewModel
 
     var body: some View {
         ZStack {
@@ -157,7 +152,7 @@ private struct AppIcon: View {
         .onHover { hovering in
             if self.hover != hovering {
                 self.hover = hovering
-                svm.title = hovering ? name : "None"
+                appsViewModel.title = hovering ? name : "None"
             }
         }
     }

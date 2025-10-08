@@ -82,7 +82,7 @@ _ = Apps.shared
 _ = TrayDrop.shared
 TrayDrop.shared.cleanExpiredFiles()
 
-_ = NotificationModel.shared
+_ = BadgeNotificationModel.shared
 _ = Dock.shared
 PeninsulaLog.lifecycle.notice("Peninsula initialized")
 

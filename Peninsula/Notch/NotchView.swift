@@ -15,11 +15,11 @@ struct NotchHoverView: View {
     
     var body: some View {
         ZStack(alignment: .top) {
-            NotchDynamicView(notchViewModel: notchViewModel)
+            NotchBackgroundView(notchViewModel: notchViewModel)
                 .zIndex(0)
             Group {
                 if notchViewModel.status == .opened {
-                    NotchContainerView(vm: notchViewModel)
+                    NotchCompositeView(vm: notchViewModel)
                         .padding(.top, notchViewModel.deviceNotchRect.height - notchViewModel.spacing + 1)
                         .padding(notchViewModel.spacing)
                         .frame(

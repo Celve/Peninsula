@@ -16,8 +16,8 @@ protocol NotificationInstance {
     var action: (NotchViewModel) -> Void { get }
 }
 
-class NotificationModel: ObservableObject {
-    static let shared = NotificationModel()
+class BadgeNotificationModel: ObservableObject {
+    static let shared = BadgeNotificationModel()
     @Published var alwaysItems: [String: NotificationInstance] = [:]
     @Published var temporaryItems: [String: NotificationInstance] = [:]
     @Published var namesSet: Set<String> = []

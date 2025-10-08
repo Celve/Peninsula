@@ -41,9 +41,9 @@ struct QuiverView<Inner: View>: View {
     }
 }
 
-struct NotificationAbstractView: View {
+struct BadgeNotificationAbstractView: View {
     @StateObject var notchViewModel: NotchViewModel
-    @StateObject var notifModel: NotificationModel = NotificationModel.shared
+    @StateObject var notifModel: BadgeNotificationModel = BadgeNotificationModel.shared
 
     var body: some View {
         ZStack {

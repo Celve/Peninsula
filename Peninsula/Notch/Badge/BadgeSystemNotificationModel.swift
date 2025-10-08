@@ -59,7 +59,7 @@ class SystemNotificationItem: Equatable {
     }
 
     func instance() -> SystemNotificationInstance {
-        return SystemNotificationInstance(category: "system_notification", ty: .temporary(6), icon: { (notchViewModel: NotchViewModel) in self.icon }, action: { (notchViewModel: NotchViewModel) in SystemNotificationModel.shared.open(bundleId: self.bundleId) })
+        return SystemNotificationInstance(category: "system_notification", ty: .temporary(6), icon: { (notchViewModel: NotchViewModel) in self.icon }, action: { (notchViewModel: NotchViewModel) in BadgeSystemNotificationModel.shared.open(bundleId: self.bundleId) })
     }
 }
 
@@ -107,10 +107,10 @@ class SystemNotificationInstance: NotificationInstance, Equatable {
     }
 }
 
-class SystemNotificationModel: ObservableObject {
-    static let shared = SystemNotificationModel()
+class BadgeSystemNotificationModel: ObservableObject {
+    static let shared = BadgeSystemNotificationModel()
     @ObservedObject var notchModel = NotchModel.shared
-    @ObservedObject var notifModel = NotificationModel.shared
+    @ObservedObject var notifModel = BadgeNotificationModel.shared
     @ObservedObject var apps = Apps.shared
     let monitor = BadgeMonitor.shared
 
