@@ -52,12 +52,11 @@ struct NotchHoverView: View {
             }
         }
         .onHover { isHover in
-            isHovering = isHover
             if !notchModel.isKeyboardTriggered {
-                if isHover && (notchViewModel.status == .notched || notchViewModel.status == .sliced) {
-                    notchViewModel.notchPop()
-                    notchViewModel.hapticSender.send()
-                } else if !isHover {
+                if isHover {
+                    reevaluateHover()
+                } else {
+                    isHovering = false
                     notchViewModel.notchClose()
                 }
             }
@@ -67,22 +66,6 @@ struct NotchHoverView: View {
         .onChange(of: notchViewModel.notchOpenedSize) { _ in reevaluateHover() }
         .onChange(of: notchViewModel.abstractSize) { _ in reevaluateHover() }
         .onChange(of: notchViewModel.status) { _ in reevaluateHover() }
-        // .overlay(
-        //     HoverActivationArea { isHover in
-        //         if !notchModel.isKeyboardTriggered {
-        //             if isHover && (notchViewModel.status == .notched || notchViewModel.status == .sliced) {
-        //                 notchViewModel.notchPop()
-        //                 notchViewModel.hapticSender.send()
-        //             } else if !isHover {
-        //                 notchViewModel.notchClose()
-        //             }
-        //         }
-        //     }
-        //     .frame(width: notchViewModel.notchSize.width, height: notchViewModel.notchSize.height)
-        //     .offset(x: notchViewModel.abstractSize / 2, y: 0)
-        //     .allowsHitTesting(false),
-        //     alignment: .top
-        // )
         .onTapGesture {
             notchViewModel.notchOpen(contentType: .apps)
         }
@@ -96,7 +79,7 @@ struct NotchHoverView: View {
         case .opened:
             targetRect = notchViewModel.notchOpenedRect.insetBy(dx: notchViewModel.inset, dy: notchViewModel.inset)
         case .notched, .sliced, .popping:
-            targetRect = notchViewModel.notchRect
+            targetRect = notchViewModel.notchRect.insetBy(dx: notchViewModel.inset, dy: notchViewModel.inset)
         }
         let currentlyInside = targetRect.contains(mouseLocation)
         if currentlyInside != isHovering {

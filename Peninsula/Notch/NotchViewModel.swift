@@ -22,7 +22,7 @@ class NotchViewModel: NSObject, ObservableObject {
         }
     }
 
-    init(inset: CGFloat = -4, window: NSWindow, isBuiltin: Bool) {
+    init(inset: CGFloat = -16, window: NSWindow, isBuiltin: Bool) {
         self.isBuiltin = isBuiltin
         self.inset = inset
         self.window = window

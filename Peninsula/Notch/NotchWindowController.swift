@@ -18,7 +18,7 @@ class NotchWindowController: NSWindowController {
 
     init(window: NSPanel, screen: NSScreen) {
         var notchSize = screen.notchSize
-        let vm = NotchViewModel(inset: -4, window: window, isBuiltin: notchSize != .zero)
+        let vm = NotchViewModel(inset: -16, window: window, isBuiltin: notchSize != .zero)
         self.vm = vm
         self.screen = screen
         window.orderFrontRegardless()
