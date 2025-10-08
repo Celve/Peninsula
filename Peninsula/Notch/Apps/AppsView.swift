@@ -10,75 +10,42 @@ import SwiftUI
 
 struct AppsView: View {
     let vm: NotchViewModel
-    @StateObject var windows = Windows.shared
     @StateObject var appsViewModel: AppsViewModel = AppsViewModel()
     // moved into AppsViewModel: currentPage, cachedFilteredWindows, lastScreenRect
     
-    // Paging configuration
-    private let itemsPerRow: Int = 9
-    private let rowsPerPage: Int = 2
-    private var pageCapacity: Int { itemsPerRow * rowsPerPage }
+    // Paging configuration moved to ViewModel; derive layout from it
     private var columns: [GridItem] {
-        Array(repeating: GridItem(.fixed(50), spacing: 12), count: itemsPerRow)
+        Array(repeating: GridItem(.fixed(appsViewModel.itemSize.width), spacing: 12), count: appsViewModel.itemsPerRow)
     }
     private var gridHeight: CGFloat {
         // rows * cellHeight + (rows-1) * rowSpacing + top/bottom padding (8 + 8)
-        let rows = CGFloat(rowsPerPage)
-        return rows * 45 + (rows - 1) * 12 + 16
+        let rows = CGFloat(appsViewModel.rowsPerPage)
+        return rows * appsViewModel.itemSize.height + (rows - 1) * 12
     }
     
-    var filteredWindows: [Window] {
-        // Only recalculate if screen rect changed or windows changed
-        if appsViewModel.lastScreenRect != vm.cgScreenRect || appsViewModel.cachedFilteredWindows.isEmpty {
-            return windows.coll.filter {
-                if let frame = try? $0.axElement.frame() {
-                    return vm.cgScreenRect.intersects(frame)
-                }
-                return false
-            }
-        }
-        return appsViewModel.cachedFilteredWindows
-    }
-    
-    private var pageCount: Int {
-        let count = filteredWindows.count
-        return max(1, Int(ceil(Double(count) / Double(pageCapacity))))
-    }
-    
-    private var currentPageClamped: Int {
-        min(max(0, appsViewModel.currentPage), max(0, pageCount - 1))
-    }
-    
-    private var windowsForCurrentPage: ArraySlice<Window> {
-        let p = currentPageClamped
-        let start = p * pageCapacity
-        let end = min(start + pageCapacity, filteredWindows.count)
-        guard start < end else { return [] }
-        return filteredWindows[start..<end]
-    }
+    // Data-driven pieces moved into AppsViewModel (pageCount, clamping, slicing)
     
     var body: some View {
         VStack(spacing: 12) {
             ZStack(alignment: .topLeading) {
                 LazyVGrid(columns: columns, alignment: .leading, spacing: 12) {
-                    ForEach(Array(windowsForCurrentPage), id: \.id) { window in
+                    ForEach(Array(appsViewModel.windowsForCurrentPage()), id: \.id) { window in
                         AppIcon(name: window.title, image: (window.application.icon ?? NSImage(systemSymbolName: "app.fill", accessibilityDescription: nil) ?? NSImage()), vm: vm, appsViewModel: appsViewModel)
-                            .frame(width: 45, height: 45)
+                            .frame(width: appsViewModel.itemSize.width, height: appsViewModel.itemSize.height)
                             .onTapGesture {
                                 window.focus()
                                 vm.notchClose()
                             }
                     }
                 }
-                .padding(.vertical, 8)
                 .padding(.horizontal, 16)
             }
             .frame(maxWidth: .infinity)
             .frame(height: gridHeight, alignment: .top)
             .overlay(alignment: .leading) {
-                if currentPageClamped > 0 {
+                if appsViewModel.currentPageClamped > 0 {
                     Button {
-                        withAnimation(vm.normalAnimation) { appsViewModel.currentPage = max(0, currentPageClamped - 1) }
+                        withAnimation(vm.normalAnimation) { appsViewModel.goPrev() }
                     } label: {
                         Image(systemName: "chevron.left")
                             .font(.system(size: 12, weight: .medium))
@@ -91,9 +58,9 @@ struct AppsView: View {
                 }
             }
             .overlay(alignment: .trailing) {
-                if currentPageClamped < pageCount - 1 {
+                if appsViewModel.currentPageClamped < appsViewModel.pageCount - 1 {
                     Button {
-                        withAnimation(vm.normalAnimation) { appsViewModel.currentPage = min(pageCount - 1, currentPageClamped + 1) }
+                        withAnimation(vm.normalAnimation) { appsViewModel.goNext() }
                     } label: {
                         Image(systemName: "chevron.right")
                             .font(.system(size: 12, weight: .medium))
@@ -106,14 +73,22 @@ struct AppsView: View {
                 }
             }
             .onAppear {
-                appsViewModel.cachedFilteredWindows = filteredWindows
-                appsViewModel.lastScreenRect = vm.cgScreenRect
-                if currentPageClamped != appsViewModel.currentPage { appsViewModel.currentPage = currentPageClamped }
+                appsViewModel.refreshFilteredWindows(for: vm.cgScreenRect)
+                appsViewModel.clampCurrentPageIfNeeded()
             }
             .onChange(of: vm.cgScreenRect) { newValue in
-                appsViewModel.lastScreenRect = newValue
-                appsViewModel.cachedFilteredWindows = filteredWindows
-                if currentPageClamped != appsViewModel.currentPage { appsViewModel.currentPage = currentPageClamped }
+                appsViewModel.refreshFilteredWindows(for: newValue)
+                appsViewModel.clampCurrentPageIfNeeded()
+            }
+            .onReceive(appsViewModel.windows.$coll) { _ in
+                appsViewModel.refreshFilteredWindows(for: vm.cgScreenRect)
+                appsViewModel.clampCurrentPageIfNeeded()
+            }
+            .onChange(of: appsViewModel.itemsPerRow) { _ in
+                appsViewModel.clampCurrentPageIfNeeded()
+            }
+            .onChange(of: appsViewModel.rowsPerPage) { _ in
+                appsViewModel.clampCurrentPageIfNeeded()
             }
             
             Text(appsViewModel.title)

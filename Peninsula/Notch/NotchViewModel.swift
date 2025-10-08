@@ -58,14 +58,6 @@ class NotchViewModel: NSObject, ObservableObject {
                 height: CGFloat(visibleCount) * SwitchContentView.HEIGHT
                     + deviceNotchRect.height + SwitchSearchView.LINEHEIGHT + spacing * CGFloat(4) + 1
             )
-        case .apps:
-            // Paged apps grid: exact 2-row height (icons 50, inter-row spacing 12, vertical padding 8+8)
-            let gridHeight: CGFloat = 2 * 50 + 12 + 16 // = 128
-            let labelHeight: CGFloat = 22 // single-line label under grid
-            // Total: notch area + grid + header/content spacing (≈ 3*spacing) + label + 1px fudge
-            let baseHeight = deviceNotchRect.height + gridHeight + spacing * 3 + labelHeight
-            let minHeight: CGFloat = 200
-            return .init(width: 600, height: max(minHeight, baseHeight) + 1)
         default:
             return .init(width: 600, height: 200 + 1)
         }
