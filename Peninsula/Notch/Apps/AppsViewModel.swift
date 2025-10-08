@@ -16,7 +16,7 @@ class AppsViewModel: ObservableObject {
     // Paging configuration
     @Published var itemsPerRow: Int = 10
     @Published var rowsPerPage: Int = 2
-    @Published var itemSize = CGSize(width: 35, height: 35)
+    @Published var itemSize = CGSize(width: 40, height: 40)
     var pageCapacity: Int { itemsPerRow * rowsPerPage }
 
     // Refresh filtered windows for a given screen rect

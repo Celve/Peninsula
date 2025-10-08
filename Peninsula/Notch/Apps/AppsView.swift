@@ -30,8 +30,7 @@ struct AppsView: View {
             ZStack(alignment: .topLeading) {
                 LazyVGrid(columns: columns, alignment: .leading, spacing: 12) {
                     ForEach(Array(appsViewModel.windowsForCurrentPage()), id: \.id) { window in
-                        AppIcon(name: window.title, image: (window.application.icon ?? NSImage(systemSymbolName: "app.fill", accessibilityDescription: nil) ?? NSImage()), vm: vm, appsViewModel: appsViewModel)
-                            .frame(width: appsViewModel.itemSize.width, height: appsViewModel.itemSize.height)
+                        AppIcon(name: window.title, image: (window.application.icon ?? NSImage(systemSymbolName: "app.fill", accessibilityDescription: nil) ?? NSImage()), size: appsViewModel.itemSize, vm: vm, appsViewModel: appsViewModel)
                             .onTapGesture {
                                 window.focus()
                                 vm.notchClose()
@@ -97,7 +96,7 @@ struct AppsView: View {
                 .transition(.opacity)
                 .animation(vm.normalAnimation, value: appsViewModel.title)
                 .contentTransition(.numericText())
-                .padding(.bottom, 8)
+                .padding(.bottom, 4)
         }
     }
 }
@@ -106,23 +105,20 @@ struct AppsView: View {
 private struct AppIcon: View {
     let name: String
     let image: NSImage
+    let size: CGSize
     let vm: NotchViewModel
     @State var hover: Bool = false
     @ObservedObject var appsViewModel: AppsViewModel
 
     var body: some View {
         ZStack {
-            RoundedRectangle(cornerRadius: 10)
-                .fill(Color.white.opacity(hover ? 0.15 : 0.05))
-            
             Image(nsImage: image)
                 .resizable()
                 .contentShape(Rectangle())
                 .aspectRatio(contentMode: .fit)
-                .padding(8)
                 .scaleEffect(hover ? 1.1 : 1)
         }
-        .frame(width: 50, height: 50)
+        .frame(width: size.width, height: size.height)
         .animation(.spring(response: 0.3, dampingFraction: 0.7), value: hover)
         .onHover { hovering in
             if self.hover != hovering {
