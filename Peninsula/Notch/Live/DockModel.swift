@@ -59,7 +59,7 @@ class SystemNotificationItem: Equatable {
     }
 
     func instance() -> SystemNotificationInstance {
-        return SystemNotificationInstance(category: "system_notification", ty: .temporary(6), icon: { (notchViewModel: NotchViewModel) in self.icon }, action: { (notchViewModel: NotchViewModel) in BadgeSystemNotificationModel.shared.open(bundleId: self.bundleId) })
+        return SystemNotificationInstance(category: "system_notification", ty: .transient(6), icon: { (notchViewModel: NotchViewModel) in self.icon }, action: { (notchViewModel: NotchViewModel) in DockModel.shared.open(bundleId: self.bundleId) })
     }
 }
 
@@ -87,14 +87,14 @@ struct NumberSquare: View {
     }
 }
 
-class SystemNotificationInstance: NotificationInstance, Equatable {
+class SystemNotificationInstance: LiveItem, Equatable {
     var id: UUID
     var category: String
-    var ty: NotificationType
+    var ty: LiveType
     var icon: (NotchViewModel) -> any View
     var action: (NotchViewModel) -> Void
     
-    init(category: String, ty: NotificationType, icon: @escaping (NotchViewModel) -> any View, action: @escaping (NotchViewModel) -> Void) {
+    init(category: String, ty: LiveType, icon: @escaping (NotchViewModel) -> any View, action: @escaping (NotchViewModel) -> Void) {
         self.id = UUID()
         self.category = category
         self.ty = ty
@@ -107,10 +107,10 @@ class SystemNotificationInstance: NotificationInstance, Equatable {
     }
 }
 
-class BadgeSystemNotificationModel: ObservableObject {
-    static let shared = BadgeSystemNotificationModel()
+class DockModel: ObservableObject {
+    static let shared = DockModel()
     @ObservedObject var notchModel = NotchModel.shared
-    @ObservedObject var notifModel = BadgeNotificationModel.shared
+    @ObservedObject var liveModel = LiveModel.shared
     @ObservedObject var apps = Apps.shared
     let monitor = BadgeMonitor.shared
 
@@ -178,12 +178,12 @@ class BadgeSystemNotificationModel: ObservableObject {
             item.badge = badge
 
             if new > old {
-                self.notifModel.add(item: item.instance())
+                self.liveModel.add(item: item.instance())
             } else if new == 0 {
-                self.notifModel.remove(ty: .temporary(6), category: "system_notification")
+                self.liveModel.remove(ty: .transient(6), category: "system_notification")
             }
             if self.total != 0 {
-                self.notifModel.add(item: SystemNotificationInstance(
+                self.liveModel.add(item: SystemNotificationInstance(
                     category: "system_notification",
                     ty: .always,
                     icon: { (notchViewModel: NotchViewModel) in
@@ -191,11 +191,11 @@ class BadgeSystemNotificationModel: ObservableObject {
                         ).aspectRatio(contentMode: .fit)
                     },
                     action: { (notchViewModel: NotchViewModel) in
-                        notchViewModel.notchOpen(contentType: .notification)
+                        notchViewModel.notchOpen(galleryItem: .notification)
                     }
                 ))
             } else {
-                self.notifModel.remove(ty: .always, category: "system_notification")
+                self.liveModel.remove(ty: .always, category: "system_notification")
             }
         }
     }

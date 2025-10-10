@@ -12,19 +12,20 @@ import UniformTypeIdentifiers
 struct NotchCompositeView: View {
     @StateObject var vm: NotchViewModel
     @ObservedObject var windows = Windows.shared
+    @ObservedObject var galleryModel = GalleryModel.shared
     var headline: some View {
-        Text("\(vm.contentType.toTitle())").contentTransition(.numericText())
+        Text("\(galleryModel.currentItem.toTitle())").contentTransition(.numericText())
     }
     
     var menubar: some View {
         ZStack {
-            switch vm.contentType {
+            switch galleryModel.currentItem {
             case .notification:
-                BadgeNotificationMenubarView(vm: vm)
+                NotificationMenubarView(vm: vm)
             case .tray:
-                TrayDropMenubarView(notchViewModel: vm)
+                TrayDropMenubarView()
             case .apps:
-                SwitchMenubarView(notchViewModel: vm)
+                SwitchMenubarView()
             default:
                 EmptyView()
             }
@@ -34,25 +35,25 @@ struct NotchCompositeView: View {
     var body: some View {
         VStack(alignment: .center, spacing: vm.spacing) {
             HeaderView(headline: headline, menubar: menubar)
-                .animation(vm.normalAnimation, value: vm.contentType)
+                .animation(vm.normalAnimation, value: galleryModel.currentItem)
                 .animation(vm.status == .opened ? vm.innerOnAnimation : vm.innerOffAnimation, value: vm.status)
-            switch vm.contentType {
+            switch galleryModel.currentItem {
             case .timer:
                 TimerMenuView(notchViewModel: vm)
             case .tray:
                 HStack(spacing: vm.spacing) {
                     TrayView(vm: vm)
-                        .animation(vm.normalAnimation, value: vm.contentType)
+                        .animation(vm.normalAnimation, value: galleryModel.currentItem)
                         .animation(vm.status == .opened ? vm.innerOnAnimation : vm.innerOffAnimation, value: vm.status)
                 }
             case .traySettings:
                 TryDropSettingsView(notchViewModel: vm, trayDrop: TrayDrop.shared)
             case .apps:
-                AppsView(vm: vm).transition(.blurReplace)
-                    .animation(vm.normalAnimation, value: vm.contentType)
+                AppsView(vm: vm, appsViewModel: galleryModel.appsViewModel).transition(.blurReplace)
+                    .animation(vm.normalAnimation, value: galleryModel.currentItem)
                     .animation(vm.status == .opened ? vm.innerOnAnimation : vm.innerOffAnimation, value: vm.status)
             case .notification:
-                BadgeNotificationContentView(nvm: vm).transition(.blurReplace)
+                NotificationContentView(notchViewModel: vm).transition(.blurReplace)
             case .settings:
                 SettingsView(vm: vm).transition(.blurReplace)
             case .switching:

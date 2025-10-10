@@ -55,7 +55,6 @@ struct SwitchSettingView: View {
             }
         }
         .padding()
-        .animation(notchViewModel.normalAnimation, value: notchViewModel.contentType)
         .animation(
             notchViewModel.status == .opened ? notchViewModel.innerOnAnimation : notchViewModel.innerOffAnimation, value: notchViewModel.status)
     }

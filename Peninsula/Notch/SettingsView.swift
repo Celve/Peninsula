@@ -18,6 +18,7 @@ struct SettingsView: View {
     @StateObject var vm: NotchViewModel
     @StateObject var notchModel = NotchModel.shared
     @StateObject var tvm: TrayDrop = .shared
+    @ObservedObject var galleryModel = GalleryModel.shared
 
     var body: some View {
         VStack(spacing: vm.spacing) {
@@ -61,7 +62,7 @@ struct SettingsView: View {
             }
             .padding()
         }
-        .animation(vm.normalAnimation, value: vm.contentType)
+        .animation(vm.normalAnimation, value: galleryModel.currentItem)
         .animation(
             vm.status == .opened ? vm.innerOnAnimation : vm.innerOffAnimation, value: vm.status)
     }

@@ -30,7 +30,7 @@ struct SwitchContentView: View {
         VStack(spacing: 0) {
             ForEach(items, id: \.0) { index, element in
                 HStack {
-                    AppIcon(image: element.1)
+                    AppImage(image: element.1)
                     HStack(spacing: 0) {
                         ForEach(element.2) { matchResult in
                             switch matchResult {
@@ -107,7 +107,7 @@ struct SwitchContentView: View {
     }
 }
 
-private struct AppIcon: View {
+private struct AppImage: View {
     let image: NSImage
 
     var body: some View {

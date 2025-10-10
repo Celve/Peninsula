@@ -3,37 +3,35 @@ import Combine
 import Foundation
 import SwiftUI
 
-enum NotificationType {
-    case temporary(Int) // number of seconds to show
+enum LiveType {
+    case transient(Int)
     case always 
 }
 
-protocol NotificationInstance {
+protocol LiveItem {
     var id: UUID { get }
     var category: String { get }
-    var ty: NotificationType { get }
+    var ty: LiveType { get }
     var icon: (NotchViewModel) -> any View { get }
     var action: (NotchViewModel) -> Void { get }
 }
 
-class BadgeNotificationModel: ObservableObject {
-    static let shared = BadgeNotificationModel()
-    @Published var alwaysItems: [String: NotificationInstance] = [:]
-    @Published var temporaryItems: [String: NotificationInstance] = [:]
-    @Published var namesSet: Set<String> = []
+class LiveModel: ObservableObject {
+    static let shared = LiveModel()
+    @Published var alwaysItems: [String: LiveItem] = [:]
+    @Published var temporaryItems: [String: LiveItem] = [:]
     @Published var names: [String] = []
     private let lock = NSLock()
 
-    func add(item: NotificationInstance) {
+    func add(item: LiveItem) {
         lock.withLock {
             switch item.ty {
                 case .always:
                     alwaysItems[item.category] = item
-                    if !namesSet.contains(item.category) {
+                    if !names.contains(item.category) {
                         names.append(item.category)
-                        namesSet.insert(item.category)
                     }
-                case .temporary(let time):
+                case .transient(let time):
                 temporaryItems[item.category] = item
                 DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(time)) {
                     if self.temporaryItems[item.category]?.id == item.id {
@@ -42,7 +40,6 @@ class BadgeNotificationModel: ObservableObject {
                             if let index = self.names.firstIndex(of: item.category) {
                                 self.names.remove(at: index)
                             }
-                            self.namesSet.remove(item.category)
                         }
                     }
                 }
@@ -50,7 +47,7 @@ class BadgeNotificationModel: ObservableObject {
         }
     }
 
-    func remove(ty: NotificationType, category: String) {
+    func remove(ty: LiveType, category: String) {
         lock.withLock {
             switch ty {
             case .always:
@@ -59,15 +56,13 @@ class BadgeNotificationModel: ObservableObject {
                     if let index = names.firstIndex(of: category) {
                         names.remove(at: index)
                     }
-                    namesSet.remove(category)
                 }
-            case .temporary:
+            case .transient:
                 temporaryItems.removeValue(forKey: category)
                 if alwaysItems[category] == nil {
                     if let index = names.firstIndex(of: category) {
                         names.remove(at: index)
                     }
-                    namesSet.remove(category)
                 }
             }
         }

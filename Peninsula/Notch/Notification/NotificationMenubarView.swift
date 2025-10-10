@@ -7,9 +7,9 @@
 
 import SwiftUI
 
-struct BadgeNotificationMenubarView: View {
+struct NotificationMenubarView: View {
     @StateObject var vm: NotchViewModel
-    @StateObject var sysNotifModel = BadgeSystemNotificationModel.shared
+    @StateObject var dockModel = DockModel.shared
 
     var body: some View {
         HStack {
@@ -31,7 +31,7 @@ struct BadgeNotificationMenubarView: View {
                         else {
                             return
                         }
-                        sysNotifModel.observe(bundleId: appBundle.bundleIdentifier ?? "")
+                        dockModel.observe(bundleId: appBundle.bundleIdentifier ?? "")
                     } else {
                         vm.isExternal = false
                     }

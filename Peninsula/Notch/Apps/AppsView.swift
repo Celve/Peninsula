@@ -10,7 +10,7 @@ import SwiftUI
 
 struct AppsView: View {
     let vm: NotchViewModel
-    @StateObject var appsViewModel: AppsViewModel = AppsViewModel()
+    @StateObject var appsViewModel: AppsViewModel
     // moved into AppsViewModel: currentPage, cachedFilteredWindows, lastScreenRect
     
     // Paging configuration moved to ViewModel; derive layout from it
@@ -30,7 +30,7 @@ struct AppsView: View {
             ZStack(alignment: .topLeading) {
                 LazyVGrid(columns: columns, alignment: .leading, spacing: 12) {
                     ForEach(Array(appsViewModel.windowsForCurrentPage()), id: \.id) { window in
-                        AppIcon(name: window.title, image: (window.application.icon ?? NSImage(systemSymbolName: "app.fill", accessibilityDescription: nil) ?? NSImage()), size: appsViewModel.itemSize, vm: vm, appsViewModel: appsViewModel)
+                        AppsViewIcon(name: window.title, image: (window.application.icon ?? NSImage(systemSymbolName: "app.fill", accessibilityDescription: nil) ?? NSImage()), size: appsViewModel.itemSize, vm: vm, appsViewModel: appsViewModel)
                             .onTapGesture {
                                 window.focus()
                                 vm.notchClose()
@@ -102,7 +102,7 @@ struct AppsView: View {
 }
 
 
-private struct AppIcon: View {
+struct AppsViewIcon: View {
     let name: String
     let image: NSImage
     let size: CGSize

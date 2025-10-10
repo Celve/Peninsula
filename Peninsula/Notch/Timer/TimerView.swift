@@ -186,12 +186,12 @@ struct TimerAbstractView: View {
     }
 }
 
-class TimerAbstractInstance: NotificationInstance {
+class TimerAbstractInstance: LiveItem {
     var id: UUID
     var category: String {
         return "timer_\(id)"
     }
-    var ty: NotificationType = .always
+    var ty: LiveType = .always
     var icon: (NotchViewModel) -> any View
     var action: (NotchViewModel) -> Void
     let timerViewModel: TimerViewModel
@@ -203,7 +203,7 @@ class TimerAbstractInstance: NotificationInstance {
             TimerAbstractView(timerViewModel: timerViewModel, circleWidth: notchViewModel.deviceNotchRect.height * 0.8)
         }
         self.action = { notchViewModel in
-            notchViewModel.notchOpen(contentType: .timer)
+            notchViewModel.notchOpen(galleryItem: .timer)
         }
     }
 }

@@ -1,12 +1,12 @@
 import SwiftUI
 
 struct SwitchMenubarView: View {
-    let notchViewModel: NotchViewModel
+    @ObservedObject var galleryModel = GalleryModel.shared
     
     var body: some View {
         HStack {
             Button(action: {
-                notchViewModel.contentType = .switchSettings
+                galleryModel.currentItem = .switchSettings
             }) {
                 Image(systemName: "gear")
             }.buttonStyle(.plain)

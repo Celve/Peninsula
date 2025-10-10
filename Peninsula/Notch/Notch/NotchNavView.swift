@@ -2,39 +2,39 @@ import SwiftUI
 
 struct NotchNavButton: View {
     let notchViewModel: NotchViewModel
-    let contentType: NotchContentType
+    let galleryItem: GalleryItem
     @State private var isHovered = false
 
     var body: some View {
         Button(action: {
-            notchViewModel.notchOpen(contentType: contentType)
+            notchViewModel.notchOpen(galleryItem: galleryItem)
         }) {
             ZStack {
-                if contentType == .notification {
+                if galleryItem == .notification {
                     Image(systemName: "app.badge")
                         .resizable()
                         .aspectRatio(contentMode: .fit)
                         .foregroundColor(isHovered ? .black : .white)
                         .frame(width: notchViewModel.deviceNotchRect.height * 0.6, height: notchViewModel.deviceNotchRect.height * 0.6)
-                } else if contentType == .apps {
+                } else if galleryItem == .apps {
                     Image(systemName: "app")
                         .resizable()
                         .aspectRatio(contentMode: .fit)
                         .foregroundColor(isHovered ? .black : .white)
                         .frame(width: notchViewModel.deviceNotchRect.height * 0.6, height: notchViewModel.deviceNotchRect.height * 0.6)
-                } else if contentType == .timer {
+                } else if galleryItem == .timer {
                     Image(systemName: "timer")
                         .resizable()
                         .aspectRatio(contentMode: .fit)
                         .foregroundColor(isHovered ? .black : .white)
                         .frame(width: notchViewModel.deviceNotchRect.height * 0.6, height: notchViewModel.deviceNotchRect.height * 0.6)
-                } else if contentType == .tray {
+                } else if galleryItem == .tray {
                     Image(systemName: "tray")
                         .resizable()
                         .aspectRatio(contentMode: .fit)
                         .foregroundColor(isHovered ? .black : .white)
                         .frame(width: notchViewModel.deviceNotchRect.height * 0.6, height: notchViewModel.deviceNotchRect.height * 0.6)
-                } else if contentType == .settings {
+                } else if galleryItem == .settings {
                     Image(systemName: "gear")   
                         .resizable()
                         .aspectRatio(contentMode: .fit)
@@ -83,13 +83,13 @@ struct NotchNavButton: View {
 
 struct NotchNavView: View {
     @StateObject var notchViewModel: NotchViewModel
-    let contentTypes: [NotchContentType] = [.apps, .timer, .tray, .notification, .settings]
+    let galleryItems: [GalleryItem] = [.apps, .timer, .tray, .notification, .settings]
 
     var body: some View {
         HStack {
-            ForEach(contentTypes, id: \.self) { contentType in
-                NotchNavButton(notchViewModel: notchViewModel, contentType: contentType)
-                    .id(contentType)
+            ForEach(galleryItems, id: \.self) { galleryItem in
+                NotchNavButton(notchViewModel: notchViewModel, galleryItem: galleryItem)
+                    .id(galleryItem)
                     .transition(
                         .asymmetric(
                             insertion: .scale(scale: 0.9).combined(with: .opacity),

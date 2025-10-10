@@ -91,7 +91,7 @@ class TimerModel: ObservableObject {
     func remove(id: UUID) {
         viewModels.removeAll { $0.id == id }
         absInsts.removeAll { $0.id == id }
-        BadgeNotificationModel.shared.remove(ty: .always, category: "timer_\(id)")
+        LiveModel.shared.remove(ty: .always, category: "timer_\(id)")
     }
 
     func clearExpiredTimers() {
@@ -113,7 +113,7 @@ class TimerModel: ObservableObject {
         
         let absInst = TimerAbstractInstance(timerViewModel: timer)
         absInsts.append(absInst)
-        BadgeNotificationModel.shared.add(item: absInst)
+        LiveModel.shared.add(item: absInst)
     }
 
     func setDescription(description: String) {

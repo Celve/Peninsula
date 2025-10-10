@@ -1,34 +1,11 @@
-//
-//  NotificationContentView.swift
-//  Island
-//
-//  Created by Celve on 9/20/24.
-//
-
-import ColorfulX
 import SwiftUI
 
-struct BadgeNotificationContentView: View {
-    @StateObject var nvm: NotchViewModel
-    @StateObject var nm = BadgeSystemNotificationModel.shared
-    @State var isAnimating = false
-
-    var body: some View {
-        HStack(alignment: .top, spacing: nvm.spacing) {
-            ForEach(Array(nm.items.keys), id: \.self) { key in
-                if let item = nm.items[key] {
-                    AppIcon(bundleId: key, image: AnyView(item.icon), vm: nvm)
-                }
-            }
-        }.animation(nvm.normalAnimation, value: nm.items)
-    }
-}
-
-private struct AppIcon: View {
+struct AppIcon: View {
     let bundleId: String
     let image: AnyView
-    @ObservedObject var nm = BadgeSystemNotificationModel.shared
+    @ObservedObject var nm = DockModel.shared
     @StateObject var vm: NotchViewModel
+    @ObservedObject var galleryModel = GalleryModel.shared
 
     @State var hover: Bool = false
     @State var quiver: Bool = false
@@ -112,46 +89,8 @@ private struct AppIcon: View {
                     }
                 }
         }
-        .animation(vm.normalAnimation, value: vm.contentType)
+        .animation(vm.normalAnimation, value: galleryModel.currentItem)
         .animation(vm.status == .opened ? vm.innerOnAnimation : vm.innerOffAnimation, value: vm.status)
         
-    }
-}
-
-private struct ColorButton: View {
-    let color: [Color]
-    let image: Image
-    let title: LocalizedStringKey
-
-    @State var hover: Bool = false
-
-    var body: some View {
-        Color.white
-            .opacity(0.1)
-            .overlay(
-                ColorfulView(
-                    color: .constant(color),
-                    speed: .constant(0)
-                )
-                .mask {
-                    VStack(spacing: 8) {
-                        Text("888888")
-                            .hidden()
-                            .overlay {
-                                image
-                                    .resizable()
-                                    .aspectRatio(contentMode: .fit)
-                            }
-                        Text(title)
-                    }
-                    .font(.system(.headline, design: .rounded))
-                }
-                .contentShape(Rectangle())
-                .scaleEffect(hover ? 1.15 : 1)
-                .animation(.spring, value: hover)
-                .onHover { hover = $0 }
-            )
-            .aspectRatio(1, contentMode: .fit)
-            .contentShape(Rectangle())
     }
 }

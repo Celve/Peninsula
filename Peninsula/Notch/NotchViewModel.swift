@@ -5,7 +5,7 @@ import LaunchAtLogin
 import SwiftUI
 
 class NotchViewModel: NSObject, ObservableObject {
-    @ObservedObject var notifModel = BadgeNotificationModel.shared
+    @ObservedObject var notifModel = LiveModel.shared
     @ObservedObject var windows = Windows.shared
     @ObservedObject var notchModel = NotchModel.shared
     var cancellables: Set<AnyCancellable> = []
@@ -43,7 +43,7 @@ class NotchViewModel: NSObject, ObservableObject {
     let innerOffAnimation: Animation = .interactiveSpring(duration: 0.236)
 
     var notchOpenedSize: CGSize {
-        switch contentType {
+        switch galleryModel.currentItem {
         case .switching:
             let visibleCount = max(0, notchModel.pageEnd - notchModel.pageStart)
             return .init(
@@ -169,15 +169,16 @@ class NotchViewModel: NSObject, ObservableObject {
     }
 
     var header: String {
-        contentType == .settings
+        galleryModel.currentItem == .settings
             ? "Version: \(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "Unknown") (Build: \(Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "Unknown"))"
             : "Peninsula"
     }
 
+    @ObservedObject var galleryModel = GalleryModel.shared
+
     @Published private(set) var status: Status = .notched
     @Published var isExternal: Bool = false
     @Published var openReason: OpenReason = .unknown
-    @Published var contentType: NotchContentType = .apps
     @Published var spacing: CGFloat = 16
     @Published var cornerRadius: CGFloat = 16
     @Published var deviceNotchRect: CGRect = .zero
@@ -196,13 +197,13 @@ class NotchViewModel: NSObject, ObservableObject {
 
     let hapticSender = PassthroughSubject<Void, Never>()
 
-    func notchOpen(contentType: NotchContentType) {
+    func notchOpen(galleryItem: GalleryItem) {
         if let window = NSApp.windows.first(where: { $0.windowNumber == windowId }) {
             window.makeKey()
         }
         openReason = .unknown
         status = .opened
-        self.contentType = contentType
+        self.galleryModel.currentItem = galleryItem
     }
     
     func notchClose() {

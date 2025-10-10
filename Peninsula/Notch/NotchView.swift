@@ -17,6 +17,14 @@ struct NotchHoverView: View {
         ZStack(alignment: .top) {
             NotchBackgroundView(notchViewModel: notchViewModel)
                 .zIndex(0)
+                .overlay {
+                    if notchViewModel.status == .notched {
+                        LiveView(notchViewModel: notchViewModel)
+                            .padding(.horizontal, notchViewModel.cornerRadius / 2)
+                            .offset(x: notchViewModel.abstractSize / 2, y: 0)
+                            .frame(maxWidth: .infinity, maxHeight: notchViewModel.deviceNotchRect.height, alignment: Alignment(horizontal: .trailing, vertical: .center))
+                    }
+                }
             Group {
                 if notchViewModel.status == .opened {
                     NotchCompositeView(vm: notchViewModel)
@@ -25,7 +33,6 @@ struct NotchHoverView: View {
                         .frame(
                             maxWidth: notchViewModel.notchOpenedSize.width, maxHeight: notchViewModel.notchOpenedSize.height
                         )
-                        .zIndex(1)
                 } else if notchViewModel.status == .popping {
                     // Position nav just below the physical device notch area
                     Color.clear
@@ -47,9 +54,9 @@ struct NotchHoverView: View {
                         )
                         // Match DynamicView's horizontal offset so edges align
                         .offset(x: notchViewModel.abstractSize / 2, y: 0)
-                        .zIndex(1)
                 }
             }
+            .zIndex(1)
         }
         .onHover { isHover in
             if !notchModel.isKeyboardTriggered {
@@ -67,7 +74,7 @@ struct NotchHoverView: View {
         .onChange(of: notchViewModel.abstractSize) { _ in reevaluateHover() }
         .onChange(of: notchViewModel.status) { _ in reevaluateHover() }
         .onTapGesture {
-            notchViewModel.notchOpen(contentType: .apps)
+            notchViewModel.notchOpen(galleryItem: .apps)
         }
     }
 
@@ -125,7 +132,7 @@ struct NotchView: View {
             .onChange(of: dropTargeting) { isTargeted in
                 if isTargeted, notchViewModel.status == .notched {
                     // Open the notch when a file is dragged over it
-                    notchViewModel.notchOpen(contentType: .tray)
+                    notchViewModel.notchOpen(galleryItem: .tray)
                     notchViewModel.hapticSender.send()
                 } else if !isTargeted {
                     // Close the notch when the dragged item leaves the area

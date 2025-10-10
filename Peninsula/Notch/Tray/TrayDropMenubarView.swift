@@ -7,12 +7,12 @@
 import SwiftUI
 
 struct TrayDropMenubarView: View {
-    let notchViewModel: NotchViewModel
+    @ObservedObject var galleryModel = GalleryModel.shared
     
     var body: some View {
         HStack {
             Button(action: {
-                notchViewModel.contentType = .traySettings
+                galleryModel.currentItem = .traySettings
             }) {
                 Image(systemName: "gear")
             }.buttonStyle(.plain)

@@ -20,9 +20,8 @@ enum SwipeDirection {
 struct NotchBackgroundView: View {
     @StateObject var notchViewModel: NotchViewModel
     @StateObject var notchModel = NotchModel.shared
-    @StateObject var sysNotifModel = BadgeSystemNotificationModel.shared
-    @StateObject var notifModel = BadgeNotificationModel.shared
     @ObservedObject var windows = Windows.shared
+    @ObservedObject var galleryModel = GalleryModel.shared
 
     var body: some View {
         Rectangle()
@@ -31,19 +30,6 @@ struct NotchBackgroundView: View {
             .frame(
                 width: notchViewModel.notchSize.width + notchViewModel.notchCornerRadius * 2,
                 height: notchViewModel.notchSize.height
-            )
-            .overlay(
-                Group {
-                    if notchViewModel.status != .opened {
-                        BadgeNotificationAbstractView(notchViewModel: notchViewModel)
-                            .frame(maxWidth: .infinity, maxHeight: notchViewModel.deviceNotchRect.height, alignment: Alignment(horizontal: .trailing, vertical: .center))
-                            .offset(x: -notchViewModel.spacing)
-                            .transition(
-                                .blurReplace
-                            )
-                    }
-                }
-                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topTrailing)
             )
             .overlay(
                 Group {
@@ -56,7 +42,8 @@ struct NotchBackgroundView: View {
                                 height: notchViewModel.deviceNotchRect.height
                             )
                             .onTapGesture {
-                                notchViewModel.contentType = notchViewModel.contentType.next(invisibles: notchModel.invisibleContentTypes)
+                                galleryModel.next()
+                                print("next", galleryModel.currentItem)
                             }
                     }
                 },
@@ -73,7 +60,7 @@ struct NotchBackgroundView: View {
                 : notchViewModel.status == .notched ? notchViewModel.outerOffAnimation : notchViewModel.normalAnimation,
                 value: notchViewModel.status
             )
-            .animation(notchViewModel.outerOnAnimation, value: notchViewModel.contentType)
+            .animation(notchViewModel.outerOnAnimation, value: galleryModel.currentItem)
             .animation(notchViewModel.normalAnimation, value: notchViewModel.abstractSize)
             .animation(notchViewModel.outerOnAnimation, value: notchViewModel.notchOpenedSize)
             // .onAppear(perform:{
